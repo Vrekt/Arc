@@ -1,0 +1,16 @@
+main: arc.Arc
+name: Arc
+version: 1.0.0
+description: Arc is an anticheat built for PaperSpigot 1.12.2
+author: Vrekt
+
+permissions:
+  arc.violations:
+    description: Allows the sender to view player violations as they come in.
+    default: true
+  arc.bypass:
+    description: Allows the sender to bypass all Arc checks.
+    default: true
+  arc.administrator:
+    description: Allows the sender permission to manage Arc.
+    default: true
