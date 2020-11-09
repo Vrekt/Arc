@@ -51,6 +51,7 @@ public final class ViolationManager {
         final var violationResult = new ViolationResult();
         final var violations = history.get(player.getUniqueId());
         final var level = violations.incrementViolationLevel(check.getName());
+
         if (check.configuration().notifyViolation() && check.configuration().shouldNotify(level)) {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             final var violationMessage = translate(Arc.arc().arcConfiguration().violationMessage(), player.getName(), check.getName(), level, result.information());
@@ -86,7 +87,7 @@ public final class ViolationManager {
         message = message.replace("%player%", player);
         message = message.replace("%check%", check);
         message = message.replace("%level%", level + "");
-        message = message.replace("%information%", information);
+        message = message.replace("%information%", information == null ? "\nNo information" : "\n" + information);
         return message;
     }
 

@@ -5,10 +5,21 @@ package arc.check.result;
  */
 public final class CheckResult {
 
+    /**
+     * Empty/Default check result
+     */
+    public static final CheckResult EMPTY = new CheckResult();
+
     public enum Result {
 
-        PASSED, FAILED
-
+        /**
+         * The player has passed
+         */
+        PASSED,
+        /**
+         * The player has failed
+         */
+        FAILED,
     }
 
     /**
@@ -45,7 +56,15 @@ public final class CheckResult {
     }
 
     /**
-     * @return if we failed.
+     * Set failed + information
+     */
+    public void setFailed(String information) {
+        this.result = Result.FAILED;
+        information(information);
+    }
+
+    /**
+     * @return if the player has failed
      */
     public boolean failed() {
         return result == Result.FAILED;
@@ -73,4 +92,5 @@ public final class CheckResult {
     public void information(String information) {
         this.information = information;
     }
+
 }

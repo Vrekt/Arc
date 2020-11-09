@@ -1,5 +1,6 @@
 package arc.configuration.check;
 
+import arc.Arc;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -11,7 +12,7 @@ public final class CheckConfigurationWriter {
     /**
      * The configuration
      */
-    private FileConfiguration configuration;
+    private final FileConfiguration configuration;
 
     /**
      * The section
@@ -20,11 +21,9 @@ public final class CheckConfigurationWriter {
 
     /**
      * Initialize
-     *
-     * @param configuration the configuration
      */
-    public CheckConfigurationWriter(FileConfiguration configuration) {
-        this.configuration = configuration;
+    public CheckConfigurationWriter() {
+        this.configuration = Arc.plugin().getConfig();
     }
 
     /**
@@ -139,11 +138,10 @@ public final class CheckConfigurationWriter {
     }
 
     /**
-     * Destroy configuration instance
+     * @return a new check configuration
      */
-    public void finish() {
-        configuration = null;
-        section = null;
+    public CheckConfiguration finish() {
+        return new CheckConfiguration(section);
     }
 
     /**

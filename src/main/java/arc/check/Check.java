@@ -3,6 +3,7 @@ package arc.check;
 import arc.Arc;
 import arc.check.result.CheckResult;
 import arc.configuration.check.CheckConfiguration;
+import arc.configuration.check.CheckConfigurationWriter;
 import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Player;
 
@@ -17,14 +18,61 @@ public abstract class Check {
     private final String name;
 
     /**
+     * The check type
+     */
+    private final CheckType checkType;
+
+    /**
      * The check configuration
      */
-    private final CheckConfiguration configuration;
+    protected CheckConfiguration configuration;
 
-    protected Check(String name) {
+    /**
+     * Initialize the check
+     *
+     * @param name the name
+     */
+    protected Check(String name, CheckType checkType) {
         this.name = name;
+        this.checkType = checkType;
+    }
 
-        configuration = new CheckConfiguration(Arc.plugin().getConfig().getConfigurationSection(name.toLowerCase()));
+    /**
+     * Write the default check configuration for this check
+     *
+     * @param cancel      {@code true} if this check should cancel
+     * @param cancelLevel the level at which to cancel at
+     * @param notify      {@code true} if this check should notify violations
+     * @param notifyLevel the level at which to notify
+     * @param ban         {@code true} if this check should ban
+     * @param banLevel    the level at which to ban
+     * @param kick        {@code true} if this check should kick
+     * @param kickLevel   the level at which to kick
+     */
+    protected void writeConfiguration(boolean cancel, int cancelLevel, boolean notify, int notifyLevel, boolean ban, int banLevel, boolean kick, int kickLevel) {
+        configuration = new CheckConfigurationWriter()
+                .name(getName())
+                .cancel(cancel)
+                .cancelLevel(cancelLevel)
+                .notify(notify)
+                .notifyEvery(notifyLevel)
+                .ban(ban)
+                .banLevel(banLevel)
+                .kick(kick)
+                .kickLevel(kickLevel)
+                .finish();
+    }
+
+    /**
+     * Convenience method for checks that don't kick or ban.
+     *
+     * @param cancel      {@code true} if this check should cancel
+     * @param cancelLevel the level at which to cancel at
+     * @param notify      {@code true} if this check should notify violations
+     * @param notifyLevel the level at which to notify
+     */
+    protected void writeConfiguration(boolean cancel, int cancelLevel, boolean notify, int notifyLevel) {
+        writeConfiguration(cancel, cancelLevel, notify, notifyLevel, false, 0, false, 0);
     }
 
     /**
@@ -83,11 +131,29 @@ public abstract class Check {
      *
      * @param result the result
      */
-    protected ViolationResult processResult(Player player, CheckResult result) {
-        if (result.failed()) {
-            return Arc.arc().violations().violation(player, this, result);
-        }
+    protected ViolationResult result(Player player, CheckResult result) {
+        if (result.failed()) return Arc.arc().violations().violation(player, this, result);
         return ViolationResult.EMPTY;
+    }
+
+    /**
+     * Process this result but ignore the output
+     *
+     * @param player the player
+     * @param result the result
+     */
+    protected void resultIgnore(Player player, CheckResult result) {
+        if (result.failed()) Arc.arc().violations().violation(player, this, result);
+    }
+
+    /**
+     * Check if the player is exempt
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    protected boolean exempt(Player player) {
+        return Arc.arc().exemptions().isPlayerExempt(player, type());
     }
 
     /**
@@ -98,9 +164,17 @@ public abstract class Check {
     }
 
     /**
+     * @return the check type
+     */
+    public CheckType type() {
+        return checkType;
+    }
+
+    /**
      * @return the check configuration
      */
     public CheckConfiguration configuration() {
         return configuration;
     }
+
 }

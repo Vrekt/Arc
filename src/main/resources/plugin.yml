@@ -3,6 +3,8 @@ name: Arc
 version: 1.0.0
 description: Arc is an anticheat built for PaperSpigot 1.12.2
 author: Vrekt
+depend:
+  - ProtocolLib
 
 permissions:
   arc.violations:
