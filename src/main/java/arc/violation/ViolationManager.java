@@ -54,7 +54,7 @@ public final class ViolationManager {
 
         if (check.configuration().notifyViolation() && check.configuration().shouldNotify(level)) {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
-            final var violationMessage = translate(Arc.arc().arcConfiguration().violationMessage(), player.getName(), check.getName(), level, result.information());
+            final var violationMessage = translate(Arc.arc().configuration().violationMessage(), player.getName(), check.getName(), level, result.information());
             Arc.arc().permissions().violationViewers().forEach(viewer -> viewer.sendMessage(violationMessage));
         }
 

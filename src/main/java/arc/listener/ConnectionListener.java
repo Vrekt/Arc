@@ -20,6 +20,11 @@ public final class ConnectionListener implements Listener {
         Arc.arc().permissions().onPlayerJoin(player);
     }
 
+    /**
+     * TODO: We don't want to remove violation data
+     *
+     * @param event e
+     */
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerLeave(PlayerQuitEvent event) {
         final var player = event.getPlayer();

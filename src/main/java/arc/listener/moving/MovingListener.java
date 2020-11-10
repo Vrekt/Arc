@@ -16,10 +16,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 public final class MovingListener implements Listener {
 
+    private final NoFall noFall;
+
     /**
      * The no fall check
      */
-    private final NoFall noFall = new NoFall();
+    public MovingListener() {
+        noFall = Arc.arc().checks().noFall();
+    }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onMove(PlayerMoveEvent event) {

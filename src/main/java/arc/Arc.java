@@ -19,7 +19,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    private static final String VERSION = "1.0.0-b1";
+    private static final String VERSION = "1.0.1-b1";
 
     /**
      * The file configuration
@@ -44,7 +44,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The check manager
      */
-    private final CheckManager checkManager = new CheckManager();
+    private CheckManager checkManager;
 
     /**
      * The packet manager
@@ -67,6 +67,8 @@ public final class Arc extends JavaPlugin {
         arcConfiguration = new ArcConfiguration(getConfig());
 
         getLogger().info(ChatColor.RED + "[2] Registering checks and listeners");
+        checkManager = new CheckManager();
+
         getServer().getPluginManager().registerEvents(new ConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new MovingListener(), this);
 
@@ -102,7 +104,7 @@ public final class Arc extends JavaPlugin {
     /**
      * @return the arc configuration
      */
-    public ArcConfiguration arcConfiguration() {
+    public ArcConfiguration configuration() {
         return arcConfiguration;
     }
 
@@ -126,4 +128,12 @@ public final class Arc extends JavaPlugin {
     public ExemptionManager exemptions() {
         return exemptionManager;
     }
+
+    /**
+     * @return the check manager
+     */
+    public CheckManager checks() {
+        return checkManager;
+    }
+
 }

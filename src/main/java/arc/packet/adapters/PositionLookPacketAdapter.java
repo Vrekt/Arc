@@ -19,7 +19,14 @@ public final class PositionLookPacketAdapter extends PacketAdapter {
         final var packet = new WrapperPlayClientPositionLook(event.getPacket());
         final var player = event.getPlayer();
         final var data = MovingData.get(player);
+        final var packets = data.packets();
+
         data.wasClientOnGround(data.clientOnGround());
         data.clientOnGround(packet.getOnGround());
+        // TODO: Separate tracker for POSITION_LOOK?
+        packets.positionPackets(packets.positionPackets() + 1);
+        packets.lastPositionPacket(System.currentTimeMillis());
+
+        if (packets.cancelPositionPackets()) event.setCancelled(true);
     }
 }

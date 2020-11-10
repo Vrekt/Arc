@@ -1,6 +1,7 @@
 package arc.data.moving;
 
 import arc.data.moving.nf.NoFallData;
+import arc.data.moving.packets.PacketData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -69,6 +70,11 @@ public final class MovingData {
      * No fall data
      */
     private final NoFallData noFallData = new NoFallData();
+
+    /**
+     * Packet data
+     */
+    private final PacketData packetData = new PacketData();
 
     public boolean climbing() {
         return climbing;
@@ -170,6 +176,13 @@ public final class MovingData {
      */
     public NoFallData nf() {
         return noFallData;
+    }
+
+    /**
+     * @return packets
+     */
+    public PacketData packets() {
+        return packetData;
     }
 
     public int onGroundTime() {

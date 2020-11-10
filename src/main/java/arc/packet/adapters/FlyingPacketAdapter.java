@@ -22,7 +22,14 @@ public final class FlyingPacketAdapter extends PacketAdapter {
         final var packet = new WrapperPlayClientFlying(event.getPacket());
         final var player = event.getPlayer();
         final var data = MovingData.get(player);
+        final var packets = data.packets();
+
         data.wasClientOnGround(data.clientOnGround());
         data.clientOnGround(packet.getOnGround());
+
+        packets.flyingPackets(packets.flyingPackets() + 1);
+        packets.lastFlyingPacket(System.currentTimeMillis());
+
+        if (packets.cancelFlyingPackets()) event.setCancelled(true);
     }
 }

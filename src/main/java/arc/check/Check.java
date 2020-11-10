@@ -4,7 +4,10 @@ import arc.Arc;
 import arc.check.result.CheckResult;
 import arc.configuration.check.CheckConfiguration;
 import arc.configuration.check.CheckConfigurationWriter;
+import arc.permissions.Permissions;
 import arc.violation.result.ViolationResult;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -144,6 +147,41 @@ public abstract class Check {
      */
     protected void resultIgnore(Player player, CheckResult result) {
         if (result.failed()) Arc.arc().violations().violation(player, this, result);
+    }
+
+    /**
+     * Kick the player
+     *
+     * @param player the player
+     */
+    protected void kick(Player player) {
+        final var config = Arc.arc().configuration();
+        Bukkit.getScheduler().runTaskLater(Arc.plugin(), ()
+                -> {
+            player.kickPlayer(config.kickConfiguration().kickMessage());
+            broadcast(player);
+        }, config.kickConfiguration().kickDelay());
+    }
+
+    /**
+     * Broadcast to players who have the permission ARC_VIOLATIONS
+     *
+     * @param player the player
+     */
+    protected void broadcast(Player player) {
+        Bukkit.broadcast(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
+                + player.getName() + ChatColor.WHITE + " was kicked for sending too many packets. ", Permissions.ARC_VIOLATIONS);
+    }
+
+    /**
+     * Schedule this check
+     *
+     * @param runnable the runnable
+     * @param every    timer
+     * @param delay    initial delay
+     */
+    protected void scheduledCheck(Runnable runnable, long delay, long every) {
+        Bukkit.getScheduler().runTaskTimer(Arc.plugin(), runnable, delay, every);
     }
 
     /**

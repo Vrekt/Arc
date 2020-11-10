@@ -19,6 +19,11 @@ public enum CheckType {
     /**
      * Checks if the player is using critical hits while impossible.
      */
-    CRITICALS
+    CRITICALS,
+
+    /**
+     * Checks if the player is sending too many packets.
+     */
+    MORE_PACKETS
 
 }

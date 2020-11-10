@@ -1,5 +1,6 @@
 package arc.configuration.punishment.kick;
 
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -23,8 +24,21 @@ public final class KickConfiguration {
      * @param configuration the configuration
      */
     public KickConfiguration(FileConfiguration configuration) {
-        kickMessage = configuration.getString("kick-message");
+        kickMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("kick-message"));
         kickDelay = configuration.getInt("kick-delay");
     }
 
+    /**
+     * @return the kick message
+     */
+    public String kickMessage() {
+        return kickMessage;
+    }
+
+    /**
+     * @return the kick delay
+     */
+    public int kickDelay() {
+        return kickDelay;
+    }
 }
