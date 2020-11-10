@@ -43,6 +43,7 @@ public abstract class Check {
     /**
      * Write the default check configuration for this check
      *
+     * @param enabled     {@code true} if this check is enabled.
      * @param cancel      {@code true} if this check should cancel
      * @param cancelLevel the level at which to cancel at
      * @param notify      {@code true} if this check should notify violations
@@ -52,9 +53,10 @@ public abstract class Check {
      * @param kick        {@code true} if this check should kick
      * @param kickLevel   the level at which to kick
      */
-    protected void writeConfiguration(boolean cancel, int cancelLevel, boolean notify, int notifyLevel, boolean ban, int banLevel, boolean kick, int kickLevel) {
+    protected void writeConfiguration(boolean enabled, boolean cancel, int cancelLevel, boolean notify, int notifyLevel, boolean ban, int banLevel, boolean kick, int kickLevel) {
         configuration = new CheckConfigurationWriter()
                 .name(getName())
+                .enabled(enabled)
                 .cancel(cancel)
                 .cancelLevel(cancelLevel)
                 .notify(notify)
@@ -69,13 +71,14 @@ public abstract class Check {
     /**
      * Convenience method for checks that don't kick or ban.
      *
+     * @param enabled     {@code true} if this check is enabled.
      * @param cancel      {@code true} if this check should cancel
      * @param cancelLevel the level at which to cancel at
      * @param notify      {@code true} if this check should notify violations
      * @param notifyLevel the level at which to notify
      */
-    protected void writeConfiguration(boolean cancel, int cancelLevel, boolean notify, int notifyLevel) {
-        writeConfiguration(cancel, cancelLevel, notify, notifyLevel, false, 0, false, 0);
+    protected void writeConfiguration(boolean enabled, boolean cancel, int cancelLevel, boolean notify, int notifyLevel) {
+        writeConfiguration(enabled, cancel, cancelLevel, notify, notifyLevel, false, 0, false, 0);
     }
 
     /**
@@ -192,6 +195,13 @@ public abstract class Check {
      */
     protected boolean exempt(Player player) {
         return Arc.arc().exemptions().isPlayerExempt(player, type());
+    }
+
+    /**
+     * @return {@code true} if the check is enabled.
+     */
+    public boolean enabled() {
+        return configuration.enabled();
     }
 
     /**

@@ -24,6 +24,11 @@ public enum CheckType {
     /**
      * Checks if the player is sending too many packets.
      */
-    MORE_PACKETS
+    MORE_PACKETS,
+
+    /**
+     * Checks if the player is removing bad effects.
+     */
+    BAD_EFFECTS;
 
 }

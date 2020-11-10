@@ -53,7 +53,6 @@ public final class MovingListener implements Listener {
         // retrieve data and calculate what we need
         final var movingData = MovingData.get(player);
         calculateGround(movingData, event.getFrom(), event.getTo());
-
         noFall.check(player, movingData);
     }
 

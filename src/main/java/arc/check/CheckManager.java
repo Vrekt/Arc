@@ -2,6 +2,7 @@ package arc.check;
 
 import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
+import arc.check.player.BadEffects;
 
 /**
  * A check manager
@@ -17,9 +18,15 @@ public final class CheckManager {
      */
     private final MorePackets morePackets;
 
+    /**
+     * Bad effects check
+     */
+    private final BadEffects badEffects;
+
     public CheckManager() {
         noFall = new NoFall();
         morePackets = new MorePackets();
+        badEffects = new BadEffects();
     }
 
     /**

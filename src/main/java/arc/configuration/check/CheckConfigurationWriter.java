@@ -42,6 +42,18 @@ public final class CheckConfigurationWriter {
     }
 
     /**
+     * Set if a check is enabled
+     *
+     * @param enabled enabled
+     * @return this
+     */
+    public CheckConfigurationWriter enabled(boolean enabled) {
+        if (containsValue("enabled")) return this;
+        section.set("enabled", enabled);
+        return this;
+    }
+
+    /**
      * Set if a check should cancel
      *
      * @param cancel cancel

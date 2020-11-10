@@ -23,7 +23,7 @@ public final class NoFall extends Check {
 
     public NoFall() {
         super("NoFall", CheckType.NOFALL);
-        writeConfiguration(true, 0, true, 1);
+        writeConfiguration(false, true, 0, true, 1);
 
         addConfigurationValue("tolerance", 0.1);
         tolerance = getValueDouble("tolerance");
@@ -36,7 +36,7 @@ public final class NoFall extends Check {
      * @param data   the data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player)) return;
+        if (exempt(player) || !enabled()) return;
 
         final var result = new CheckResult();
         final var nf = data.nf();

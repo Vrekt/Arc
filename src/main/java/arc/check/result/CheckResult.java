@@ -8,7 +8,7 @@ public final class CheckResult {
     /**
      * Empty/Default check result
      */
-    public static final CheckResult EMPTY = new CheckResult();
+    public static final CheckResult EMPTY = new CheckResult(Result.PASSED);
 
     public enum Result {
 
@@ -31,6 +31,22 @@ public final class CheckResult {
      * The check information
      */
     private String information;
+
+    /**
+     * Initialize this check result with a result
+     *
+     * @param result the result
+     */
+    public CheckResult(Result result) {
+        this.result = result;
+    }
+
+    /**
+     * Empty
+     */
+    public CheckResult() {
+
+    }
 
     /**
      * @return the result

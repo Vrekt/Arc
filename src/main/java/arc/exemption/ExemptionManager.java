@@ -5,6 +5,9 @@ import arc.check.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 /**
@@ -16,6 +19,31 @@ public final class ExemptionManager {
      * Test if a check is exempt while the player is flying
      */
     private final Predicate<CheckType> exemptWhenFlying = type -> type == CheckType.NOFALL || type == CheckType.FLIGHT || type == CheckType.SPEED;
+
+    /**
+     * Exemptions by player
+     */
+    private final Map<UUID, Exemptions> exemptions = new ConcurrentHashMap<>();
+
+    /**
+     * Invoked when a player joins
+     *
+     * @param player the player
+     */
+    public void onPlayerJoin(Player player) {
+        exemptions.put(player.getUniqueId(), new Exemptions());
+    }
+
+    /**
+     * Invoked when a player leaves
+     *
+     * @param player the player
+     */
+    public void onPlayerLeave(Player player) {
+        final var exemptions = this.exemptions.get(player.getUniqueId());
+        exemptions.dispose();
+        this.exemptions.remove(player.getUniqueId());
+    }
 
     /**
      * Check if a player is exempt via permissions
@@ -40,7 +68,20 @@ public final class ExemptionManager {
     public boolean isPlayerExempt(Player player, CheckType check) {
         // return if we are flying and the provided check is exempt while flying
         if (isFlying(player) && exemptWhenFlying.test(check)) return true;
-        return false;
+        final var exemptions = this.exemptions.get(player.getUniqueId());
+        return exemptions.isExempt(check);
+    }
+
+    /**
+     * Add an exemption
+     *
+     * @param player   the player
+     * @param check    the check
+     * @param duration the duration
+     */
+    public void addExemption(Player player, CheckType check, long duration) {
+        final var exemptions = this.exemptions.get(player.getUniqueId());
+        exemptions.addExemption(check, duration);
     }
 
     /**
