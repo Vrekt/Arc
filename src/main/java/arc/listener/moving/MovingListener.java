@@ -41,8 +41,7 @@ public final class MovingListener implements Listener {
 
         final var player = event.getPlayer();
         // finally, check permission exemption.
-        // TODO: Is debug
-        if (Arc.arc().exemptions().isPlayerExempt(player, true)) return;
+        if (Arc.arc().exemptions().isPlayerExempt(player)) return;
 
         // check if we have moved but only from block to another block.
         boolean hasMovedByBlock =

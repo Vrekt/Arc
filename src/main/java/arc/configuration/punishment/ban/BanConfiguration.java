@@ -1,6 +1,7 @@
 package arc.configuration.punishment.ban;
 
 import org.bukkit.BanList;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
@@ -24,6 +25,11 @@ public final class BanConfiguration {
     private final BanList.Type banType;
 
     /**
+     * The ban length type.
+     */
+    private final BanLengthType banLengthType;
+
+    /**
      * If the ban should be broadcasted.
      */
     private final boolean broadcastBan;
@@ -34,14 +40,63 @@ public final class BanConfiguration {
      * @param configuration the configuration
      */
     public BanConfiguration(FileConfiguration configuration) {
-        banMessage = configuration.getString("ban-message");
-        banBroadcastMessage = configuration.getString("broadcast-ban-message");
+        banMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("ban-message"));
+        banBroadcastMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("broadcast-ban-message"));
 
         banDelay = configuration.getInt("ban-delay");
         banLength = configuration.getInt("ban-length");
 
         banType = BanList.Type.valueOf(configuration.getString("ban-type"));
+        banLengthType = BanLengthType.parse(configuration.getString("ban-length-type"));
         broadcastBan = configuration.getBoolean("broadcast-ban");
     }
 
+    /**
+     * @return the ban message
+     */
+    public String banMessage() {
+        return banMessage;
+    }
+
+    /**
+     * @return the broadcast message
+     */
+    public String banBroadcastMessage() {
+        return banBroadcastMessage;
+    }
+
+    /**
+     * @return the ban delay
+     */
+    public int banDelay() {
+        return banDelay;
+    }
+
+    /**
+     * @return the ban length
+     */
+    public int banLength() {
+        return banLength;
+    }
+
+    /**
+     * @return the type of ban
+     */
+    public BanList.Type banType() {
+        return banType;
+    }
+
+    /**
+     * @return the ban length type
+     */
+    public BanLengthType banLengthType() {
+        return banLengthType;
+    }
+
+    /**
+     * @return if bans should be broadcasted
+     */
+    public boolean broadcastBan() {
+        return broadcastBan;
+    }
 }

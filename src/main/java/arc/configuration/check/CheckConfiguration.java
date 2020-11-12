@@ -28,6 +28,7 @@ public final class CheckConfiguration {
         notify = configuration.getBoolean("notify");
         ban = configuration.getBoolean("ban");
         kick = configuration.getBoolean("kick");
+        System.err.println("KICK " + kick + " ," + configuration.getName());
 
         cancelLevel = configuration.getInt("cancel-level");
         notifyLevel = configuration.getInt("notify-every");
@@ -77,7 +78,7 @@ public final class CheckConfiguration {
      * @return {@code true} if so
      */
     public boolean shouldCancel(int violationLevel) {
-        return violationLevel >= cancelLevel;
+        return cancel() && violationLevel >= cancelLevel;
     }
 
     /**
@@ -97,7 +98,7 @@ public final class CheckConfiguration {
      * @return {@code true} if so
      */
     public boolean shouldBan(int violationLevel) {
-        return violationLevel >= banLevel;
+        return ban() && violationLevel >= banLevel;
     }
 
     /**
@@ -107,7 +108,7 @@ public final class CheckConfiguration {
      * @return {@code true} if so
      */
     public boolean shouldKick(int violationLevel) {
-        return violationLevel >= kickLevel;
+        return kick() && violationLevel >= kickLevel;
     }
 
 }

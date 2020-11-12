@@ -23,7 +23,7 @@ public final class NoFall extends Check {
 
     public NoFall() {
         super("NoFall", CheckType.NOFALL);
-        writeConfiguration(false, true, 0, true, 1);
+        writeConfiguration(true, true, 0, true, 1);
 
         addConfigurationValue("tolerance", 0.1);
         tolerance = getValueDouble("tolerance");

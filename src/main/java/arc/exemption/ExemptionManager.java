@@ -49,11 +49,10 @@ public final class ExemptionManager {
      * Check if a player is exempt via permissions
      *
      * @param player the player
-     * @param debug  if {@code true} this function will return {@code false}
      * @return {@code true} if so
      */
-    public boolean isPlayerExempt(Player player, boolean debug) {
-        if (debug) return false;
+    public boolean isPlayerExempt(Player player) {
+        if (Arc.DEBUG) return false;
         return Arc.arc().permissions().canBypassChecks(player);
     }
 
@@ -66,8 +65,13 @@ public final class ExemptionManager {
      * TODO: Not done yet!
      */
     public boolean isPlayerExempt(Player player, CheckType check) {
-        // return if we are flying and the provided check is exempt while flying
+        if (Arc.DEBUG) return false;
+        // check permissions
+        if (isPlayerExempt(player)) return true;
+
+        // check flying status
         if (isFlying(player) && exemptWhenFlying.test(check)) return true;
+        // check other general exemptions.
         final var exemptions = this.exemptions.get(player.getUniqueId());
         return exemptions.isExempt(check);
     }

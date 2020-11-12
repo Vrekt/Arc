@@ -18,6 +18,7 @@ import java.util.List;
  * TODO: Call this Zoot? I feel like BadEffects is better.
  * TODO: Not totally perfect but does flag.
  * TODO: Doesn't work with /effect command (will flag)
+ * TODO: Fix duration, (save duration from initial potion effect add)
  */
 public final class BadEffects extends PacketCheck {
 

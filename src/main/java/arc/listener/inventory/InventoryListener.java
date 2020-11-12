@@ -21,8 +21,8 @@ public final class InventoryListener implements Listener {
         if (event.getItem().getType() == Material.MILK_BUCKET) {
             // if so, exempt for 500 ms, and remove all effects.
             final var player = event.getPlayer();
-            Arc.arc().exemptions().addExemption(player, CheckType.BAD_EFFECTS, 500);
             final var data = PlayerData.get(player);
+            Arc.arc().exemptions().addExemption(player, CheckType.BAD_EFFECTS, 500);
             data.removeEffects();
         }
     }

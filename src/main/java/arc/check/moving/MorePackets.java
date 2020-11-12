@@ -27,7 +27,7 @@ public final class MorePackets extends PacketCheck {
 
     public MorePackets() {
         super("MorePackets", CheckType.MORE_PACKETS);
-        writeConfiguration(false, true, 0, true, 1, true, 20, false, 0);
+        writeConfiguration(true, true, 0, true, 1, true, 20, false, 0);
 
         addConfigurationValue("max-flying-packets", 30);
         addConfigurationValue("max-position-packets", 30);
