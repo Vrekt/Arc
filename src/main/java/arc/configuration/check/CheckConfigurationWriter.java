@@ -12,7 +12,7 @@ public final class CheckConfigurationWriter {
     /**
      * The configuration
      */
-    private final FileConfiguration configuration;
+    private FileConfiguration configuration;
 
     /**
      * The section
@@ -153,7 +153,9 @@ public final class CheckConfigurationWriter {
      * @return a new check configuration
      */
     public CheckConfiguration finish() {
-        return new CheckConfiguration(section);
+        final var config = new CheckConfiguration(section);
+        configuration = null;
+        return config;
     }
 
     /**

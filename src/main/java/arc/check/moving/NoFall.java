@@ -23,7 +23,14 @@ public final class NoFall extends Check {
 
     public NoFall() {
         super("NoFall", CheckType.NOFALL);
-        writeConfiguration(true, true, 0, true, 1);
+        enabled(true).
+                cancel(true).
+                cancelLevel(0).
+                notify(true).
+                notifyEvery(1).
+                ban(false).
+                kick(false).
+                write();
 
         addConfigurationValue("tolerance", 0.1);
         tolerance = getValueDouble("tolerance");

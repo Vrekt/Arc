@@ -7,8 +7,9 @@ import arc.configuration.check.CheckConfigurationWriter;
 import arc.permissions.Permissions;
 import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import java.util.List;
 
 /**
  * Represents a check.
@@ -31,6 +32,11 @@ public abstract class Check {
     protected CheckConfiguration configuration;
 
     /**
+     * The configuration writer.
+     */
+    protected final CheckConfigurationWriter writer = new CheckConfigurationWriter();
+
+    /**
      * Initialize the check
      *
      * @param name the name
@@ -38,47 +44,116 @@ public abstract class Check {
     protected Check(String name, CheckType checkType) {
         this.name = name;
         this.checkType = checkType;
+
+        writer.name(name);
     }
 
     /**
-     * Write the default check configuration for this check
+     * Set if this check is enabled.
      *
-     * @param enabled     {@code true} if this check is enabled.
-     * @param cancel      {@code true} if this check should cancel
-     * @param cancelLevel the level at which to cancel at
-     * @param notify      {@code true} if this check should notify violations
-     * @param notifyLevel the level at which to notify
-     * @param ban         {@code true} if this check should ban
-     * @param banLevel    the level at which to ban
-     * @param kick        {@code true} if this check should kick
-     * @param kickLevel   the level at which to kick
+     * @param enabled enabled
+     * @return this
      */
-    protected void writeConfiguration(boolean enabled, boolean cancel, int cancelLevel, boolean notify, int notifyLevel, boolean ban, int banLevel, boolean kick, int kickLevel) {
-        configuration = new CheckConfigurationWriter()
-                .name(getName())
-                .enabled(enabled)
-                .cancel(cancel)
-                .cancelLevel(cancelLevel)
-                .notify(notify)
-                .notifyEvery(notifyLevel)
-                .ban(ban)
-                .banLevel(banLevel)
-                .kick(kick)
-                .kickLevel(kickLevel)
-                .finish();
+    public Check enabled(boolean enabled) {
+        writer.enabled(enabled);
+        return this;
     }
 
     /**
-     * Convenience method for checks that don't kick or ban.
+     * Set if this check should cancel
      *
-     * @param enabled     {@code true} if this check is enabled.
-     * @param cancel      {@code true} if this check should cancel
-     * @param cancelLevel the level at which to cancel at
-     * @param notify      {@code true} if this check should notify violations
-     * @param notifyLevel the level at which to notify
+     * @param cancel cancel
+     * @return this
      */
-    protected void writeConfiguration(boolean enabled, boolean cancel, int cancelLevel, boolean notify, int notifyLevel) {
-        writeConfiguration(enabled, cancel, cancelLevel, notify, notifyLevel, false, 0, false, 0);
+    public Check cancel(boolean cancel) {
+        writer.cancel(cancel);
+        return this;
+    }
+
+    /**
+     * Set the cancel level
+     *
+     * @param level level
+     * @return this
+     */
+    public Check cancelLevel(int level) {
+        writer.cancelLevel(level);
+        return this;
+    }
+
+    /**
+     * Set if this check should notify
+     *
+     * @param notify notify
+     * @return this
+     */
+    public Check notify(boolean notify) {
+        writer.notify(notify);
+        return this;
+    }
+
+    /**
+     * Set the notify level
+     *
+     * @param level level
+     * @return this
+     */
+    public Check notifyEvery(int level) {
+        writer.notifyEvery(level);
+        return this;
+    }
+
+    /**
+     * Set if this check should ban
+     *
+     * @param ban ban
+     * @return this
+     */
+    public Check ban(boolean ban) {
+        writer.ban(ban);
+        if (!ban) writer.banLevel(0);
+        return this;
+    }
+
+    /**
+     * Set the ban level
+     *
+     * @param level level
+     * @return this
+     */
+    public Check banLevel(int level) {
+        writer.banLevel(level);
+        return this;
+    }
+
+    /**
+     * Set if this check should kick
+     *
+     * @param kick kick
+     * @return this
+     */
+    public Check kick(boolean kick) {
+        writer.kick(kick);
+        if (!kick) writer.kickLevel(0);
+        return this;
+    }
+
+    /**
+     * Set the kick level
+     *
+     * @param level level
+     * @return this
+     */
+    public Check kickLevel(int level) {
+        writer.kickLevel(level);
+        return this;
+    }
+
+    /**
+     * Write the config
+     */
+    public void write() {
+        configuration = writer.finish();
     }
 
     /**
@@ -89,7 +164,7 @@ public abstract class Check {
      */
     protected void addConfigurationValue(String valueName, Object value) {
         if (containsValue(valueName)) return;
-        Arc.plugin().getConfig().set(name + "." + valueName, value);
+        configuration.section().set(valueName, value);
     }
 
     /**
@@ -99,7 +174,7 @@ public abstract class Check {
      * @return {@code true} if so.
      */
     protected boolean containsValue(String valueName) {
-        return Arc.plugin().getConfig().contains(name + "." + valueName);
+        return configuration.section().contains(valueName);
     }
 
     /**
@@ -109,7 +184,7 @@ public abstract class Check {
      * @return the value
      */
     protected int getValueInt(String valueName) {
-        return Arc.plugin().getConfig().getInt(name + "." + valueName);
+        return configuration.section().getInt(valueName);
     }
 
     /**
@@ -119,7 +194,7 @@ public abstract class Check {
      * @return the value
      */
     protected double getValueDouble(String valueName) {
-        return Arc.plugin().getConfig().getDouble(name + "." + valueName);
+        return configuration.section().getDouble(valueName);
     }
 
     /**
@@ -129,7 +204,17 @@ public abstract class Check {
      * @return the value
      */
     protected boolean getValueBoolean(String valueName) {
-        return Arc.plugin().getConfig().getBoolean(name + "." + valueName);
+        return configuration.section().getBoolean(valueName);
+    }
+
+    /**
+     * Get a string list
+     *
+     * @param valueName the value name
+     * @return the list
+     */
+    protected List<String> getList(String valueName) {
+        return configuration.section().getStringList(valueName);
     }
 
     /**
@@ -154,26 +239,28 @@ public abstract class Check {
 
     /**
      * Kick the player
+     * TODO: Translate kick message string.
      *
-     * @param player the player
+     * @param player  the player
+     * @param message the message to broadcast
      */
-    protected void kick(Player player) {
+    protected void kick(Player player, String message) {
         final var config = Arc.arc().configuration();
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), ()
                 -> {
             player.kickPlayer(config.kickConfiguration().kickMessage());
-            broadcast(player);
+            broadcast(player, message);
         }, config.kickConfiguration().kickDelay());
     }
 
     /**
      * Broadcast to players who have the permission ARC_VIOLATIONS
      *
-     * @param player the player
+     * @param player    the player
+     * @param broadcast the message
      */
-    protected void broadcast(Player player) {
-        Bukkit.broadcast(ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
-                + player.getName() + ChatColor.WHITE + " was kicked for sending too many packets. ", Permissions.ARC_VIOLATIONS);
+    protected void broadcast(Player player, String broadcast) {
+        Bukkit.broadcast(broadcast, Permissions.ARC_VIOLATIONS);
     }
 
     /**

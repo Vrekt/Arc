@@ -8,6 +8,11 @@ import org.bukkit.configuration.ConfigurationSection;
 public final class CheckConfiguration {
 
     /**
+     * The section for this check
+     */
+    private final ConfigurationSection section;
+
+    /**
      * Boolean check values
      */
     private final boolean enabled, cancel, notify, ban, kick;
@@ -23,17 +28,25 @@ public final class CheckConfiguration {
      * @param configuration the configuration
      */
     public CheckConfiguration(ConfigurationSection configuration) {
+        this.section = configuration;
+
         enabled = configuration.getBoolean("enabled");
         cancel = configuration.getBoolean("cancel");
         notify = configuration.getBoolean("notify");
         ban = configuration.getBoolean("ban");
         kick = configuration.getBoolean("kick");
-        System.err.println("KICK " + kick + " ," + configuration.getName());
 
         cancelLevel = configuration.getInt("cancel-level");
         notifyLevel = configuration.getInt("notify-every");
         banLevel = configuration.getInt("ban-level");
         kickLevel = configuration.getInt("kick-level");
+    }
+
+    /**
+     * @return the section
+     */
+    public ConfigurationSection section() {
+        return section;
     }
 
     /**

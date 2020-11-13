@@ -86,7 +86,6 @@ public final class ViolationManager {
 
         // handling kicking this player
         if (check.configuration().shouldKick(level)) {
-            System.err.println("bye");
             kickPlayer(player, check);
         }
 

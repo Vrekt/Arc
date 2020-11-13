@@ -43,7 +43,15 @@ public final class BadEffects extends PacketCheck {
 
     public BadEffects() {
         super("BadEffects", CheckType.BAD_EFFECTS);
-        writeConfiguration(false, true, 0, true, 1);
+        enabled(false).
+                cancel(true).
+                cancelLevel(0).
+                notify(true).
+                notifyEvery(1).
+                ban(false).
+                kick(false).
+                write();
+
         addConfigurationValue("tolerance", 1000);
         tolerance = getValueInt("tolerance");
 

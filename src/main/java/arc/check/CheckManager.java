@@ -3,6 +3,8 @@ package arc.check;
 import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
 import arc.check.player.BadEffects;
+import arc.check.player.PayloadFrequency;
+import arc.check.player.SwingFrequency;
 
 /**
  * A check manager
@@ -23,10 +25,22 @@ public final class CheckManager {
      */
     private final BadEffects badEffects;
 
+    /**
+     * Swing frequency check
+     */
+    private final SwingFrequency swingFrequency;
+
+    /**
+     * Payload frequency check
+     */
+    private final PayloadFrequency payloadFrequency;
+
     public CheckManager() {
         noFall = new NoFall();
         morePackets = new MorePackets();
         badEffects = new BadEffects();
+        swingFrequency = new SwingFrequency();
+        payloadFrequency = new PayloadFrequency();
     }
 
     /**
@@ -36,10 +50,4 @@ public final class CheckManager {
         return noFall;
     }
 
-    /**
-     * @return more packets check
-     */
-    public MorePackets morePackets() {
-        return morePackets;
-    }
 }

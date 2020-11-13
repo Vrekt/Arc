@@ -29,6 +29,16 @@ public enum CheckType {
     /**
      * Checks if the player is removing bad effects.
      */
-    BAD_EFFECTS;
+    BAD_EFFECTS,
+
+    /**
+     * Checks if the player is sending too many swing packets.
+     */
+    SWING_FREQUENCY,
+
+    /**
+     * Checks the payload packet and frequency
+     */
+    PAYLOAD_FREQUENCY;
 
 }

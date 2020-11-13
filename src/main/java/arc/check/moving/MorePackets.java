@@ -10,6 +10,7 @@ import com.comphenix.packetwrapper.WrapperPlayClientPositionLook;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -17,6 +18,12 @@ import org.bukkit.entity.Player;
  * TODO: Needs work!
  */
 public final class MorePackets extends PacketCheck {
+
+    /**
+     * The kick broadcast message
+     */
+    private final String kickBroadcastMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
+            + "%player%" + ChatColor.WHITE + " was kicked for sending too many packets. ";
 
     /**
      * Max flying packets allowed
@@ -27,7 +34,15 @@ public final class MorePackets extends PacketCheck {
 
     public MorePackets() {
         super("MorePackets", CheckType.MORE_PACKETS);
-        writeConfiguration(true, true, 0, true, 1, true, 20, false, 0);
+        enabled(true).
+                cancel(true).
+                cancelLevel(0).
+                notify(true).
+                notifyEvery(1).
+                ban(true).
+                banLevel(20).
+                kick(false).
+                write();
 
         addConfigurationValue("max-flying-packets", 30);
         addConfigurationValue("max-position-packets", 30);
@@ -120,7 +135,7 @@ public final class MorePackets extends PacketCheck {
 
         if (flyingPackets >= maxFlyingPackets) {
             if (flyingPackets >= maxPacketsToKick && !packets.kick()) {
-                kick(player);
+                kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
                 packets.kick(true);
             }
             result.setFailed("Too many flying packets p=" + flyingPackets + " max=" + maxFlyingPackets);
@@ -131,7 +146,7 @@ public final class MorePackets extends PacketCheck {
 
         if (positionPackets >= maxPositionPackets) {
             if (positionPackets >= maxPacketsToKick && !packets.kick()) {
-                kick(player);
+                kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
                 packets.kick(true);
             }
             result.setFailed("Too many position packets p=" + positionPackets + " max=" + maxPositionPackets);
