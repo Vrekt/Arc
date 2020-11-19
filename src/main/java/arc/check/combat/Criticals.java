@@ -48,7 +48,7 @@ public final class Criticals extends PacketCheck {
                 .kick(false)
                 .write();
 
-        addConfigurationValue("distance", 0.099);
+        addConfigurationValue("distance", 0.09);
         addConfigurationValue("difference", 0.05);
         addConfigurationValue("max-similar-vertical-allowed", 5);
         addConfigurationValue("max-no-vertical-allowed", 3);
@@ -76,8 +76,8 @@ public final class Criticals extends PacketCheck {
             // If it was a possible critical hit and we are on-ground lets check.
             if (isPossibleCriticalHit(player, data) && data.onGround()) {
                 final var result = new CheckResult();
-                final var vertical = data.vertical();
-                final var last = data.lastVerticalDistance();
+                final var vertical = Math.floor(data.vertical() * 100) / 100;
+                final var last = Math.floor(data.lastVerticalDistance() * 100) / 100;
                 var similarVerticalAmount = data.similarVerticalAmount();
                 var noVerticalAmount = data.noVerticalAmount();
 

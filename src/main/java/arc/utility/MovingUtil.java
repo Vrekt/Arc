@@ -62,14 +62,16 @@ public final class MovingUtil {
     /**
      * Check if the location is on a solid block
      * 0.5, 0.3, 0.1
+     * <p>
+     * TODO: Removed:
+     * TODO: final var relativeBlock = location.getBlock().getRelative(BlockFace.DOWN);
+     * TODO: if (CONSIDERED_SOLID.test(relativeBlock.getType())) return true;
+     * Was causing inaccuracy, may need to be added back but with modifications.
      *
      * @param location the location
      * @return {@code true} if so
      */
     public static boolean onGround(Location location) {
-        // test relative block first to possibly save performance
-        final var relativeBlock = location.getBlock().getRelative(BlockFace.DOWN);
-        if (CONSIDERED_SOLID.test(relativeBlock.getType())) return true;
         // test subtracted blocks next
         final var selfBlock = location.clone().subtract(0, 0.5, 0).getBlock().getType();
         if (CONSIDERED_SOLID.test(selfBlock)) return true;

@@ -14,6 +14,8 @@ import org.bukkit.entity.Player;
  * <p>
  * This check is not entirely perfect.
  * In some cases certain NoFalls will bypass just because of how Minecraft works and insufficient data at the checking stage.
+ *
+ * TODO: Expected distance checking regardless of client ground state?
  */
 public final class NoFall extends Check {
 
@@ -84,9 +86,13 @@ public final class NoFall extends Check {
                 nf.lastCheck(System.currentTimeMillis());
                 if (nf.lastCheckLocation() == null) nf.lastCheckLocation(data.from());
                 final var clientHasGround = data.clientOnGround();
-                // Fixes regular NoFall
+
+                // Fixes regular NoFall and "Packet" types
                 if (clientHasGround && player.getFallDistance() == 0.0) {
                     result.setFailed("client faked onGround state, fDist=" + player.getFallDistance());
+                    nf.hasFailed(true);
+                } else if(!clientHasGround && player.getFallDistance() == 0.0) {
+                    result.setFailed("client faked fall distance, fDist=" + player.getFallDistance());
                     nf.hasFailed(true);
                 }
 
