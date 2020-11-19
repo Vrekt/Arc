@@ -16,3 +16,4 @@ An anticheat for Spigot. (Its actually called Arc)
 - [ ] More checks, obviously
 - [x] Better permissions
 - [ ] Improve NoFall maybe
+- [ ] Lag Checking/Refactoring before continuing (Next)
