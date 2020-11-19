@@ -1,7 +1,7 @@
 package arc.data;
 
 import arc.data.moving.MovingData;
-import arc.data.player.PlayerData;
+import arc.data.packet.PacketData;
 import org.bukkit.entity.Player;
 
 /**
@@ -16,7 +16,7 @@ public final class DataUtility {
      */
     public static void removeAll(Player player) {
         MovingData.remove(player);
-        PlayerData.remove(player);
+        PacketData.remove(player);
     }
 
 }

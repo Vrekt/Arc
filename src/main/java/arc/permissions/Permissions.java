@@ -1,5 +1,7 @@
 package arc.permissions;
 
+import arc.check.CheckCategory;
+import arc.check.CheckType;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -76,6 +78,23 @@ public final class Permissions {
     public boolean canBypassChecks(Player player) {
         return player.hasPermission(ARC_BYPASS);
     }
+
+    /**
+     * Check if the player can bypass checks
+     *
+     * @param player the player
+     * @param checks checks
+     * @return {@code true} if so.
+     */
+    public boolean canBypassChecks(Player player, CheckCategory category, CheckType... checks) {
+        if (canBypassChecks(player)) return true;
+        for (CheckType check : checks) {
+            return player.hasPermission(ARC_BYPASS + "." + category.name().toLowerCase() + "." + check.getName());
+
+        }
+        return false;
+    }
+
 
     /**
      * Check if the player is an administrator.

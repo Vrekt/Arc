@@ -56,10 +56,25 @@ public final class MovingData {
     private int onGroundTime;
 
     /**
+     * The amount of times the vertical has been similar.
+     */
+    private int similarVerticalAmount, noVerticalAmount;
+
+    /**
+     * The max difference allowed for similar vertical amounts.
+     */
+    private double similarVerticalDifference;
+
+    /**
      * Movement location
      * The last known ground location
      */
     private Location from, to, ground;
+
+    /**
+     * Last moving update.
+     */
+    private long lastMovingUpdate;
 
     /**
      * The vertical distances traveled.
@@ -199,5 +214,37 @@ public final class MovingData {
 
     public void wasClientOnGround(boolean wasClientOnGround) {
         this.wasClientOnGround = wasClientOnGround;
+    }
+
+    public long lastMovingUpdate() {
+        return lastMovingUpdate;
+    }
+
+    public void lastMovingUpdate(long lastMovingUpdate) {
+        this.lastMovingUpdate = lastMovingUpdate;
+    }
+
+    public int similarVerticalAmount() {
+        return similarVerticalAmount;
+    }
+
+    public void similarVerticalAmount(int similarVerticalAmount) {
+        this.similarVerticalAmount = similarVerticalAmount;
+    }
+
+    public double similarVerticalDifference() {
+        return similarVerticalDifference;
+    }
+
+    public void similarVerticalDifference(double similarVerticalDifference) {
+        this.similarVerticalDifference = similarVerticalDifference;
+    }
+
+    public int noVerticalAmount() {
+        return noVerticalAmount;
+    }
+
+    public void noVerticalAmount(int noVerticalAmount) {
+        this.noVerticalAmount = noVerticalAmount;
     }
 }

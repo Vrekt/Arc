@@ -27,6 +27,11 @@ public abstract class Check {
     private final CheckType checkType;
 
     /**
+     * The category
+     */
+    private final CheckCategory category;
+
+    /**
      * The check configuration
      */
     protected CheckConfiguration configuration;
@@ -39,11 +44,14 @@ public abstract class Check {
     /**
      * Initialize the check
      *
-     * @param name the name
+     * @param name      the name
+     * @param checkType the type
+     * @param category  the category
      */
-    protected Check(String name, CheckType checkType) {
+    protected Check(String name, CheckType checkType, CheckCategory category) {
         this.name = name;
         this.checkType = checkType;
+        this.category = category;
 
         writer.name(name);
     }
@@ -281,7 +289,7 @@ public abstract class Check {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player) {
-        return Arc.arc().exemptions().isPlayerExempt(player, type());
+        return Arc.arc().exemptions().isPlayerExempt(player, category(), type());
     }
 
     /**
@@ -303,6 +311,13 @@ public abstract class Check {
      */
     public CheckType type() {
         return checkType;
+    }
+
+    /**
+     * @return the category
+     */
+    public CheckCategory category() {
+        return category;
     }
 
     /**

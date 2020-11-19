@@ -1,5 +1,6 @@
 package arc.check.moving;
 
+import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -33,7 +34,7 @@ public final class MorePackets extends PacketCheck {
     private final int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
 
     public MorePackets() {
-        super("MorePackets", CheckType.MORE_PACKETS);
+        super("MorePackets", CheckType.MORE_PACKETS, CheckCategory.MOVING);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).

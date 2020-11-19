@@ -1,10 +1,15 @@
 package arc.check;
 
+import arc.check.combat.Criticals;
 import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
-import arc.check.player.BadEffects;
-import arc.check.player.PayloadFrequency;
-import arc.check.player.SwingFrequency;
+import arc.check.network.PayloadFrequency;
+import arc.check.network.SwingFrequency;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A check manager
@@ -12,42 +17,62 @@ import arc.check.player.SwingFrequency;
 public final class CheckManager {
 
     /**
-     * The NoFall check
+     * Combat checks.
      */
-    private final NoFall noFall;
-    /**
-     * The more packets check
-     */
-    private final MorePackets morePackets;
+    private final Map<String, Check> combatChecks = new HashMap<>();
 
     /**
-     * Bad effects check
+     * Movement checks.
      */
-    private final BadEffects badEffects;
+    private final Map<String, Check> movingChecks = new HashMap<>();
 
     /**
-     * Swing frequency check
+     * Network checks.
      */
-    private final SwingFrequency swingFrequency;
+    private final Map<String, Check> networkChecks = new HashMap<>();
 
     /**
-     * Payload frequency check
+     * Player checks
      */
-    private final PayloadFrequency payloadFrequency;
+    private final Map<String, Check> playerChecks = new HashMap<>();
+
 
     public CheckManager() {
-        noFall = new NoFall();
-        morePackets = new MorePackets();
-        badEffects = new BadEffects();
-        swingFrequency = new SwingFrequency();
-        payloadFrequency = new PayloadFrequency();
+        combatChecks.put("Criticals", new Criticals());
+        movingChecks.put("MorePackets", new MorePackets());
+        movingChecks.put("NoFall", new NoFall());
+        networkChecks.put("PayloadFrequency", new PayloadFrequency());
+        networkChecks.put("SwingFrequency", new SwingFrequency());
     }
 
     /**
-     * @return nofall check
+     * Get checks within the provided category.
+     *
+     * @param category the category.
+     * @return the collection
      */
-    public NoFall noFall() {
-        return noFall;
+    public Collection<Check> withinCategory(CheckCategory category) {
+        switch (category) {
+            case COMBAT:
+                return combatChecks.values();
+            case MOVING:
+                return movingChecks.values();
+            case NETWORK:
+                return networkChecks.values();
+            case PLAYER:
+                return playerChecks.values();
+        }
+        return Collections.emptyList();
+    }
+
+    /**
+     * Get a moving check.
+     *
+     * @param name the name
+     * @return the check
+     */
+    public Check getMovingCheck(String name) {
+        return movingChecks.get(name);
     }
 
 }

@@ -25,9 +25,10 @@ public abstract class PacketCheck extends Check {
      *
      * @param name      the name
      * @param checkType the type
+     * @param category the check category
      */
-    public PacketCheck(String name, CheckType checkType) {
-        super(name, checkType);
+    public PacketCheck(String name, CheckType checkType, CheckCategory category) {
+        super(name, checkType, category);
 
         protocol = ProtocolLibrary.getProtocolManager();
     }

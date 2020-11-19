@@ -3,28 +3,17 @@ package arc;
 import arc.check.CheckManager;
 import arc.configuration.ArcConfiguration;
 import arc.exemption.ExemptionManager;
-import arc.listener.ConnectionListener;
-import arc.listener.inventory.InventoryListener;
+import arc.listener.connection.ConnectionListener;
 import arc.listener.moving.MovingListener;
 import arc.permissions.Permissions;
 import arc.violation.ViolationManager;
-import com.comphenix.protocol.ProtocolLibrary;
-import com.comphenix.protocol.events.ListeningWhitelist;
-import com.comphenix.protocol.events.PacketEvent;
-import com.comphenix.protocol.events.PacketListener;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * The main entry point for Arc.
  */
 public final class Arc extends JavaPlugin {
-
-    /**
-     * Debug
-     */
-    public static final boolean DEBUG = false;
 
     /**
      * The version of Arc.
@@ -76,34 +65,6 @@ public final class Arc extends JavaPlugin {
 
         getServer().getPluginManager().registerEvents(new ConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new MovingListener(), this);
-        getServer().getPluginManager().registerEvents(new InventoryListener(), this);
-
-        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketListener() {
-            @Override
-            public void onPacketSending(PacketEvent packetEvent) {
-
-            }
-
-            @Override
-            public void onPacketReceiving(PacketEvent packetEvent) {
-                System.err.println(packetEvent.getPacket());
-            }
-
-            @Override
-            public ListeningWhitelist getSendingWhitelist() {
-                return null;
-            }
-
-            @Override
-            public ListeningWhitelist getReceivingWhitelist() {
-                return null;
-            }
-
-            @Override
-            public Plugin getPlugin() {
-                return Arc.plugin();
-            }
-        });
 
         // save the configuration now since checks were registered.
         getLogger().info(ChatColor.RED + "[3] Saving configuration");

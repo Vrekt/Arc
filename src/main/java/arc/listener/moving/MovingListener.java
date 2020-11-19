@@ -3,9 +3,9 @@ package arc.listener.moving;
 import arc.Arc;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
-import arc.location.Locations;
-import arc.utility.MathUtil;
-import org.bukkit.Location;
+import arc.listener.moving.tasks.MovingTask;
+import arc.utility.MovingUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -16,13 +16,23 @@ import org.bukkit.event.player.PlayerMoveEvent;
  */
 public final class MovingListener implements Listener {
 
+    /**
+     * The NoFall task
+     */
     private final NoFall noFall;
 
     /**
-     * The no fall check
+     * The moving task.
+     * TODO: Reference probably not needed.
+     */
+    private final MovingTask task = new MovingTask();
+
+    /**
+     * Initialize and add all the checks we need.
      */
     public MovingListener() {
-        noFall = Arc.arc().checks().noFall();
+        noFall = (NoFall) Arc.arc().checks().getMovingCheck("NoFall");
+        Bukkit.getScheduler().runTaskTimer(Arc.plugin(), task, 20, 20);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -41,7 +51,7 @@ public final class MovingListener implements Listener {
 
         final var player = event.getPlayer();
         // finally, check permission exemption.
-        if (Arc.arc().exemptions().isPlayerExempt(player)) return;
+        if (Arc.arc().permissions().canBypassChecks(player)) return;
 
         // check if we have moved but only from block to another block.
         boolean hasMovedByBlock =
@@ -50,44 +60,16 @@ public final class MovingListener implements Listener {
                         || from.getBlockZ() != to.getBlockZ();
 
         // retrieve data and calculate what we need
-        final var movingData = MovingData.get(player);
-        calculateGround(movingData, event.getFrom(), event.getTo());
-        noFall.check(player, movingData);
-    }
+        final var data = MovingData.get(player);
+        MovingUtil.updateMovingPlayer(data, from, to);
 
-    /**
-     * Calculate on-ground, ascending/descending states, vertical dist, etc
-     *
-     * @param data the moving data
-     * @param from the previous location
-     * @param to   the current location
-     */
-    private void calculateGround(MovingData data, Location from, Location to) {
-        data.from(from);
-        data.to(to);
+        // Check players for NoFall.
+        noFall.check(player, data);
 
-        // calculate ground
-        final var wasOnGround = data.onGround();
-        final var onGround = Locations.onGround(to);
-        data.onGround(onGround);
-        data.wasOnGround(wasOnGround);
-
-        if (onGround) {
-            data.ground(to);
-            data.onGroundTime(data.onGroundTime() + 1);
-        } else {
-            data.onGroundTime(0);
+        if (hasMovedByBlock) {
+            // TODO:
         }
 
-        // calculate vertical distance
-        final var distance = MathUtil.distance(from, to);
-        data.lastVerticalDistance(data.lastVerticalDistance());
-        data.verticalDistance(distance);
-
-        // set ascending/descending states
-        data.ascending(to.getY() > from.getY() && distance > 0.0);
-        data.descending(from.getY() > to.getY() && distance > 0.0);
-        data.climbing(distance > 0.0 && Locations.hasClimbable(to));
     }
 
 }

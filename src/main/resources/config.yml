@@ -23,32 +23,3 @@ tps-helper: true
 tps-lower-limit: 17
 # The message to display when a violation occurs
 violation-notify-message: "&8[&cArc&8] &9%player%&f has violated check &c%check%&8(&c%level%&8)&7 [%information%]"
-# A example check to show off configuration options
-example-check:
-  # If this check is enabled
-  enabled: true
-  # If this check should cancel when a player fails
-  # For example, attempting to fly will teleport the player back.
-  cancel: true
-  # When this check should start cancelling.
-  # If the players violation level is greater than this the check will cancel.
-  cancel-level: 0
-  # If this check should notify players with the permission 'arc.violations'
-  notify: true
-  # Notifies players with the permission 'arc.violations' every time this number is
-  # divisible by the violation level.
-  # If this value is 1, the check will notify every time.
-  # If this value is 2, the check will notify every time their violation level can be divided by 2.
-  # If this value is 4, the check will notify every time their violation level can be divided by 4.
-  # For example if the value is 4, you would see "Failed VL: (4)" .. "Failed VL: (8)" ... "Failed VL: (12)".. etc
-  notify-every: 1
-  # If this check should ban.
-  ban: true
-  # When the player violation level reaches this number the player will be banned.
-  ban-level: 100
-  # If this check should kick.
-  kick: true
-  # When the player violation level reaches this number the player will be kicked.
-  kick-level: 50
-  # An example value
-  example-check-value: 0.5

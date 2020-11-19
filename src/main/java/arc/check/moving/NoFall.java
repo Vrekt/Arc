@@ -1,6 +1,7 @@
 package arc.check.moving;
 
 import arc.check.Check;
+import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
@@ -22,7 +23,7 @@ public final class NoFall extends Check {
     private final double tolerance;
 
     public NoFall() {
-        super("NoFall", CheckType.NOFALL);
+        super("NoFall", CheckType.NOFALL, CheckCategory.MOVING);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).

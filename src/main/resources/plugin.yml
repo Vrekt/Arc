@@ -1,18 +1,44 @@
 main: arc.Arc
 name: Arc
 version: 1.0.0
-description: Arc is an anticheat built for PaperSpigot
+description: Arc is an anticheat built for legacy verisons of Spigot.
 author: Vrekt
 depend:
   - ProtocolLib
 
 permissions:
-  arc.violations:
-    description: Allows the sender to view player violations as they come in.
-    default: true
   arc.bypass:
-    description: Allows the sender to bypass all Arc checks.
-    default: true
+    description: Allows the player to bypass all Arc checks.
+    children:
+      arc.bypass.moving:
+        description: Allows the player to bypass all Moving checks.
+        children:
+          arc.bypass.moving.morepackets:
+            description: Allows the player to bypass the MorePackets check.
+          arc.bypass.moving.nofall:
+            description: Allows the player to bypass the NoFall check.
+      arc.bypass.player:
+        description: Allows the player to bypass all Player checks.
+        children:
+          arc.bypass.player.badeffects:
+            description: Allows the player to bypass the BadEffects check
+      arc.bypass.network:
+        description: Allows the player to bypass all network/packet checks.
+        children:
+          arc.bypass.network.payloadfrequency:
+            description: Allows the player to bypass payload packet checks.
+          arc.bypass.network.swingfrequency:
+            description: Allows the player to bypass the swing packet checks.
+      arc.bypass.combat:
+        description: Allows the player to bypass all combat checks.
+        children:
+          arc.bypass.combat.criticals:
+            description: Allows the player to bypass the criticals check.
+  arc.violations:
+    description: Allows the player to view player violations as they come in.
+    children:
+      arc.violations.debug:
+        description: Allows the player to view extra debug information with violations.
   arc.administrator:
-    description: Allows the sender permission to manage Arc.
-    default: true
+    description: Allows the player permission to manage Arc.
+    default: false
