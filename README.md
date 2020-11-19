@@ -1,4 +1,4 @@
-# Base
+# Arc
 An anticheat for Spigot. (Its actually called Arc)
 
 # TODO LIST
