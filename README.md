@@ -1,8 +1,9 @@
 # Arc
-An anticheat for Spigot. (Its actually called Arc)
+An anticheat for Spigot.
 
 # TODO LIST
 
+- [ ] CONVERT CODE BACK TO JAVA 8 FROM 11.
 - [x] Permissions for each check to bypass
 - [ ] Improve MorePackets
 - [ ] Patch more crashing exploits
