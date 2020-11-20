@@ -1,5 +1,24 @@
 # Arc
-An anticheat for Spigot.
+An anticheat for legacy Spigot version 1.8.8
+
+# Current Features
+- Customizable checks and check parameters.
+- Permissions for each type of check and category.
+- Configurable punishment
+- Configurable messages
+- Basic API
+- More to come...
+
+# Current Checks
+### Combat
+- Criticals
+### Moving
+- MorePackets
+- NoFall
+### Network
+- Swing Frequency (Server Crashing)
+- Payload Frequency (Server Crashing)
+
 
 # TODO LIST
 
