@@ -25,6 +25,8 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 ### Network
 - Swing Frequency (Server Crashing)
 - Payload Frequency (Server Crashing)
+### Player
+- Regeneration
 
 
 # TODO LIST
