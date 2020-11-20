@@ -17,6 +17,11 @@ public final class MovingPacketData {
      */
     private boolean cancelFlyingPackets, cancelPositionPackets, kick;
 
+    /**
+     * The last check.
+     */
+    private long lastCheck;
+
     public int flyingPackets() {
         return flyingPackets;
     }
@@ -55,5 +60,13 @@ public final class MovingPacketData {
 
     public void kick(boolean kick) {
         this.kick = kick;
+    }
+
+    public long lastCheck() {
+        return lastCheck;
+    }
+
+    public void lastCheck(long lastCheck) {
+        this.lastCheck = lastCheck;
     }
 }

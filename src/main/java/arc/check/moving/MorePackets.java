@@ -1,15 +1,9 @@
 package arc.check.moving;
 
-import arc.check.CheckCategory;
+import arc.check.Check;
 import arc.check.CheckType;
-import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import com.comphenix.packetwrapper.WrapperPlayClientFlying;
-import com.comphenix.packetwrapper.WrapperPlayClientPosition;
-import com.comphenix.packetwrapper.WrapperPlayClientPositionLook;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -18,7 +12,7 @@ import org.bukkit.entity.Player;
  * Ensures too many packets aren't being sent at once.
  * TODO: Needs work!
  */
-public final class MorePackets extends PacketCheck {
+public final class MorePackets extends Check {
 
     /**
      * The kick broadcast message
@@ -34,7 +28,7 @@ public final class MorePackets extends PacketCheck {
     private final int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
 
     public MorePackets() {
-        super("MorePackets", CheckType.MORE_PACKETS, CheckCategory.MOVING);
+        super(CheckType.MORE_PACKETS);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).
@@ -53,71 +47,12 @@ public final class MorePackets extends PacketCheck {
         maxPacketsToKick = getValueInt("max-packets-kick");
 
         if (enabled()) {
-            registerPacketListener(PacketType.Play.Client.FLYING, this::onFlying);
-            registerPacketListener(PacketType.Play.Client.POSITION, this::onPosition);
-            registerPacketListener(PacketType.Play.Client.POSITION_LOOK, this::onPositionLook);
-
             scheduledCheck(() -> {
                 for (var player : Bukkit.getOnlinePlayers()) {
                     if (!exempt(player)) check(player, MovingData.get(player));
                 }
             }, 20, 20);
         }
-    }
-
-    /**
-     * Invoked when the client sends FLYING
-     *
-     * @param event the event
-     */
-    private void onFlying(PacketEvent event) {
-        final var packet = new WrapperPlayClientFlying(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
-
-        data.wasClientOnGround(data.clientOnGround());
-        data.clientOnGround(packet.getOnGround());
-
-        packets.flyingPackets(packets.flyingPackets() + 1);
-        if (packets.cancelFlyingPackets()) event.setCancelled(true);
-    }
-
-    /**
-     * Invoked when the client sends POSITION
-     *
-     * @param event the event
-     */
-    private void onPosition(PacketEvent event) {
-        final var packet = new WrapperPlayClientPosition(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
-
-        data.wasClientOnGround(data.clientOnGround());
-        data.clientOnGround(packet.getOnGround());
-        packets.positionPackets(packets.positionPackets() + 1);
-
-        if (packets.cancelPositionPackets()) event.setCancelled(true);
-    }
-
-    /**
-     * Invoked when the client sends POSITION_LOOK
-     *
-     * @param event the event
-     */
-    private void onPositionLook(PacketEvent event) {
-        final var packet = new WrapperPlayClientPositionLook(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
-
-        data.wasClientOnGround(data.clientOnGround());
-        data.clientOnGround(packet.getOnGround());
-
-        // TODO: Separate tracker for POSITION_LOOK?
-        packets.positionPackets(packets.positionPackets() + 1);
-        if (packets.cancelPositionPackets()) event.setCancelled(true);
     }
 
     /**
@@ -129,6 +64,11 @@ public final class MorePackets extends PacketCheck {
     private void check(Player player, MovingData data) {
         final var result = new CheckResult();
         final var packets = data.packets();
+        // we were exempt for awhile or some type of lag occurred so reset.
+        if (System.currentTimeMillis() - packets.lastCheck() >= 2000) {
+            packets.flyingPackets(0);
+            packets.positionPackets(0);
+        }
 
         final var flyingPackets = packets.flyingPackets();
         final var positionPackets = packets.positionPackets();
@@ -164,6 +104,7 @@ public final class MorePackets extends PacketCheck {
 
         packets.flyingPackets(0);
         packets.positionPackets(0);
+        packets.lastCheck(System.currentTimeMillis());
     }
 
 }

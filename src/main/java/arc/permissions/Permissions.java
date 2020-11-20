@@ -69,6 +69,7 @@ public final class Permissions {
             if (canBypassCategory(player, check.category())) return true;
             if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getName()))
                 return true;
+
         }
         return false;
     }

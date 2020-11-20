@@ -1,7 +1,6 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
@@ -14,7 +13,7 @@ import org.bukkit.entity.Player;
  * <p>
  * This check is not entirely perfect.
  * In some cases certain NoFalls will bypass just because of how Minecraft works and insufficient data at the checking stage.
- *
+ * <p>
  * TODO: Expected distance checking regardless of client ground state?
  */
 public final class NoFall extends Check {
@@ -25,7 +24,7 @@ public final class NoFall extends Check {
     private final double tolerance;
 
     public NoFall() {
-        super("NoFall", CheckType.NOFALL, CheckCategory.MOVING);
+        super(CheckType.NOFALL);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).
@@ -91,7 +90,7 @@ public final class NoFall extends Check {
                 if (clientHasGround && player.getFallDistance() == 0.0) {
                     result.setFailed("client faked onGround state, fDist=" + player.getFallDistance());
                     nf.hasFailed(true);
-                } else if(!clientHasGround && player.getFallDistance() == 0.0) {
+                } else if (!clientHasGround && player.getFallDistance() == 0.0) {
                     result.setFailed("client faked fall distance, fDist=" + player.getFallDistance());
                     nf.hasFailed(true);
                 }

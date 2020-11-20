@@ -11,9 +11,8 @@ public interface CheckCallback {
     /**
      * Invoked when the result is received.
      *
-     * @param checkResult     the check result
      * @param violationResult the violation result
      */
-    void onResult(CheckResult checkResult, ViolationResult violationResult);
+    void onResult(ViolationResult violationResult);
 
 }

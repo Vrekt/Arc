@@ -88,7 +88,7 @@ public final class ExemptionManager {
      */
     public void addExemption(Player player, CheckType check, long duration) {
         final var exemptions = this.exemptions.get(player.getUniqueId());
-        exemptions.addExemption(check, duration);
+        exemptions.addExemption(check, System.currentTimeMillis() + duration);
     }
 
     /**

@@ -1,6 +1,5 @@
 package arc.check.network;
 
-import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -28,7 +27,7 @@ public final class SwingFrequency extends PacketCheck {
     private final int maxPackets, maxPacketsKick;
 
     public SwingFrequency() {
-        super("SwingFrequency", CheckType.SWING_FREQUENCY, CheckCategory.NETWORK);
+        super(CheckType.SWING_FREQUENCY);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).

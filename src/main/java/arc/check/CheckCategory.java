@@ -5,6 +5,21 @@ package arc.check;
  */
 public enum CheckCategory {
 
-    MOVING, PLAYER, NETWORK, COMBAT
+    /**
+     * Checks movement
+     */
+    MOVING,
+    /**
+     * Checks other player related things
+     */
+    PLAYER,
+    /**
+     * Checks packets
+     */
+    NETWORK,
+    /**
+     * Checks combat
+     */
+    COMBAT
 
 }

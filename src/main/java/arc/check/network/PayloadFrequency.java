@@ -1,6 +1,5 @@
 package arc.check.network;
 
-import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -44,7 +43,7 @@ public final class PayloadFrequency extends PacketCheck {
     private final boolean maxPacketSizeKick, maxPacketsPerIntervalKick;
 
     public PayloadFrequency() {
-        super("PayloadFrequency", CheckType.PAYLOAD_FREQUENCY, CheckCategory.NETWORK);
+        super(CheckType.PAYLOAD_FREQUENCY);
         enabled(true).
                 cancel(true).
                 cancelLevel(0).

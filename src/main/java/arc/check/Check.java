@@ -17,19 +17,9 @@ import java.util.List;
 public abstract class Check {
 
     /**
-     * The check name
-     */
-    private final String name;
-
-    /**
      * The check type
      */
     private final CheckType checkType;
-
-    /**
-     * The category
-     */
-    private final CheckCategory category;
 
     /**
      * The check configuration
@@ -42,18 +32,18 @@ public abstract class Check {
     protected final CheckConfigurationWriter writer = new CheckConfigurationWriter();
 
     /**
+     * The appended name
+     */
+    private String appended;
+
+    /**
      * Initialize the check
      *
-     * @param name      the name
      * @param checkType the type
-     * @param category  the category
      */
-    protected Check(String name, CheckType checkType, CheckCategory category) {
-        this.name = name;
+    protected Check(CheckType checkType) {
         this.checkType = checkType;
-        this.category = category;
-
-        writer.name(name);
+        writer.name(checkType.getName());
     }
 
     /**
@@ -216,6 +206,16 @@ public abstract class Check {
     }
 
     /**
+     * Get a value
+     *
+     * @param valueName the value name
+     * @return the value
+     */
+    protected long getValueLong(String valueName) {
+        return configuration.section().getLong(valueName);
+    }
+
+    /**
      * Get a string list
      *
      * @param valueName the value name
@@ -293,6 +293,15 @@ public abstract class Check {
     }
 
     /**
+     * Append a name to this check name
+     *
+     * @param name the name
+     */
+    protected void appendName(String name) {
+        this.appended = name;
+    }
+
+    /**
      * @return {@code true} if the check is enabled.
      */
     public boolean enabled() {
@@ -303,7 +312,7 @@ public abstract class Check {
      * @return the check name.
      */
     public String getName() {
-        return name;
+        return checkType.getName();
     }
 
     /**
@@ -317,7 +326,7 @@ public abstract class Check {
      * @return the category
      */
     public CheckCategory category() {
-        return category;
+        return checkType.category();
     }
 
     /**

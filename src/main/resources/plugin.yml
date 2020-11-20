@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 1.0.0
+version: 1.0.6
 description: Arc is an anticheat built for legacy verisons of Spigot.
 author: Vrekt
 depend:
@@ -20,8 +20,8 @@ permissions:
       arc.bypass.player:
         description: Allows the player to bypass all Player checks.
         children:
-          arc.bypass.player.badeffects:
-            description: Allows the player to bypass the BadEffects check
+          arc.bypass.player.regeneration:
+            description: Allows the player to bypass the Regeneration check
       arc.bypass.network:
         description: Allows the player to bypass all network/packet checks.
         children:

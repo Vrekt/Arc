@@ -34,7 +34,12 @@ public enum CheckType {
     /**
      * Checks the payload packet and frequency
      */
-    PAYLOAD_FREQUENCY("PayloadFrequency", CheckCategory.NETWORK);
+    PAYLOAD_FREQUENCY("PayloadFrequency", CheckCategory.NETWORK),
+
+    /**
+     * Checks if the player is regenerating health too fast.
+     */
+    REGENERATION("Regeneration", CheckCategory.PLAYER);
 
     /**
      * The name

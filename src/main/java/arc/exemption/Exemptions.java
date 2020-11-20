@@ -33,7 +33,11 @@ public final class Exemptions {
      */
     public boolean isExempt(CheckType check) {
         final var time = exemptions.getOrDefault(check, 0L);
-        return time != 0 && (System.currentTimeMillis() - time > 0);
+        if (time == 0) return false;
+
+        final var result = (System.currentTimeMillis() - time <= 0);
+        if (!result) exemptions.remove(check);
+        return result;
     }
 
     /**

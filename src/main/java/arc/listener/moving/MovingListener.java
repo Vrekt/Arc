@@ -1,6 +1,7 @@
 package arc.listener.moving;
 
 import arc.Arc;
+import arc.check.CheckType;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
 import arc.listener.moving.tasks.MovingTask;
@@ -32,7 +33,7 @@ public final class MovingListener implements Listener {
      * Initialize and add all the checks we need.
      */
     public MovingListener() {
-        noFall = (NoFall) Arc.arc().checks().getMovingCheck("NoFall");
+        noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
         Bukkit.getScheduler().runTaskTimer(Arc.plugin(), task, 20, 20);
     }
 

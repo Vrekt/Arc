@@ -1,6 +1,5 @@
 package arc.check.combat;
 
-import arc.check.CheckCategory;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -38,7 +37,7 @@ public final class Criticals extends PacketCheck {
     private final int maxSimilarVerticalAllowed, maxNoVerticalAllowed;
 
     public Criticals() {
-        super("Criticals", CheckType.CRITICALS, CheckCategory.COMBAT);
+        super(CheckType.CRITICALS);
         enabled(true)
                 .cancel(true)
                 .cancelLevel(0)
