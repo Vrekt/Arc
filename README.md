@@ -9,6 +9,13 @@ An anticheat for legacy Spigot version 1.8.8
 - Basic API
 - More to come...
 
+# Documentation
+You can find general configuration info [here](https://github.com/Vrekt/Arc/wiki/Configuration)
+
+You can find check configuration info [here](https://github.com/Vrekt/Arc/wiki/Check-configuration)
+
+You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
+
 # Current Checks
 ### Combat
 - Criticals
