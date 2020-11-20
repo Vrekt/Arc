@@ -7,47 +7,48 @@ public enum CheckType {
     /**
      * Checks if the player is taking fall damage
      */
-    NOFALL("NoFall"),
+    NOFALL("NoFall", CheckCategory.MOVING),
     /**
      * Checks if the player is flying
      */
-    FLIGHT("Flight"),
+    FLIGHT("Flight", CheckCategory.MOVING),
     /**
      * Checks if the player is moving fast
      */
-    SPEED("Speed"),
+    SPEED("Speed", CheckCategory.MOVING),
     /**
      * Checks if the player is using critical hits while impossible.
      */
-    CRITICALS("Criticals"),
+    CRITICALS("Criticals", CheckCategory.COMBAT),
 
     /**
      * Checks if the player is sending too many packets.
      */
-    MORE_PACKETS("MorePackets"),
-
-    /**
-     * Checks if the player is removing bad effects.
-     */
-    BAD_EFFECTS("BadEffects"),
+    MORE_PACKETS("MorePackets", CheckCategory.MOVING),
 
     /**
      * Checks if the player is sending too many swing packets.
      */
-    SWING_FREQUENCY("SwingFrequency"),
+    SWING_FREQUENCY("SwingFrequency", CheckCategory.NETWORK),
 
     /**
      * Checks the payload packet and frequency
      */
-    PAYLOAD_FREQUENCY("PayloadFrequency");
+    PAYLOAD_FREQUENCY("PayloadFrequency", CheckCategory.NETWORK);
 
     /**
      * The name
      */
     private final String name;
 
-    CheckType(String name) {
+    /**
+     * The category
+     */
+    private final CheckCategory category;
+
+    CheckType(String name, CheckCategory category) {
         this.name = name;
+        this.category = category;
     }
 
     /**
@@ -55,5 +56,12 @@ public enum CheckType {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the category
+     */
+    public CheckCategory category() {
+        return category;
     }
 }

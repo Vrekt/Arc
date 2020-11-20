@@ -289,7 +289,7 @@ public abstract class Check {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player) {
-        return Arc.arc().exemptions().isPlayerExempt(player, category(), type());
+        return Arc.arc().exemptions().isPlayerExempt(player, checkType);
     }
 
     /**

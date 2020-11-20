@@ -39,7 +39,7 @@ public abstract class PacketCheck extends Check {
      * @param packetType the packet type
      * @param consumer   the consumer
      */
-    protected void registerListener(PacketType packetType, Consumer<PacketEvent> consumer) {
+    protected void registerPacketListener(PacketType packetType, Consumer<PacketEvent> consumer) {
         if (packetType.isServer()) {
             protocol.addPacketListener(new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
                 @Override

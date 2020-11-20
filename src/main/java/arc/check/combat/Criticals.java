@@ -58,7 +58,7 @@ public final class Criticals extends PacketCheck {
         maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
 
         if (enabled()) {
-            registerListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
+            registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
         }
     }
 

@@ -36,6 +36,15 @@ public final class Violations {
     }
 
     /**
+     * Decrease the violation level by 1.
+     *
+     * @param checkName the check name
+     */
+    public void decreaseViolationLevel(String checkName) {
+        violations.put(checkName, getViolationLevel(checkName) - 1);
+    }
+
+    /**
      * Dispose
      */
     public void dispose() {

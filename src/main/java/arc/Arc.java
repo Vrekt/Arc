@@ -5,7 +5,6 @@ import arc.configuration.ArcConfiguration;
 import arc.exemption.ExemptionManager;
 import arc.listener.connection.ConnectionListener;
 import arc.listener.moving.MovingListener;
-import arc.permissions.Permissions;
 import arc.violation.ViolationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,14 +30,9 @@ public final class Arc extends JavaPlugin {
     private ArcConfiguration arcConfiguration;
 
     /**
-     * The permissions utility
-     */
-    private final Permissions permissions = new Permissions();
-
-    /**
      * The violation manager.
      */
-    private final ViolationManager violationManager = new ViolationManager();
+    private ViolationManager violationManager;
 
     /**
      * The check manager
@@ -62,6 +56,7 @@ public final class Arc extends JavaPlugin {
 
         getLogger().info(ChatColor.RED + "[2] Registering checks and listeners");
         checkManager = new CheckManager();
+        violationManager = new ViolationManager(arcConfiguration);
 
         getServer().getPluginManager().registerEvents(new ConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new MovingListener(), this);
@@ -97,13 +92,6 @@ public final class Arc extends JavaPlugin {
      */
     public ArcConfiguration configuration() {
         return arcConfiguration;
-    }
-
-    /**
-     * @return the permissions utility
-     */
-    public Permissions permissions() {
-        return permissions;
     }
 
     /**

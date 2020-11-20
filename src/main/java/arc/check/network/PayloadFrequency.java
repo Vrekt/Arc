@@ -75,7 +75,7 @@ public final class PayloadFrequency extends PacketCheck {
         final var interval = (checkInterval / 1000) * 20;
 
         if (enabled()) {
-            registerListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
+            registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
             scheduledCheck(() -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     check(player, PacketData.get(player));

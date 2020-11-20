@@ -53,9 +53,9 @@ public final class MorePackets extends PacketCheck {
         maxPacketsToKick = getValueInt("max-packets-kick");
 
         if (enabled()) {
-            registerListener(PacketType.Play.Client.FLYING, this::onFlying);
-            registerListener(PacketType.Play.Client.POSITION, this::onPosition);
-            registerListener(PacketType.Play.Client.POSITION_LOOK, this::onPositionLook);
+            registerPacketListener(PacketType.Play.Client.FLYING, this::onFlying);
+            registerPacketListener(PacketType.Play.Client.POSITION, this::onPosition);
+            registerPacketListener(PacketType.Play.Client.POSITION_LOOK, this::onPositionLook);
 
             scheduledCheck(() -> {
                 for (var player : Bukkit.getOnlinePlayers()) {

@@ -19,8 +19,6 @@ public final class ArcConfiguration {
      */
     private KickConfiguration kickConfiguration;
 
-    // General configuration values
-
     /**
      * If TPS should be watched
      */

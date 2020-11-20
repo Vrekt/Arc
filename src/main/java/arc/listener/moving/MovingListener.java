@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
 import arc.listener.moving.tasks.MovingTask;
+import arc.permissions.Permissions;
 import arc.utility.MovingUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
@@ -51,7 +52,7 @@ public final class MovingListener implements Listener {
 
         final var player = event.getPlayer();
         // finally, check permission exemption.
-        if (Arc.arc().permissions().canBypassChecks(player)) return;
+        if (Permissions.canBypassChecks(player)) return;
 
         // check if we have moved but only from block to another block.
         boolean hasMovedByBlock =

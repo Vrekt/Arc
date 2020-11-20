@@ -17,7 +17,6 @@ public final class ConnectionListener implements Listener {
     private void onPlayerJoin(PlayerJoinEvent event) {
         final var player = event.getPlayer();
         Arc.arc().violations().onPlayerJoin(player);
-        Arc.arc().permissions().onPlayerJoin(player);
         Arc.arc().exemptions().onPlayerJoin(player);
     }
 
@@ -30,7 +29,6 @@ public final class ConnectionListener implements Listener {
     private void onPlayerLeave(PlayerQuitEvent event) {
         final var player = event.getPlayer();
         Arc.arc().violations().onPlayerLeave(player);
-        Arc.arc().permissions().onPlayerLeave(player);
         Arc.arc().exemptions().onPlayerLeave(player);
         DataUtility.removeAll(player);
     }

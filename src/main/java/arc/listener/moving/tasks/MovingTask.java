@@ -1,9 +1,8 @@
 package arc.listener.moving.tasks;
 
-import arc.Arc;
 import arc.data.moving.MovingData;
-import arc.exemption.ExemptionManager;
 import arc.utility.MovingUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -13,21 +12,9 @@ import org.bukkit.entity.Player;
  */
 public final class MovingTask implements Runnable {
 
-    /**
-     * Exemptions
-     */
-    private final ExemptionManager exemptions;
-
-    /**
-     * Initialize
-     */
-    public MovingTask() {
-        exemptions = Arc.arc().exemptions();
-    }
-
     @Override
     public void run() {
-        for (Player player : exemptions.playerList()) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
             final var data = MovingData.get(player);
 
             // update this players moving data if they haven't moved in the last half-second;

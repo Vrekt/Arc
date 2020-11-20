@@ -1,18 +1,13 @@
 package arc.exemption;
 
-import arc.Arc;
-import arc.check.Check;
-import arc.check.CheckCategory;
 import arc.check.CheckType;
+import arc.permissions.Permissions;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Predicate;
 
 /**
  * Manages player exemptions
@@ -20,19 +15,9 @@ import java.util.function.Predicate;
 public final class ExemptionManager {
 
     /**
-     * Test if a check is exempt while the player is flying
-     */
-    private final Predicate<CheckType> exemptWhenFlying = type -> type == CheckType.NOFALL || type == CheckType.FLIGHT || type == CheckType.SPEED;
-
-    /**
      * Exemptions by player
      */
     private final Map<UUID, Exemptions> exemptions = new ConcurrentHashMap<>();
-
-    /**
-     * Keeps track of players who are not exempt.
-     */
-    private final List<Player> playerList = new CopyOnWriteArrayList<>();
 
     /**
      * Invoked when a player joins
@@ -40,16 +25,19 @@ public final class ExemptionManager {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        exemptions.put(player.getUniqueId(), new Exemptions());
-
-        // TODO: Maybe more later.
-        // TODO: This is for the moving task, we just want a easy list to grab.
-        // TODO: Instead of looping all players and constantly checking permissions.
-        // TODO: May need to be changed or a reload permissions command.
-        if (!Arc.arc().permissions().canBypassChecks(player)
-                && !isPlayerExemptInCategory(player, CheckCategory.MOVING)) {
-            playerList.add(player);
+        final boolean canBypassAll = Permissions.canBypassAllChecks(player);
+        if (!canBypassAll) {
+            // if we cannot bypass all checks add our exemptions map.
+            exemptions.put(player.getUniqueId(), new Exemptions());
+            doJoinExemptions(player);
         }
+    }
+
+    /**
+     * Exempt players when joining.
+     */
+    private void doJoinExemptions(Player player) {
+        addExemption(player, CheckType.MORE_PACKETS, 500);
     }
 
     /**
@@ -61,7 +49,6 @@ public final class ExemptionManager {
         final var exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.dispose();
         this.exemptions.remove(player.getUniqueId());
-        playerList.remove(player);
     }
 
     /**
@@ -70,31 +57,26 @@ public final class ExemptionManager {
      * @param player the player
      * @param check  the check
      * @return {@code true} if so
-     * TODO: Not done yet!
      */
-    public boolean isPlayerExempt(Player player, CheckCategory category, CheckType check) {
-        // check permissions
-        if (Arc.arc().permissions().canBypassChecks(player, category, check)) return true;
-
+    public boolean isPlayerExempt(Player player, CheckType check) {
+        // check general exemption
+        if (isPlayerExemptFromCheck(player, check)) return true;
         // check flying status
-        if (isFlying(player) && exemptWhenFlying.test(check)) return true;
-        // check other general exemptions.
+        if (isFlying(player) && isExemptWhenFlying(check)) return true;
+        // check other added exemptions
         final var exemptions = this.exemptions.get(player.getUniqueId());
         return exemptions.isExempt(check);
     }
 
     /**
-     * Check if a player is exempt from any check in a category.
+     * Check if a player is exempt from a check
      *
-     * @param player   the player
-     * @param category the category
+     * @param player the player
+     * @param check  the check
      * @return {@code true} if so
      */
-    public boolean isPlayerExemptInCategory(Player player, CheckCategory category) {
-        for (Check check : Arc.arc().checks().withinCategory(category)) {
-            if (Arc.arc().permissions().canBypassChecks(player, category, check.type())) return true;
-        }
-        return false;
+    public boolean isPlayerExemptFromCheck(Player player, CheckType check) {
+        return Permissions.canBypassChecks(player, check);
     }
 
     /**
@@ -120,9 +102,12 @@ public final class ExemptionManager {
     }
 
     /**
-     * @return non exempt player list
+     * Check if the player from a check when flying.
+     *
+     * @param check the check
+     * @return {@code true} if so
      */
-    public List<Player> playerList() {
-        return playerList;
+    private boolean isExemptWhenFlying(CheckType check) {
+        return check == CheckType.NOFALL || check == CheckType.FLIGHT || check == CheckType.SPEED;
     }
 }

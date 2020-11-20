@@ -12,7 +12,7 @@ public final class BanConfiguration {
     /**
      * The various messages.
      */
-    private final String banMessage, banBroadcastMessage;
+    private final String banMessage, banBroadcastMessage, banMessageToViolations;
 
     /**
      * The delay and length
@@ -42,6 +42,7 @@ public final class BanConfiguration {
     public BanConfiguration(FileConfiguration configuration) {
         banMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("ban-message"));
         banBroadcastMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("broadcast-ban-message"));
+        banMessageToViolations = ChatColor.translateAlternateColorCodes('&', configuration.getString("ban-message-to-violations"));
 
         banDelay = configuration.getInt("ban-delay");
         banLength = configuration.getInt("ban-length");
@@ -63,6 +64,13 @@ public final class BanConfiguration {
      */
     public String banBroadcastMessage() {
         return banBroadcastMessage;
+    }
+
+    /**
+     * @return the message to display to violation viewers.
+     */
+    public String banMessageToViolations() {
+        return banMessageToViolations;
     }
 
     /**

@@ -47,7 +47,7 @@ public final class SwingFrequency extends PacketCheck {
         maxPacketsKick = getValueInt("max-packets-kick");
 
         if (enabled()) {
-            registerListener(PacketType.Play.Client.ARM_ANIMATION, this::onArmAnimation);
+            registerPacketListener(PacketType.Play.Client.ARM_ANIMATION, this::onArmAnimation);
             scheduledCheck(() -> {
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     if (!exempt(player)) check(player, PacketData.get(player));

@@ -17,6 +17,8 @@ ban-length: 30
 broadcast-ban: false
 # If so, what should the message be?
 broadcast-ban-message: "&c%player% was banned for %check%"
+# The ban message to display to players with the permissions arc.violations
+ban-message-to-violations: "&8[&cArc&8] &9%player%&f will be banned for &c%check%&f in &c%time%&f seconds."
 # If arc should monitor TPS and adjust check performance if TPS drops
 tps-helper: true
 # When TPS to this or below TPS helper will engage.

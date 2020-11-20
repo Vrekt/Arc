@@ -4,9 +4,6 @@ import arc.check.CheckCategory;
 import arc.check.CheckType;
 import org.bukkit.entity.Player;
 
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 /**
  * Arc permissions
  */
@@ -28,44 +25,12 @@ public final class Permissions {
     public static final String ARC_ADMINISTRATOR = "arc.administrator";
 
     /**
-     * A list of UUIDs who can view violations.
-     */
-    private final List<Player> violationViewers = new CopyOnWriteArrayList<>();
-
-    /**
-     * Invoked when a player joins
-     *
-     * @param player the player
-     */
-    public void onPlayerJoin(Player player) {
-        if (canViewViolations(player)) violationViewers.add(player);
-    }
-
-    /**
-     * Invoked when a player leaves
-     *
-     * @param player the player
-     */
-    public void onPlayerLeave(Player player) {
-        if (canViewViolations(player)) violationViewers.remove(player);
-    }
-
-    /**
-     * A list of violation viewers
-     *
-     * @return the violation viewers
-     */
-    public List<Player> violationViewers() {
-        return violationViewers;
-    }
-
-    /**
      * Check if the player can view violations
      *
      * @param player the player
      * @return {@code true} if so.
      */
-    public boolean canViewViolations(Player player) {
+    public static boolean canViewViolations(Player player) {
         return player.hasPermission(ARC_VIOLATIONS);
     }
 
@@ -75,22 +40,35 @@ public final class Permissions {
      * @param player the player
      * @return {@code true} if so.
      */
-    public boolean canBypassChecks(Player player) {
+    public static boolean canBypassAllChecks(Player player) {
         return player.hasPermission(ARC_BYPASS);
     }
 
     /**
-     * Check if the player can bypass checks
+     * Check if a player can bypass a category all together
+     *
+     * @param player   the player
+     * @param category the category
+     * @return {@code true} if so
+     */
+    public static boolean canBypassCategory(Player player, CheckCategory category) {
+        return player.hasPermission(ARC_BYPASS + "." + category.name().toLowerCase());
+    }
+
+    /**
+     * Check if the player can bypass the provided checks.
      *
      * @param player the player
      * @param checks checks
      * @return {@code true} if so.
      */
-    public boolean canBypassChecks(Player player, CheckCategory category, CheckType... checks) {
-        if (canBypassChecks(player)) return true;
-        for (CheckType check : checks) {
-            return player.hasPermission(ARC_BYPASS + "." + category.name().toLowerCase() + "." + check.getName());
+    public static boolean canBypassChecks(Player player, CheckType... checks) {
+        if (canBypassAllChecks(player)) return true;
 
+        for (CheckType check : checks) {
+            if (canBypassCategory(player, check.category())) return true;
+            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getName()))
+                return true;
         }
         return false;
     }
@@ -102,8 +80,12 @@ public final class Permissions {
      * @param player the player
      * @return {@code true} if so
      */
-    public boolean isAdministrator(Player player) {
+    public static boolean isAdministrator(Player player) {
         return player.hasPermission(ARC_ADMINISTRATOR);
+    }
+
+    public static void reloadPermissions() {
+
     }
 
 }
