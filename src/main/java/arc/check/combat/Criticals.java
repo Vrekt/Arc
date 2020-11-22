@@ -28,13 +28,13 @@ public final class Criticals extends PacketCheck {
      * The min distance allowed when checking for a critical hit.
      * The min distance allowed when checking between the current vertical and last.
      */
-    private final double distance, difference;
+    private double distance, difference;
 
     /**
      * The max time allowed before flagging when the vertical doesn't change.
      * The max amount of times the vertical can be 0
      */
-    private final int maxSimilarVerticalAllowed, maxNoVerticalAllowed;
+    private int maxSimilarVerticalAllowed, maxNoVerticalAllowed;
 
     public Criticals() {
         super(CheckType.CRITICALS);
@@ -51,14 +51,8 @@ public final class Criticals extends PacketCheck {
         addConfigurationValue("difference", 0.05);
         addConfigurationValue("max-similar-vertical-allowed", 5);
         addConfigurationValue("max-no-vertical-allowed", 3);
-        distance = getValueDouble("distance");
-        difference = getValueDouble("difference");
-        maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
-        maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
 
-        if (enabled()) {
-            registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
-        }
+        if (enabled()) load();
     }
 
     /**
@@ -131,5 +125,24 @@ public final class Criticals extends PacketCheck {
                 && !player.isInsideVehicle()
                 && !player.hasPotionEffect(PotionEffectType.BLINDNESS)
                 && !MovingUtil.hasClimbable(player.getLocation());
+    }
+
+    @Override
+    public void reloadConfig() {
+        if (!enabled()) {
+            unregisterPacketListeners();
+        } else {
+            load();
+        }
+    }
+
+
+    @Override
+    public void load() {
+        distance = getValueDouble("distance");
+        difference = getValueDouble("difference");
+        maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
+        maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
+        registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
     }
 }

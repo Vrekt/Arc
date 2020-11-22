@@ -39,7 +39,12 @@ public enum CheckType {
     /**
      * Checks if the player is regenerating health too fast.
      */
-    REGENERATION("Regeneration", CheckCategory.PLAYER);
+    REGENERATION("Regeneration", CheckCategory.PLAYER),
+
+    /**
+     * Checks if the player is walking on water.
+     */
+    JESUS("Jesus", CheckCategory.MOVING);
 
     /**
      * The name

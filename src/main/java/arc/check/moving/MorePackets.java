@@ -25,7 +25,7 @@ public final class MorePackets extends Check {
      * Max position packets allowed
      * Max packets allowed before kicking
      */
-    private final int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
+    private int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
@@ -42,17 +42,8 @@ public final class MorePackets extends Check {
         addConfigurationValue("max-flying-packets", 30);
         addConfigurationValue("max-position-packets", 30);
         addConfigurationValue("max-packets-kick", 50);
-        maxFlyingPackets = getValueInt("max-flying-packets");
-        maxPositionPackets = getValueInt("max-position-packets");
-        maxPacketsToKick = getValueInt("max-packets-kick");
 
-        if (enabled()) {
-            scheduledCheck(() -> {
-                for (var player : Bukkit.getOnlinePlayers()) {
-                    if (!exempt(player)) check(player, MovingData.get(player));
-                }
-            }, 20, 20);
-        }
+        if (enabled()) load();
     }
 
     /**
@@ -107,4 +98,27 @@ public final class MorePackets extends Check {
         packets.lastCheck(System.currentTimeMillis());
     }
 
+    @Override
+    public void reloadConfig() {
+        if (!enabled()) {
+            scheduled.cancel();
+            scheduled = null;
+        } else {
+            load();
+        }
+    }
+
+    @Override
+    public void load() {
+        maxFlyingPackets = getValueInt("max-flying-packets");
+        maxPositionPackets = getValueInt("max-position-packets");
+        maxPacketsToKick = getValueInt("max-packets-kick");
+
+        scheduledCheck(() -> {
+            for (var player : Bukkit.getOnlinePlayers()) {
+                if (!exempt(player)) check(player, MovingData.get(player));
+            }
+        }, 20, 20);
+
+    }
 }

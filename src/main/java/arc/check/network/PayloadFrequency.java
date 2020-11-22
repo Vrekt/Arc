@@ -27,20 +27,20 @@ public final class PayloadFrequency extends PacketCheck {
     /**
      * Channels to monitor
      */
-    private final List<String> channels;
+    private List<String> channels;
 
     /**
      * The max packet size for books
      * The max packet size for other types.
      * The max packets allowed every check
      */
-    private final int maxPacketSizeBooks, maxPacketSizeOthers, maxPacketsPerInterval;
+    private int maxPacketSizeBooks, maxPacketSizeOthers, maxPacketsPerInterval;
 
     /**
      * If the player should be kicked for max packet size
      * If the player should be kicked for exceeding the max packets per interval
      */
-    private final boolean maxPacketSizeKick, maxPacketsPerIntervalKick;
+    private boolean maxPacketSizeKick, maxPacketsPerIntervalKick;
 
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
@@ -63,25 +63,7 @@ public final class PayloadFrequency extends PacketCheck {
         addConfigurationValue("max-packets-per-interval-kick", true);
         addConfigurationValue("channels", List.of("MC|BSign", "MC|BEdit"));
 
-        maxPacketSizeBooks = getValueInt("max-packet-size-books");
-        maxPacketSizeOthers = getValueInt("max-packet-size-others");
-        maxPacketsPerInterval = getValueInt("max-packets-per-interval");
-        maxPacketSizeKick = getValueBoolean("max-packet-size-kick");
-        maxPacketsPerIntervalKick = getValueBoolean("max-packets-per-interval-kick");
-        channels = getList("channels");
-
-        final var checkInterval = getValueInt("check-interval-milliseconds");
-        final var interval = (checkInterval / 1000) * 20;
-
-        if (enabled()) {
-            registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
-            scheduledCheck(() -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    check(player, PacketData.get(player));
-                }
-            }, interval, interval);
-        }
-
+        if (enabled()) load();
     }
 
     /**
@@ -158,4 +140,35 @@ public final class PayloadFrequency extends PacketCheck {
         return channel.equalsIgnoreCase("MC|BEdit") || channel.equalsIgnoreCase("MC|BSign");
     }
 
+    @Override
+    public void reloadConfig() {
+        if (!enabled()) {
+            unregisterPacketListeners();
+            scheduled.cancel();
+            scheduled = null;
+        } else {
+            load();
+        }
+    }
+
+    @Override
+    public void load() {
+        maxPacketSizeBooks = getValueInt("max-packet-size-books");
+        maxPacketSizeOthers = getValueInt("max-packet-size-others");
+        maxPacketsPerInterval = getValueInt("max-packets-per-interval");
+        maxPacketSizeKick = getValueBoolean("max-packet-size-kick");
+        maxPacketsPerIntervalKick = getValueBoolean("max-packets-per-interval-kick");
+        channels = getList("channels");
+
+        final var checkInterval = getValueInt("check-interval-milliseconds");
+        final var interval = (checkInterval / 1000) * 20;
+
+        registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
+        scheduledCheck(() -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                check(player, PacketData.get(player));
+            }
+        }, interval, interval);
+
+    }
 }

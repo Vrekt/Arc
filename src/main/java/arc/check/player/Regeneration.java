@@ -15,7 +15,7 @@ public final class Regeneration extends Check {
     /**
      * The min time it takes to regain health.
      */
-    private final long regenerationTime;
+    private long regenerationTime;
 
     public Regeneration() {
         super(CheckType.REGENERATION);
@@ -29,7 +29,7 @@ public final class Regeneration extends Check {
                 .write();
 
         addConfigurationValue("regeneration-time-ms", 3400);
-        regenerationTime = getValueLong("regeneration-time-ms");
+        load();
     }
 
     /**
@@ -53,4 +53,13 @@ public final class Regeneration extends Check {
         }
     }
 
+    @Override
+    public void reloadConfig() {
+        if (enabled()) load();
+    }
+
+    @Override
+    public void load() {
+        regenerationTime = getValueLong("regeneration-time-ms");
+    }
 }

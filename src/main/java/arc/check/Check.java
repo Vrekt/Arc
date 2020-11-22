@@ -7,7 +7,9 @@ import arc.configuration.check.CheckConfigurationWriter;
 import arc.permissions.Permissions;
 import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.List;
 
@@ -32,6 +34,11 @@ public abstract class Check {
     protected final CheckConfigurationWriter writer = new CheckConfigurationWriter();
 
     /**
+     * The schedule task.
+     */
+    protected BukkitTask scheduled;
+
+    /**
      * The appended name
      */
     private String appended;
@@ -43,7 +50,7 @@ public abstract class Check {
      */
     protected Check(CheckType checkType) {
         this.checkType = checkType;
-        writer.name(checkType.getName());
+        writer.name(checkType.getName().toLowerCase());
     }
 
     /**
@@ -279,7 +286,7 @@ public abstract class Check {
      * @param delay    initial delay
      */
     protected void scheduledCheck(Runnable runnable, long delay, long every) {
-        Bukkit.getScheduler().runTaskTimer(Arc.plugin(), runnable, delay, every);
+        scheduled = Bukkit.getScheduler().runTaskTimer(Arc.plugin(), runnable, delay, every);
     }
 
     /**
@@ -300,6 +307,24 @@ public abstract class Check {
     protected void appendName(String name) {
         this.appended = name;
     }
+
+    /**
+     * Reload the configuration.
+     */
+    public void reloadConfigInternal(FileConfiguration configuration) {
+        this.configuration.reload(configuration.getConfigurationSection(getName().toLowerCase()));
+        reloadConfig();
+    }
+
+    /**
+     * Reload the check implementation config.
+     */
+    public abstract void reloadConfig();
+
+    /**
+     * Load the check
+     */
+    public abstract void load();
 
     /**
      * @return {@code true} if the check is enabled.

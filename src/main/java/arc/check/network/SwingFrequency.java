@@ -24,7 +24,7 @@ public final class SwingFrequency extends PacketCheck {
     /**
      * Max packets and max packets to kick.
      */
-    private final int maxPackets, maxPacketsKick;
+    private int maxPackets, maxPacketsKick;
 
     public SwingFrequency() {
         super(CheckType.SWING_FREQUENCY);
@@ -41,18 +41,7 @@ public final class SwingFrequency extends PacketCheck {
 
         addConfigurationValue("max-packets", 20);
         addConfigurationValue("max-packets-kick", 100);
-
-        maxPackets = getValueInt("max-packets");
-        maxPacketsKick = getValueInt("max-packets-kick");
-
-        if (enabled()) {
-            registerPacketListener(PacketType.Play.Client.ARM_ANIMATION, this::onArmAnimation);
-            scheduledCheck(() -> {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (!exempt(player)) check(player, PacketData.get(player));
-                }
-            }, 20, 20);
-        }
+        if (enabled()) load();
     }
 
     /**
@@ -93,4 +82,28 @@ public final class SwingFrequency extends PacketCheck {
         data.incrementSwingPacketCount();
     }
 
+    @Override
+    public void reloadConfig() {
+        if (!enabled()) {
+            unregisterPacketListeners();
+            scheduled.cancel();
+            scheduled = null;
+        } else {
+            load();
+        }
+    }
+
+    @Override
+    public void load() {
+        maxPackets = getValueInt("max-packets");
+        maxPacketsKick = getValueInt("max-packets-kick");
+
+        registerPacketListener(PacketType.Play.Client.ARM_ANIMATION, this::onArmAnimation);
+        scheduledCheck(() -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!exempt(player)) check(player, PacketData.get(player));
+            }
+        }, 20, 20);
+
+    }
 }

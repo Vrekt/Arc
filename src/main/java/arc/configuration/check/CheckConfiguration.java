@@ -10,17 +10,17 @@ public final class CheckConfiguration {
     /**
      * The section for this check
      */
-    private final ConfigurationSection section;
+    private ConfigurationSection section;
 
     /**
      * Boolean check values
      */
-    private final boolean enabled, cancel, notify, ban, kick;
+    private boolean enabled, cancel, notify, ban, kick;
 
     /**
      * Violation levels
      */
-    private final int cancelLevel, notifyLevel, banLevel, kickLevel;
+    private int cancelLevel, notifyLevel, banLevel, kickLevel;
 
     /**
      * Initialize this check configuration
@@ -29,17 +29,31 @@ public final class CheckConfiguration {
      */
     public CheckConfiguration(ConfigurationSection configuration) {
         this.section = configuration;
+        read();
+    }
 
-        enabled = configuration.getBoolean("enabled");
-        cancel = configuration.getBoolean("cancel");
-        notify = configuration.getBoolean("notify");
-        ban = configuration.getBoolean("ban");
-        kick = configuration.getBoolean("kick");
+    /**
+     * Reload this check configuration
+     */
+    public void reload(ConfigurationSection section) {
+        this.section = section;
+        read();
+    }
 
-        cancelLevel = configuration.getInt("cancel-level");
-        notifyLevel = configuration.getInt("notify-every");
-        banLevel = configuration.getInt("ban-level");
-        kickLevel = configuration.getInt("kick-level");
+    /**
+     * Read from the configuration
+     */
+    private void read() {
+        enabled = section.getBoolean("enabled");
+        cancel = section.getBoolean("cancel");
+        notify = section.getBoolean("notify");
+        ban = section.getBoolean("ban");
+        kick = section.getBoolean("kick");
+
+        cancelLevel = section.getInt("cancel-level");
+        notifyLevel = section.getInt("notify-every");
+        banLevel = section.getInt("ban-level");
+        kickLevel = section.getInt("kick-level");
     }
 
     /**

@@ -11,9 +11,6 @@ import org.bukkit.entity.Player;
 /**
  * Checks if the player is taking no fall damage.
  * <p>
- * This check is not entirely perfect.
- * In some cases certain NoFalls will bypass just because of how Minecraft works and insufficient data at the checking stage.
- * <p>
  * TODO: Expected distance checking regardless of client ground state?
  */
 public final class NoFall extends Check {
@@ -21,7 +18,7 @@ public final class NoFall extends Check {
     /**
      * The tolerance amount to allow when fall distance is greater than calculated vertical distance
      */
-    private final double tolerance;
+    private double tolerance;
 
     public NoFall() {
         super(CheckType.NOFALL);
@@ -35,7 +32,7 @@ public final class NoFall extends Check {
                 write();
 
         addConfigurationValue("tolerance", 0.1);
-        tolerance = getValueDouble("tolerance");
+        load();
     }
 
     /**
@@ -133,4 +130,15 @@ public final class NoFall extends Check {
         }
     }
 
+    @Override
+    public void reloadConfig() {
+        if (enabled()) {
+            load();
+        }
+    }
+
+    @Override
+    public void load() {
+        tolerance = getValueDouble("tolerance");
+    }
 }

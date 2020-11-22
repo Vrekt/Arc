@@ -6,6 +6,7 @@ import arc.check.moving.NoFall;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.Regeneration;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
 
@@ -29,6 +30,15 @@ public final class CheckManager {
     }
 
     /**
+     * Reload check configurations
+     *
+     * @param configuration the configuration
+     */
+    public void reloadConfigurations(FileConfiguration configuration) {
+        checks.forEach(check -> check.reloadConfigInternal(configuration));
+    }
+
+    /**
      * Get a check
      *
      * @param checkType the type
@@ -38,4 +48,10 @@ public final class CheckManager {
         return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow();
     }
 
+    /**
+     * @return all checks
+     */
+    public Set<Check> getAllChecks() {
+        return checks;
+    }
 }

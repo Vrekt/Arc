@@ -25,6 +25,31 @@ public final class Permissions {
     public static final String ARC_ADMINISTRATOR = "arc.administrator";
 
     /**
+     * The base command permission.
+     */
+    public static final String ARC_COMMANDS_BASE = "arc.commands.base";
+
+    /**
+     * The permission to toggle violations
+     */
+    public static final String ARC_COMMANDS_TOGGLE_VIOLATIONS = "arc.commands.toggleviolations";
+
+    /**
+     * The permission to cancel player bans
+     */
+    public static final String ARC_COMMANDS_CANCEL_BAN = "arc.commands.cancelban";
+
+    /**
+     * The permission to reload the config
+     */
+    public static final String ARC_COMMANDS_RELOAD_CONFIG = "arc.commands.reloadconfig";
+
+    /**
+     * The permission to execute all arc commands
+     */
+    public static final String ARC_COMMANDS_ALL = "arc.commands.all";
+
+    /**
      * Check if the player can view violations
      *
      * @param player the player

@@ -69,7 +69,7 @@ public final class MovingListener implements Listener {
         noFall.check(player, data);
 
         if (hasMovedByBlock) {
-            // TODO:
+
         }
 
     }

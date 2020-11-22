@@ -7,6 +7,16 @@ depend:
   - ProtocolLib
 
 permissions:
+  arc.commands.toggleviolations:
+    description: Allows the player to toggle their violations.
+  arc.commands.cancelban:
+    description: Allows the player to cancel bans.
+  arc.commands.reloadconfig:
+    description: Allows the player to reload Arcs configuration.
+  arc.commands.base:
+    description: Allows the player to execute /arc
+  arc.commands.all:
+    description: Allows the player to use all Arc commands.
   arc.bypass:
     description: Allows the player to bypass all Arc checks.
     children:
@@ -42,3 +52,7 @@ permissions:
   arc.administrator:
     description: Allows the player permission to manage Arc.
     default: false
+
+commands:
+  arc:
+    description: The base command for managing Arc.

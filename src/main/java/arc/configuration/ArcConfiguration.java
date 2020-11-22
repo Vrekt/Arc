@@ -1,5 +1,6 @@
 package arc.configuration;
 
+import arc.Arc;
 import arc.configuration.punishment.ban.BanConfiguration;
 import arc.configuration.punishment.kick.KickConfiguration;
 import org.bukkit.ChatColor;
@@ -32,7 +33,7 @@ public final class ArcConfiguration {
     /**
      * The violation message
      */
-    private String violationMessage;
+    private String violationMessage, noPermissionMessage;
 
     /**
      * Initializes the configuration and starts reading
@@ -55,6 +56,7 @@ public final class ArcConfiguration {
         watchTps = configuration.getBoolean("tps-helper");
         tpsLowerLimit = configuration.getInt("tps-lower-limit");
         violationMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("violation-notify-message"));
+        noPermissionMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-command-no-permission-message"));
     }
 
     /**
@@ -91,4 +93,23 @@ public final class ArcConfiguration {
     public String violationMessage() {
         return violationMessage;
     }
+
+    /**
+     * @return the no permission message for the /arc command
+     */
+    public String noPermissionMessage() {
+        return noPermissionMessage;
+    }
+
+    /**
+     * Reload configuration
+     */
+    public void reload() {
+        Arc.arc().reloadConfig();
+        final var config = Arc.arc().getConfig();
+
+        read(config);
+        Arc.arc().checks().reloadConfigurations(config);
+    }
+
 }
