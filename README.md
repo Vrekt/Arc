@@ -31,17 +31,17 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 
 # TODO LIST
 
-- [ ] CONVERT CODE BACK TO JAVA 8 FROM 11.
+- [ ] ~CONVERT CODE BACK TO JAVA 8 FROM 11.~
 - [x] Permissions for each check to bypass
 - [ ] Improve MorePackets
 - [ ] Patch more crashing exploits
 - [x] ~Workaround /effect for BadEffects check~
 - [x] ~Fix BadEffects potion duration~
-- [ ] Better information system with violations
+- [x] ~Better information system with violations~
 - [ ] Debug system
 - [ ] Debug/Information commands to toggle
 - [ ] Commands in general
-- [ ] Exemptions 
+- [x] Exemptions 
 - [ ] More checks, obviously
 - [x] Better permissions
 - [x] Improve NoFall 
