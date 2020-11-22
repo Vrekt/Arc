@@ -58,15 +58,15 @@ public final class Arc extends JavaPlugin {
     public void onEnable() {
         arc = this;
 
-        getLogger().info(ChatColor.RED + "Arc version " + VERSION);
-        getLogger().info(ChatColor.RED + "[1] Loading configuration");
+        getLogger().info("Arc version " + VERSION);
+        getLogger().info("[INFO] Loading configuration");
 
         saveDefaultConfig();
         arcConfiguration = new ArcConfiguration(getConfig());
         protocolManager = ProtocolLibrary.getProtocolManager();
         final var movingPacketListener = new MovingPacketListener(protocolManager);
 
-        getLogger().info(ChatColor.RED + "[2] Registering checks and listeners");
+        getLogger().info("[INFO] Registering checks and listeners");
         checkManager = new CheckManager();
         violationManager = new ViolationManager(arcConfiguration);
 
@@ -74,13 +74,14 @@ public final class Arc extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MovingListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
 
+        getLogger().info("[INFO] Registering base command.");
         getCommand("arc").setExecutor(new CommandArc());
 
         // save the configuration now since checks were registered.
-        getLogger().info(ChatColor.RED + "[3] Saving configuration");
+        getLogger().info(ChatColor.RED + "[INFO] Saving configuration");
         saveConfig();
 
-        getLogger().info(ChatColor.RED + "[4] Ready!");
+        getLogger().info(ChatColor.RED + "[SUCCESS] Ready!");
     }
 
     @Override

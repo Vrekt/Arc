@@ -8,6 +8,11 @@ import org.bukkit.command.CommandSender;
 public abstract class ArcSubCommand {
 
     /**
+     * The permission for this command
+     */
+    protected String permission;
+
+    /**
      * Execute this sub command
      *
      * @param sender    the sender
@@ -15,4 +20,19 @@ public abstract class ArcSubCommand {
      */
     protected abstract void execute(CommandSender sender, String[] arguments);
 
+    /**
+     * @return the permission
+     */
+    public String permission() {
+        return permission;
+    }
+
+    /**
+     * Set the permission
+     *
+     * @param permission permission
+     */
+    public void permission(String permission) {
+        this.permission = permission;
+    }
 }

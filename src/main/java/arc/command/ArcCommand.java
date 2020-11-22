@@ -47,10 +47,11 @@ public abstract class ArcCommand {
     /**
      * Add a sub command
      *
-     * @param command    the command
-     * @param executor   the executor
+     * @param command  the command
+     * @param executor the executor
      */
-    protected void addSubCommand(String command, ArcSubCommand executor) {
+    protected void addSubCommand(String command, String permission, ArcSubCommand executor) {
+        executor.permission(permission);
         subCommands.put(command, executor);
     }
 
@@ -73,6 +74,11 @@ public abstract class ArcCommand {
      * @return {@code true}
      */
     protected boolean executeSubCommand(String argument, CommandSender sender, String[] args) {
+        final var subCommand = subCommands.get(argument);
+        if (!sender.hasPermission(subCommand.permission())) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to execute this sub-command.");
+            return true;
+        }
         subCommands.get(argument).execute(sender, args);
         return true;
     }

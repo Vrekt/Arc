@@ -1,10 +1,8 @@
 package arc.utility;
 
 import arc.data.moving.MovingData;
-import net.minecraft.server.v1_8_R3.MathHelper;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
@@ -113,23 +111,6 @@ public final class MovingUtil {
      * @return if we are in liquid.
      */
     public static boolean isInLiquid(Player player, Location location) {
-        final var bounding = ((CraftPlayer) player).getHandle().getBoundingBox();
-
-        int x1 = MathHelper.floor(bounding.a);
-        int x2 = MathHelper.floor(bounding.b + 1.0D);
-        int y1 = MathHelper.floor(bounding.c);
-        int y2 = MathHelper.floor(bounding.d + 1.0D);
-        int z1 = MathHelper.floor(bounding.e);
-        int z2 = MathHelper.floor(bounding.f + 1.0D);
-        for (int x = x1; x < x2; x++) {
-            for (int y = y1; y < y2; y++) {
-                for (int z = z1; z < z2; z++) {
-                    if (player.getWorld().getBlockAt(x, y, z).isLiquid()) {
-                        return true;
-                    }
-                }
-            }
-        }
         return false;
     }
 

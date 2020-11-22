@@ -1,27 +1,21 @@
 package arc.violation;
 
-import arc.Arc;
 import arc.api.events.PlayerViolationEvent;
 import arc.api.events.PostPlayerViolationEvent;
 import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.punishment.ban.BanConfiguration;
-import arc.configuration.punishment.ban.BanLengthType;
 import arc.configuration.punishment.kick.KickConfiguration;
 import arc.permissions.Permissions;
+import arc.utility.Punishment;
 import arc.violation.result.ViolationResult;
-import org.apache.commons.lang3.time.DateUtils;
-import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Manages violations
@@ -34,15 +28,9 @@ public final class ViolationManager {
     private final Map<UUID, Violations> history = new ConcurrentHashMap<>();
 
     /**
-     * A list of players who can view violations.
+     * A list of players who can view violations/debug information
      */
-    private final List<Player> violationViewers = new CopyOnWriteArrayList<>();
-
-    /**
-     * Keeps track of bans.
-     * TODO: Cancel bans
-     */
-    private final List<UUID> pendingPlayerBans = new CopyOnWriteArrayList<>();
+    private final Map<Player, Boolean> violationViewers = new ConcurrentHashMap<>();
 
     /**
      * The arc configuration.
@@ -77,7 +65,7 @@ public final class ViolationManager {
      */
     public void onPlayerJoin(Player player) {
         history.put(player.getUniqueId(), new Violations());
-        if (Permissions.canViewViolations(player)) violationViewers.add(player);
+        if (Permissions.canViewViolations(player)) violationViewers.put(player, Boolean.FALSE);
     }
 
     /**
@@ -121,26 +109,32 @@ public final class ViolationManager {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             // grab our violation message and then replace placeholders.
             final var rawMessage = configuration.violationMessage();
-            final var message = replaceConfigurableMessage(rawMessage,
-                    Map.of("%player%", player.getName(), "%check%", check.getName(), "%level%", level + "", "%information%", result.information()));
+            // the violation message,
+            final var messageNoInfo = replaceConfigurableMessage(rawMessage,
+                    Map.of("%player%", player.getName(), "%check%", check.getName(), "%level%", level + ""));
 
-            // notify
-            violationViewers.forEach(viewer -> viewer.sendMessage(message));
+            // notify, check debug status too.
+            violationViewers.forEach((viewer, debug) -> {
+                final var messageInfo = messageNoInfo.replace("%information%", debug ? result.information() : "");
+                viewer.sendMessage(messageInfo);
+            });
         }
 
         // add a cancel result if this check should cancel.
         if (check.configuration().shouldCancel(level)) violationResult.addResult(ViolationResult.Result.CANCEL);
 
         // ban the player if this check should ban
-        if (check.configuration().shouldBan(level)) {
+        if (check.configuration().shouldBan(level)
+                && !Punishment.hasPendingBan(player)) {
             violationResult.addResult(ViolationResult.Result.BAN);
-            banPlayer(player, check);
+            Punishment.banPlayer(player, check, banConfiguration);
         }
 
         // kick the player if this check should kick.
-        if (check.configuration().shouldKick(level)) {
+        if (check.configuration().shouldKick(level)
+                && !Punishment.hasPendingKick(player)) {
             violationResult.addResult(ViolationResult.Result.KICK);
-            kickPlayer(player, check);
+            Punishment.kickPlayer(player, check, kickConfiguration);
         }
 
         // fire the post event
@@ -151,74 +145,51 @@ public final class ViolationManager {
     }
 
     /**
-     * Ban a player
+     * Check if the player can view violations
      *
      * @param player the player
-     * @param check  the check banned for
+     * @return {@code true} if so
      */
-    private void banPlayer(final Player player, final Check check) {
-        pendingPlayerBans.add(player.getUniqueId());
-
-        // grab basic configuration values.
-        final var banLengthType = banConfiguration.banLengthType();
-        final var banDelay = banConfiguration.banDelay();
-        final var now = new Date();
-
-        // retrieve the date of how long the player should be banned.
-        final var banDate = banLengthType == BanLengthType.DAYS ?
-                DateUtils.addDays(now, banConfiguration.banLength()) :
-                banLengthType == BanLengthType.YEARS ?
-                        DateUtils.addYears(now, banConfiguration.banLength()) : null;
-
-        // notify violation watchers of the ban.
-        final String banViolationMessage = replaceConfigurableMessage(banConfiguration.banMessageToViolations(),
-                Map.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + ""));
-        Bukkit.broadcast(banViolationMessage, Permissions.ARC_VIOLATIONS);
-
-        // finally, schedule the players ban.
-        scheduleBan(player, banConfiguration.banType(), banConfiguration.banMessage(), banConfiguration.banBroadcastMessage(), check.getName(), banDate, banConfiguration.broadcastBan(), banDelay);
+    public boolean isViolationViewer(Player player) {
+        return violationViewers.containsKey(player);
     }
 
     /**
-     * Schedule a player ban
+     * Add a violation viewer
      *
-     * @param player           the player
-     * @param banType          the type of ban
-     * @param banMessage       the ban message
-     * @param broadcastMessage the message to broadcast
-     * @param checkName        the check name the player was banned for
-     * @param banLength        how long the ban is
-     * @param broadcastBan     if the ban should be broadcasted
-     * @param banDelay         the delay before banning the player.
+     * @param player the player
      */
-    private void scheduleBan(Player player, BanList.Type banType, String banMessage, String broadcastMessage, String checkName, Date banLength, boolean broadcastBan, int banDelay) {
-        Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> {
-            // add the ban to the list.
-            final var isIpBan = banType == BanList.Type.IP;
-            Bukkit.getBanList(banType).addBan(isIpBan ? player.getAddress().getHostName() : player.getName(), banMessage, banLength, banMessage);
-
-            // kick the player and remove them from pending bans.
-            player.kickPlayer(banMessage);
-            pendingPlayerBans.remove(player.getUniqueId());
-
-            // broadcast the ban if applicable.
-            if (broadcastBan) {
-                final String banBroadcastMessage = replaceConfigurableMessage(broadcastMessage,
-                        Map.of("%player%", player.getName(), "%check%", checkName));
-                Bukkit.broadcastMessage(banBroadcastMessage);
-            }
-        }, banDelay * 20);
+    public void addViolationViewer(Player player) {
+        violationViewers.put(player, false);
     }
 
     /**
-     * Kick the player
+     * Remove a violation viewer
      *
      * @param player the player
-     * @param check  the check kicked for
      */
-    private void kickPlayer(Player player, Check check) {
-        final var kickMessage = replaceConfigurableMessage(kickConfiguration.kickMessage(), Map.of("%check%", check.getName()));
-        Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> player.kickPlayer(kickMessage), kickConfiguration.kickDelay() * 20);
+    public void removeViolationViewer(Player player) {
+        violationViewers.remove(player);
+    }
+
+    /**
+     * Check if the player can view debug information
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    public boolean isDebugViewer(Player player) {
+        return violationViewers.containsKey(player) && violationViewers.get(player);
+    }
+
+    /**
+     * Toggle debug viewer
+     *
+     * @param player the player
+     * @param state  the state
+     */
+    public void toggleDebugViewer(Player player, boolean state) {
+        violationViewers.put(player, state);
     }
 
     /**
