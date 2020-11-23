@@ -11,7 +11,6 @@ import arc.listener.player.PlayerListener;
 import arc.violation.ViolationManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -78,10 +77,10 @@ public final class Arc extends JavaPlugin {
         getCommand("arc").setExecutor(new CommandArc());
 
         // save the configuration now since checks were registered.
-        getLogger().info(ChatColor.RED + "[INFO] Saving configuration");
+        getLogger().info("[INFO] Saving configuration");
         saveConfig();
 
-        getLogger().info(ChatColor.RED + "[SUCCESS] Ready!");
+        getLogger().info("[SUCCESS] Ready!");
     }
 
     @Override

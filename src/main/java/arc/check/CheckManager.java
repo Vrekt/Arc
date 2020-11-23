@@ -1,6 +1,7 @@
 package arc.check;
 
 import arc.check.combat.Criticals;
+import arc.check.moving.Jesus;
 import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
 import arc.check.network.PayloadFrequency;
@@ -29,6 +30,7 @@ public final class CheckManager {
         checks.add(new SwingFrequency());
         checks.add(new Regeneration());
         checks.add(new FastUse());
+        checks.add(new Jesus());
     }
 
     /**

@@ -2,6 +2,7 @@ package arc.listener.moving;
 
 import arc.Arc;
 import arc.check.CheckType;
+import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
 import arc.listener.moving.tasks.MovingTask;
@@ -19,9 +20,14 @@ import org.bukkit.event.player.PlayerMoveEvent;
 public final class MovingListener implements Listener {
 
     /**
-     * The NoFall task
+     * The NoFall check
      */
     private final NoFall noFall;
+
+    /**
+     * The Jesus check
+     */
+    private final Jesus jesus;
 
     /**
      * The moving task.
@@ -34,6 +40,7 @@ public final class MovingListener implements Listener {
      */
     public MovingListener() {
         noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
+        jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
         Bukkit.getScheduler().runTaskTimer(Arc.plugin(), task, 20, 20);
     }
 
@@ -69,7 +76,18 @@ public final class MovingListener implements Listener {
         noFall.check(player, data);
 
         if (hasMovedByBlock) {
-
+            // TODO: Distance check the ground location
+            // TODO: We don't want to teleport back really far away
+            // TODO: Also check the Y-0.1 stuff, don't wanna create a phase.
+            jesus.check(player, data, (result) -> {
+                if (result.cancel()) {
+                    if (data.hasGround()) {
+                        event.setTo(data.ground());
+                    } else {
+                        event.setTo(event.getFrom().add(0, -0.1, 0));
+                    }
+                }
+            });
         }
 
     }

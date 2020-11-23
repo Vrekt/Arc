@@ -3,7 +3,6 @@ package arc.utility;
 import arc.data.moving.MovingData;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
 import org.bukkit.material.Step;
@@ -108,10 +107,13 @@ public final class MovingUtil {
     }
 
     /**
-     * @return if we are in liquid.
+     * TODO: Maybe bypass with values greater than 0.5
+     *
+     * @return if we are in or on liquid.
      */
-    public static boolean isInLiquid(Player player, Location location) {
-        return false;
+    public static boolean isInOrOnLiquid(Location location) {
+        final var neighbors = neighbors(location, 0.1, -0.5, 0.1);
+        return neighbors.stream().allMatch(material -> material == Material.STATIONARY_LAVA || material == Material.LAVA || material == Material.WATER || material == Material.STATIONARY_WATER);
     }
 
     /**

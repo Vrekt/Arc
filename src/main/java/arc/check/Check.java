@@ -34,7 +34,7 @@ public abstract class Check {
     protected final CheckConfigurationWriter writer = new CheckConfigurationWriter();
 
     /**
-     * The schedule task.
+     * The scheduled task.
      */
     protected BukkitTask scheduled;
 
@@ -249,7 +249,6 @@ public abstract class Check {
 
     /**
      * Kick the player
-     * TODO: Translate kick message string.
      *
      * @param player  the player
      * @param message the message to broadcast
@@ -258,19 +257,9 @@ public abstract class Check {
         final var config = Arc.arc().configuration();
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), ()
                 -> {
-            player.kickPlayer(config.kickConfiguration().kickMessage());
-            broadcast(player, message);
+            player.kickPlayer(config.kickConfiguration().kickMessage().replace("%check%", getName()));
+            Bukkit.broadcast(message, Permissions.ARC_VIOLATIONS);
         }, config.kickConfiguration().kickDelay());
-    }
-
-    /**
-     * Broadcast to players who have the permission ARC_VIOLATIONS
-     *
-     * @param player    the player
-     * @param broadcast the message
-     */
-    protected void broadcast(Player player, String broadcast) {
-        Bukkit.broadcast(broadcast, Permissions.ARC_VIOLATIONS);
     }
 
     /**
@@ -331,13 +320,6 @@ public abstract class Check {
      */
     public CheckType type() {
         return checkType;
-    }
-
-    /**
-     * @return the category
-     */
-    public CheckCategory category() {
-        return checkType.category();
     }
 
     /**

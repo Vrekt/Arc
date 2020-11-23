@@ -29,6 +29,8 @@ permissions:
             description: Allows the player to bypass the MorePackets check.
           arc.bypass.moving.nofall:
             description: Allows the player to bypass the NoFall check.
+          arc.bypass.moving.jesus:
+            description: Allows the player to bypass the Jesus check.
       arc.bypass.player:
         description: Allows the player to bypass all Player checks.
         children:

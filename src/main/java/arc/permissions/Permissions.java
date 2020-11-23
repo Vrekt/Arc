@@ -104,19 +104,4 @@ public final class Permissions {
         return false;
     }
 
-
-    /**
-     * Check if the player is an administrator.
-     *
-     * @param player the player
-     * @return {@code true} if so
-     */
-    public static boolean isAdministrator(Player player) {
-        return player.hasPermission(ARC_ADMINISTRATOR);
-    }
-
-    public static void reloadPermissions() {
-
-    }
-
 }
