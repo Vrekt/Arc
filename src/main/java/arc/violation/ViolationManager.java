@@ -11,6 +11,7 @@ import arc.permissions.Permissions;
 import arc.utility.Punishment;
 import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -109,9 +110,12 @@ public final class ViolationManager {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             // grab our violation message and then replace placeholders.
             final var rawMessage = configuration.violationMessage();
+            final var hasAppend = result.appendName() != null;
             // the violation message,
             final var messageNoInfo = replaceConfigurableMessage(rawMessage,
-                    Map.of("%player%", player.getName(), "%check%", check.getName(), "%level%", level + ""));
+                    Map.of("%player%", player.getName(), "%check%", (
+                            hasAppend ? check.getName() + ChatColor.GRAY + " " + result.appendName() + " "
+                                    : check.getName()), "%level%", level + ""));
 
             // notify, check debug status too.
             violationViewers.forEach((viewer, debug) -> {

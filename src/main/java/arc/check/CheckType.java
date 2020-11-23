@@ -44,7 +44,12 @@ public enum CheckType {
     /**
      * Checks if the player is walking on water.
      */
-    JESUS("Jesus", CheckCategory.MOVING);
+    JESUS("Jesus", CheckCategory.MOVING),
+
+    /**
+     * Checks if the player is using items too fast.
+     */
+    FAST_USE("FastUse", CheckCategory.PLAYER);
 
     /**
      * The name

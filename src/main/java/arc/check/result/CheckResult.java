@@ -29,8 +29,9 @@ public final class CheckResult {
 
     /**
      * The check information
+     * The name to append;
      */
-    private String information;
+    private String information, appendName;
 
     /**
      * Initialize this check result with a result
@@ -101,12 +102,38 @@ public final class CheckResult {
     }
 
     /**
+     * @return the name to append
+     */
+    public String appendName() {
+        return appendName;
+    }
+
+    /**
+     * Set the appended name
+     *
+     * @param appendName the name
+     */
+    public void appendName(String appendName) {
+        this.appendName = appendName;
+    }
+
+    /**
      * Set the information
      *
      * @param information information
      */
     public void information(String information) {
         this.information = information;
+    }
+
+    /**
+     * Set the information
+     *
+     * @param information information
+     */
+    public void information(String information, String appendName) {
+        this.information = information;
+        this.appendName = appendName;
     }
 
 }

@@ -40,11 +40,50 @@ public final class PlayerData {
      */
     private long lastHealthRegain;
 
+    /**
+     * The last time the bow was shot.
+     */
+    private long lastBowUse;
+
+    /**
+     * Last bow shoot
+     */
+    private long lastBowShoot;
+
+    /**
+     * The consume start time
+     */
+    private long consumeStartTime;
+
     public long lastHealthRegain() {
         return lastHealthRegain;
     }
 
     public void lastHealthRegain(long lastHealthRegain) {
         this.lastHealthRegain = lastHealthRegain;
+    }
+
+    public long lastBowUse() {
+        return lastBowUse;
+    }
+
+    public void lastBowUse(long lastBowUse) {
+        this.lastBowUse = lastBowUse;
+    }
+
+    public long lastBowShoot() {
+        return lastBowShoot;
+    }
+
+    public void lastBowShoot(long lastBowShoot) {
+        this.lastBowShoot = lastBowShoot;
+    }
+
+    public long consumeStartTime() {
+        return consumeStartTime;
+    }
+
+    public void consumeStartTime(long consumeStartTime) {
+        this.consumeStartTime = consumeStartTime;
     }
 }

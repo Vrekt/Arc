@@ -34,6 +34,8 @@ permissions:
         children:
           arc.bypass.player.regeneration:
             description: Allows the player to bypass the Regeneration check
+          arc.bypass.player.fastuse:
+            description: Allows the player to bypass the FastUse check
       arc.bypass.network:
         description: Allows the player to bypass all network/packet checks.
         children:

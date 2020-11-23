@@ -5,6 +5,7 @@ import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
+import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -27,6 +28,7 @@ public final class CheckManager {
         checks.add(new PayloadFrequency());
         checks.add(new SwingFrequency());
         checks.add(new Regeneration());
+        checks.add(new FastUse());
     }
 
     /**

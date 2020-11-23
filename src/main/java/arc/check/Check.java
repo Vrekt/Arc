@@ -39,11 +39,6 @@ public abstract class Check {
     protected BukkitTask scheduled;
 
     /**
-     * The appended name
-     */
-    private String appended;
-
-    /**
      * Initialize the check
      *
      * @param checkType the type
@@ -297,15 +292,6 @@ public abstract class Check {
      */
     protected boolean exempt(Player player) {
         return Arc.arc().exemptions().isPlayerExempt(player, checkType);
-    }
-
-    /**
-     * Append a name to this check name
-     *
-     * @param name the name
-     */
-    protected void appendName(String name) {
-        this.appended = name;
     }
 
     /**
