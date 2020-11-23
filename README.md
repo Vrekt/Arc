@@ -27,6 +27,7 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - Payload Frequency (Server Crashing)
 ### Player
 - Regeneration
+- FastUse (FastConsume) (FastBow)
 
 
 # TODO LIST
@@ -40,7 +41,7 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [x] ~Better information system with violations~
 - [ ] Debug system
 - [ ] Debug/Information commands to toggle
-- [ ] Commands in general
+- [x] Commands in general
 - [x] Exemptions 
 - [ ] More checks, obviously
 - [x] Better permissions
