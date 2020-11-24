@@ -29,6 +29,10 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - Regeneration
 - FastUse (FastConsume) (FastBow)
 
+# Future TODO
+- [ ] 1.12 Support
+- [ ] 1.15 Support
+- [ ] 1.16 Support
 
 # TODO LIST
 
