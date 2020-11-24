@@ -329,4 +329,15 @@ public abstract class Check {
         return configuration;
     }
 
+    /**
+     * Cancel the scheduled task.
+     */
+    protected void cancelScheduled() {
+        if (scheduled != null
+                && Bukkit.getScheduler().isCurrentlyRunning(scheduled.getTaskId())) {
+            scheduled.cancel();
+            scheduled = null;
+        }
+    }
+
 }

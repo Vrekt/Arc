@@ -39,7 +39,7 @@ public final class SwingFrequency extends PacketCheck {
                 kickLevel(5).
                 write();
 
-        addConfigurationValue("max-packets", 20);
+        addConfigurationValue("max-packets", 30);
         addConfigurationValue("max-packets-kick", 100);
         if (enabled()) load();
     }
@@ -59,8 +59,9 @@ public final class SwingFrequency extends PacketCheck {
             kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
         } else {
             data.cancelSwingPackets(false);
-            data.swingPacketCount(0);
         }
+
+        data.swingPacketCount(0);
 
         final var violation = result(player, result);
         if (violation.cancel()) {
@@ -84,13 +85,9 @@ public final class SwingFrequency extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        if (!enabled()) {
-            unregisterPacketListeners();
-            scheduled.cancel();
-            scheduled = null;
-        } else {
-            load();
-        }
+        unregisterPacketListeners();
+        cancelScheduled();
+        if (enabled()) load();
     }
 
     @Override

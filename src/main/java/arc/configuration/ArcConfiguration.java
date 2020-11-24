@@ -32,8 +32,10 @@ public final class ArcConfiguration {
 
     /**
      * The violation message
+     * The no permissions message
+     * The prefix
      */
-    private String violationMessage, noPermissionMessage;
+    private String violationMessage, noPermissionMessage, prefix;
 
     /**
      * Initializes the configuration and starts reading
@@ -57,6 +59,7 @@ public final class ArcConfiguration {
         tpsLowerLimit = configuration.getInt("tps-lower-limit");
         violationMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("violation-notify-message"));
         noPermissionMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-command-no-permission-message"));
+        prefix = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-prefix"));
     }
 
     /**
@@ -99,6 +102,13 @@ public final class ArcConfiguration {
      */
     public String noPermissionMessage() {
         return noPermissionMessage;
+    }
+
+    /**
+     * @return the prefix
+     */
+    public String prefix() {
+        return prefix;
     }
 
     /**

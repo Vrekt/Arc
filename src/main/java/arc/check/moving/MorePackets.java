@@ -100,10 +100,8 @@ public final class MorePackets extends Check {
 
     @Override
     public void reloadConfig() {
-        if (!enabled()) {
-            scheduled.cancel();
-            scheduled = null;
-        } else {
+        cancelScheduled();
+        if (enabled()) {
             load();
         }
     }

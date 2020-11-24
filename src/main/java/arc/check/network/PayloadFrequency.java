@@ -142,13 +142,9 @@ public final class PayloadFrequency extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        if (!enabled()) {
-            unregisterPacketListeners();
-            scheduled.cancel();
-            scheduled = null;
-        } else {
-            load();
-        }
+        unregisterPacketListeners();
+        cancelScheduled();
+        if (enabled()) load();
     }
 
     @Override

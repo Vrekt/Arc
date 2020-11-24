@@ -2,7 +2,7 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.command.ArcSubCommand;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import arc.utility.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -13,16 +13,15 @@ public final class ArcReloadConfigCommand extends ArcSubCommand {
 
     @Override
     protected void execute(CommandSender sender, String[] arguments) {
-        sender.sendMessage(ChatColor.RED + "Reloading the configuration....");
-        sender.sendMessage(ChatColor.RED + "All players will be exempt for 5 seconds afterwards.");
+        ChatUtil.sendMessage(sender, ChatColor.RED + " Reloading the configuration....");
+        ChatUtil.sendMessage(sender, ChatColor.RED + " All players will be exempt for 2 seconds afterwards.");
 
-        // exempt all players then reload.
-        Arc.arc().exemptions().exemptAllPlayersFromAllChecksFor(5000);
         try {
             Arc.arc().configuration().reload();
-            sender.sendMessage(ChatColor.GREEN + "Configuration successfully reloaded.");
+            Arc.arc().exemptions().exemptAllPlayersFromAllChecksFor(2000);
+            ChatUtil.sendMessage(sender, ChatColor.GREEN + " Configuration successfully reloaded.");
         } catch (Exception exception) {
-            sender.sendMessage(ChatColor.RED + "An error occurred. \n" + ExceptionUtils.getRootCauseMessage(exception));
+            ChatUtil.sendMessage(sender, ChatColor.RED + " An error occurred while trying to reload, it has been printed to the console.");
             exception.printStackTrace();
         }
 

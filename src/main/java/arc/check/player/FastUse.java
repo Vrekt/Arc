@@ -109,11 +109,8 @@ public final class FastUse extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        if (enabled()) {
-            load();
-        } else {
-            unregisterPacketListeners();
-        }
+        unregisterPacketListeners();
+        if (enabled()) load();
     }
 
     @Override

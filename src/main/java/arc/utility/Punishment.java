@@ -83,7 +83,7 @@ public final class Punishment {
 
         // notify violation watchers of the ban.
         final String banViolationMessage = replaceConfigurableMessage(banConfiguration.banMessageToViolations(),
-                Map.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + ""));
+                Map.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc.arc().configuration().prefix()));
         Bukkit.broadcast(banViolationMessage, Permissions.ARC_VIOLATIONS);
 
         final var banMessage = replaceConfigurableMessage(banConfiguration.banMessage(), Map.of("%check%", check.getName()));

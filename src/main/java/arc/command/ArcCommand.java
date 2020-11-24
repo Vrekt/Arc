@@ -1,6 +1,8 @@
 package arc.command;
 
 import arc.Arc;
+import arc.permissions.Permissions;
+import arc.utility.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -75,8 +77,8 @@ public abstract class ArcCommand {
      */
     protected boolean executeSubCommand(String argument, CommandSender sender, String[] args) {
         final var subCommand = subCommands.get(argument);
-        if (!sender.hasPermission(subCommand.permission())) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to execute this sub-command.");
+        if (!sender.hasPermission(subCommand.permission()) || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
+            ChatUtil.sendMessage(sender, ChatColor.RED + "You do not have permission to execute this sub-command.");
             return true;
         }
         subCommands.get(argument).execute(sender, args);

@@ -129,9 +129,8 @@ public final class Criticals extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        if (!enabled()) {
-            unregisterPacketListeners();
-        } else {
+        unregisterPacketListeners();
+        if (enabled()) {
             load();
         }
     }

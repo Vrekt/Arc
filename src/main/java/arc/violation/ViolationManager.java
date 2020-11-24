@@ -115,7 +115,7 @@ public final class ViolationManager {
             final var messageNoInfo = replaceConfigurableMessage(rawMessage,
                     Map.of("%player%", player.getName(), "%check%", (
                             hasAppend ? check.getName() + ChatColor.GRAY + " " + result.appendName() + " "
-                                    : check.getName()), "%level%", level + ""));
+                                    : check.getName()), "%level%", level + "", "%prefix%", configuration.prefix()));
 
             // notify, check debug status too.
             violationViewers.forEach((viewer, debug) -> {

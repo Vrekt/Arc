@@ -2,6 +2,7 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.command.ArcSubCommand;
+import arc.utility.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ public final class ArcDebugCommand extends ArcSubCommand {
     @Override
     protected void execute(CommandSender sender, String[] arguments) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You must be a player to run this command.");
+            sender.sendMessage(ChatColor.RED + " You must be a player to run this command.");
             return;
         }
 
@@ -22,6 +23,6 @@ public final class ArcDebugCommand extends ArcSubCommand {
         final var state = Arc.arc().violations().isDebugViewer(player);
         Arc.arc().violations().toggleDebugViewer(player, !state);
 
-        sender.sendMessage(ChatColor.GRAY + "Debug information is now " + (!state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
+        ChatUtil.sendMessage(player, ChatColor.GRAY + " Debug information is now " + (!state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
     }
 }

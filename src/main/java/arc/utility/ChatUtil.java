@@ -1,23 +1,32 @@
 package arc.utility;
 
-import arc.permissions.Permissions;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import arc.Arc;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
- * A basic chat utility
+ * Basic chat utility for sending messages and broadcasting.
  */
 public final class ChatUtil {
 
-    private static final String PREFIX = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.WHITE;
-
     /**
-     * Broadcast to the violations permission
+     * Send a message
      *
+     * @param player  the player
      * @param message the message
      */
-    public static void broadcastToViolations(String message) {
-        Bukkit.broadcast(PREFIX + message, Permissions.ARC_VIOLATIONS);
+    public static void sendMessage(Player player, String message) {
+        player.sendMessage(Arc.arc().configuration().prefix() + message);
+    }
+
+    /**
+     * Send a message
+     *
+     * @param sender the sender
+     * @param message the message
+     */
+    public static void sendMessage(CommandSender sender, String message) {
+        sender.sendMessage(Arc.arc().configuration().prefix() + message);
     }
 
 }
