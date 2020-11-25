@@ -43,8 +43,8 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [x] ~Workaround /effect for BadEffects check~
 - [x] ~Fix BadEffects potion duration~
 - [x] ~Better information system with violations~
-- [ ] Debug system
-- [ ] Debug/Information commands to toggle
+- [x] Debug system
+- [x] Debug/Information commands to toggle
 - [x] Commands in general
 - [x] Exemptions 
 - [ ] More checks, obviously
