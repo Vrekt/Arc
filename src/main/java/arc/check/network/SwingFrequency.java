@@ -85,8 +85,8 @@ public final class SwingFrequency extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unregisterPacketListeners();
-        cancelScheduled();
+        unload();
+
         if (enabled()) load();
     }
 
@@ -101,6 +101,11 @@ public final class SwingFrequency extends PacketCheck {
                 if (!exempt(player)) check(player, PacketData.get(player));
             }
         }, 20, 20);
+    }
 
+    @Override
+    public void unload() {
+        unregisterPacketListeners();
+        cancelScheduled();
     }
 }

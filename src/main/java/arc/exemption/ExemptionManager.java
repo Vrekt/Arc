@@ -3,6 +3,7 @@ package arc.exemption;
 import arc.Arc;
 import arc.check.CheckType;
 import arc.permissions.Permissions;
+import arc.utility.Closeable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -14,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages player exemptions
  */
-public final class ExemptionManager {
+public final class ExemptionManager implements Closeable {
 
     /**
      * Exemptions by player
@@ -49,7 +50,7 @@ public final class ExemptionManager {
      */
     public void onPlayerLeave(Player player) {
         final var exemptions = this.exemptions.get(player.getUniqueId());
-        exemptions.dispose();
+        exemptions.close();
         this.exemptions.remove(player.getUniqueId());
     }
 
@@ -120,5 +121,11 @@ public final class ExemptionManager {
      */
     private boolean isExemptWhenFlying(CheckType check) {
         return check == CheckType.NOFALL || check == CheckType.FLIGHT || check == CheckType.SPEED;
+    }
+
+    @Override
+    public void close() {
+        exemptions.values().forEach(Exemptions::close);
+        exemptions.clear();
     }
 }

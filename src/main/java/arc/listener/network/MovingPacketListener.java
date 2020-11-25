@@ -17,12 +17,11 @@ import com.comphenix.protocol.events.PacketEvent;
 public final class MovingPacketListener {
 
     /**
-     * Initialize and register the listeners
-     * TODO: Track LOOK packet for OnGround?
+     * Register all packet listeners.
      *
-     * @param protocol the protocol manager
+     * @param protocol the protocol
      */
-    public MovingPacketListener(ProtocolManager protocol) {
+    public void createPacketListeners(ProtocolManager protocol) {
         // flying
         protocol.addPacketListener(new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, PacketType.Play.Client.FLYING) {
             @Override
@@ -46,6 +45,15 @@ public final class MovingPacketListener {
                 onPositionLook(event);
             }
         });
+
+    }
+
+    /**
+     * Remove all packet listeners.
+     *
+     * @param protocol the protocol.
+     */
+    public void removePacketListeners(ProtocolManager protocol) {
 
     }
 

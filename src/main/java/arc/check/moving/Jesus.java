@@ -76,4 +76,9 @@ public final class Jesus extends Check {
     public void load() {
         // No loading required
     }
+
+    @Override
+    public void unload() {
+        // No unloading required
+    }
 }

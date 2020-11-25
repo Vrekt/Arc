@@ -3,14 +3,13 @@ package arc;
 import arc.check.CheckManager;
 import arc.command.CommandArc;
 import arc.configuration.ArcConfiguration;
+import arc.data.DataUtility;
 import arc.exemption.ExemptionManager;
-import arc.listener.connection.ConnectionListener;
-import arc.listener.moving.MovingListener;
-import arc.listener.network.MovingPacketListener;
-import arc.listener.player.PlayerListener;
+import arc.listener.Listeners;
 import arc.violation.ViolationManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -63,15 +62,12 @@ public final class Arc extends JavaPlugin {
         saveDefaultConfig();
         arcConfiguration = new ArcConfiguration(getConfig());
         protocolManager = ProtocolLibrary.getProtocolManager();
-        final var movingPacketListener = new MovingPacketListener(protocolManager);
 
         getLogger().info("[INFO] Registering checks and listeners");
         checkManager = new CheckManager();
         violationManager = new ViolationManager(arcConfiguration);
 
-        getServer().getPluginManager().registerEvents(new ConnectionListener(), this);
-        getServer().getPluginManager().registerEvents(new MovingListener(), this);
-        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        Listeners.register(this, protocolManager);
 
         getLogger().info("[INFO] Registering base command.");
         getCommand("arc").setExecutor(new CommandArc());
@@ -85,7 +81,13 @@ public final class Arc extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        Listeners.unregister(protocolManager);
 
+        exemptionManager.close();
+        violationManager.close();
+        checkManager.close();
+
+        Bukkit.getOnlinePlayers().forEach(DataUtility::removeAll);
     }
 
     /**

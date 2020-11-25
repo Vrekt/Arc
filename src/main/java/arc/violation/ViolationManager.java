@@ -8,6 +8,7 @@ import arc.configuration.ArcConfiguration;
 import arc.configuration.punishment.ban.BanConfiguration;
 import arc.configuration.punishment.kick.KickConfiguration;
 import arc.permissions.Permissions;
+import arc.utility.Closeable;
 import arc.utility.Punishment;
 import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages violations
  */
-public final class ViolationManager {
+public final class ViolationManager implements Closeable {
 
     /**
      * Violation history
@@ -210,4 +211,9 @@ public final class ViolationManager {
         return message;
     }
 
+    @Override
+    public void close() {
+        history.clear();
+        violationViewers.clear();
+    }
 }

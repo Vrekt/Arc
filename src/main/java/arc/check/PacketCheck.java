@@ -71,5 +71,4 @@ public abstract class PacketCheck extends Check {
         listeners.clear();
     }
 
-
 }

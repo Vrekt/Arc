@@ -141,4 +141,9 @@ public final class NoFall extends Check {
     public void load() {
         tolerance = getValueDouble("tolerance");
     }
+
+    @Override
+    public void unload() {
+        // no unloading required
+    }
 }

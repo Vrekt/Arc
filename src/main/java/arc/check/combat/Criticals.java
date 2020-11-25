@@ -129,12 +129,12 @@ public final class Criticals extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unregisterPacketListeners();
+        unload();
+
         if (enabled()) {
             load();
         }
     }
-
 
     @Override
     public void load() {
@@ -143,5 +143,10 @@ public final class Criticals extends PacketCheck {
         maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
         maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
         registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
+    }
+
+    @Override
+    public void unload() {
+        unregisterPacketListeners();
     }
 }

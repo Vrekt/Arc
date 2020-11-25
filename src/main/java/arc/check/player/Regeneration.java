@@ -62,4 +62,9 @@ public final class Regeneration extends Check {
     public void load() {
         regenerationTime = getValueLong("regeneration-time-ms");
     }
+
+    @Override
+    public void unload() {
+        // No unloading required
+    }
 }

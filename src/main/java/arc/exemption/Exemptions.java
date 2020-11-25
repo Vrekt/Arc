@@ -1,6 +1,7 @@
 package arc.exemption;
 
 import arc.check.CheckType;
+import arc.utility.Closeable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.Map;
 /**
  * Player exemption data
  */
-public final class Exemptions {
+public final class Exemptions implements Closeable {
 
     /**
      * Exemption data
@@ -40,10 +41,8 @@ public final class Exemptions {
         return result;
     }
 
-    /**
-     * Dispose
-     */
-    public void dispose() {
+    @Override
+    public void close() {
         exemptions.clear();
     }
 

@@ -5,10 +5,8 @@ import arc.check.CheckType;
 import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
-import arc.listener.moving.tasks.MovingTask;
 import arc.permissions.Permissions;
 import arc.utility.MovingUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -30,18 +28,11 @@ public final class MovingListener implements Listener {
     private final Jesus jesus;
 
     /**
-     * The moving task.
-     * TODO: Reference probably not needed.
-     */
-    private final MovingTask task = new MovingTask();
-
-    /**
      * Initialize and add all the checks we need.
      */
     public MovingListener() {
         noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
         jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
-        Bukkit.getScheduler().runTaskTimer(Arc.plugin(), task, 20, 20);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -89,7 +80,5 @@ public final class MovingListener implements Listener {
                 }
             });
         }
-
     }
-
 }

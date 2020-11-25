@@ -109,7 +109,8 @@ public final class FastUse extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unregisterPacketListeners();
+        unload();
+
         if (enabled()) load();
     }
 
@@ -119,5 +120,10 @@ public final class FastUse extends PacketCheck {
         deltaShotMinimum = getValueLong("delta-shot-min");
         consumeTime = getValueLong("consume-time-ms");
         registerPacketListener(PacketType.Play.Client.BLOCK_PLACE, this::onBlockPlace);
+    }
+
+    @Override
+    public void unload() {
+        unregisterPacketListeners();
     }
 }

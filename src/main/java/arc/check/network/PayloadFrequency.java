@@ -142,8 +142,8 @@ public final class PayloadFrequency extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unregisterPacketListeners();
-        cancelScheduled();
+        unload();
+
         if (enabled()) load();
     }
 
@@ -165,6 +165,11 @@ public final class PayloadFrequency extends PacketCheck {
                 check(player, PacketData.get(player));
             }
         }, interval, interval);
+    }
 
+    @Override
+    public void unload() {
+        unregisterPacketListeners();
+        cancelScheduled();
     }
 }

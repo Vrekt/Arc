@@ -8,6 +8,7 @@ import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
+import arc.utility.Closeable;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.*;
@@ -15,7 +16,7 @@ import java.util.*;
 /**
  * A check manager
  */
-public final class CheckManager {
+public final class CheckManager implements Closeable {
 
     /**
      * All the checks
@@ -57,5 +58,11 @@ public final class CheckManager {
      */
     public Set<Check> getAllChecks() {
         return checks;
+    }
+
+    @Override
+    public void close() {
+        checks.forEach(Check::unload);
+        checks.clear();
     }
 }

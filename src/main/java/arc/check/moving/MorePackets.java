@@ -100,7 +100,8 @@ public final class MorePackets extends Check {
 
     @Override
     public void reloadConfig() {
-        cancelScheduled();
+        unload();
+
         if (enabled()) {
             load();
         }
@@ -117,6 +118,10 @@ public final class MorePackets extends Check {
                 if (!exempt(player)) check(player, MovingData.get(player));
             }
         }, 20, 20);
+    }
 
+    @Override
+    public void unload() {
+        cancelScheduled();
     }
 }
