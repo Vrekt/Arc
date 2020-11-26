@@ -11,6 +11,7 @@ import arc.permissions.Permissions;
 import arc.utility.Closeable;
 import arc.utility.Punishment;
 import arc.violation.result.ViolationResult;
+import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -89,11 +90,11 @@ public final class ViolationManager implements Closeable {
      * @return the result
      */
     public ViolationResult violation(Player player, Check check, CheckResult result) {
-        final var violations = history.get(player.getUniqueId());
-        final var level = violations.incrementViolationLevel(check.getName());
+        final Violations violations = history.get(player.getUniqueId());
+        final int level = violations.incrementViolationLevel(check.getName());
 
         // call our violation event.
-        final var event = new PlayerViolationEvent(player, check.type(), level, result.information());
+        final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result.information());
         Bukkit.getPluginManager().callEvent(event);
         // if the event is cancelled, remove the violation level and return no result.
         if (event.isCancelled()) {
@@ -103,24 +104,24 @@ public final class ViolationManager implements Closeable {
         }
 
         // create a new result if we haven't cancelled.
-        final var violationResult = new ViolationResult();
+        final ViolationResult violationResult = new ViolationResult();
 
         // handle violation
         if (check.configuration().notifyViolation()
                 && check.configuration().shouldNotify(level)) {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             // grab our violation message and then replace placeholders.
-            final var rawMessage = configuration.violationMessage();
-            final var hasAppend = result.appendName() != null;
+            final String rawMessage = configuration.violationMessage();
+            final boolean hasAppend = result.appendName() != null;
             // the violation message,
-            final var messageNoInfo = replaceConfigurableMessage(rawMessage,
-                    Map.of("%player%", player.getName(), "%check%", (
+            final String messageNoInfo = replaceConfigurableMessage(rawMessage,
+                    ImmutableMap.of("%player%", player.getName(), "%check%", (
                             hasAppend ? check.getName() + ChatColor.GRAY + " " + result.appendName() + " "
                                     : check.getName()), "%level%", level + "", "%prefix%", configuration.prefix()));
 
             // notify, check debug status too.
             violationViewers.forEach((viewer, debug) -> {
-                final var messageInfo = messageNoInfo.replace("%information%", debug ? result.information() : "");
+                final String messageInfo = messageNoInfo.replace("%information%", debug ? result.information() : "");
                 viewer.sendMessage(messageInfo);
             });
         }
@@ -143,7 +144,7 @@ public final class ViolationManager implements Closeable {
         }
 
         // fire the post event
-        final var postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
+        final PostPlayerViolationEvent postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
         Bukkit.getPluginManager().callEvent(postEvent);
 
         return violationResult;

@@ -2,6 +2,7 @@ package arc.listener.connection;
 
 import arc.Arc;
 import arc.data.DataUtility;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -15,7 +16,7 @@ public final class ConnectionListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerJoin(PlayerJoinEvent event) {
-        final var player = event.getPlayer();
+        final Player player = event.getPlayer();
         Arc.arc().violations().onPlayerJoin(player);
         Arc.arc().exemptions().onPlayerJoin(player);
     }
@@ -27,7 +28,7 @@ public final class ConnectionListener implements Listener {
      */
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerLeave(PlayerQuitEvent event) {
-        final var player = event.getPlayer();
+        final Player player = event.getPlayer();
         Arc.arc().violations().onPlayerLeave(player);
         Arc.arc().exemptions().onPlayerLeave(player);
         DataUtility.removeAll(player);

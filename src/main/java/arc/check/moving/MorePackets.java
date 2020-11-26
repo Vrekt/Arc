@@ -4,6 +4,8 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
+import arc.data.moving.packets.MovingPacketData;
+import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -53,16 +55,16 @@ public final class MorePackets extends Check {
      * @param data   the data
      */
     private void check(Player player, MovingData data) {
-        final var result = new CheckResult();
-        final var packets = data.packets();
+        final CheckResult result = new CheckResult();
+        final MovingPacketData packets = data.packets();
         // we were exempt for awhile or some type of lag occurred so reset.
         if (System.currentTimeMillis() - packets.lastCheck() >= 2000) {
             packets.flyingPackets(0);
             packets.positionPackets(0);
         }
 
-        final var flyingPackets = packets.flyingPackets();
-        final var positionPackets = packets.positionPackets();
+        final int flyingPackets = packets.flyingPackets();
+        final int positionPackets = packets.positionPackets();
         boolean failedFlying = false, failedPosition = false;
 
         if (flyingPackets >= maxFlyingPackets) {
@@ -87,7 +89,7 @@ public final class MorePackets extends Check {
             packets.cancelPositionPackets(false);
         }
 
-        final var violation = result(player, result);
+        final ViolationResult violation = result(player, result);
         if (violation.cancel()) {
             packets.cancelFlyingPackets(failedFlying);
             packets.cancelPositionPackets(failedPosition);
@@ -114,7 +116,7 @@ public final class MorePackets extends Check {
         maxPacketsToKick = getValueInt("max-packets-kick");
 
         scheduledCheck(() -> {
-            for (var player : Bukkit.getOnlinePlayers()) {
+            for (final Player player : Bukkit.getOnlinePlayers()) {
                 if (!exempt(player)) check(player, MovingData.get(player));
             }
         }, 20, 20);

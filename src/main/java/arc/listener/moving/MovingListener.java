@@ -8,6 +8,8 @@ import arc.data.moving.MovingData;
 import arc.permissions.Permissions;
 import arc.utility.MathUtil;
 import arc.utility.MovingUtil;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -39,18 +41,18 @@ public final class MovingListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onMove(PlayerMoveEvent event) {
 
-        final var from = event.getFrom();
-        final var to = event.getTo();
+        final Location from = event.getFrom();
+        final Location to = event.getTo();
 
         // first, check some things before grabbing moving data and all that
         // to avoid wasting resources/time
         if (from.getWorld() != to.getWorld()) return;
 
         // check if we have moved, if not return
-        final var moved = from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ();
+        final boolean moved = from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ();
         if (!moved) return;
 
-        final var player = event.getPlayer();
+        final Player player = event.getPlayer();
         // finally, check permission exemption.
         if (Permissions.canBypassChecks(player)) return;
 
@@ -61,7 +63,7 @@ public final class MovingListener implements Listener {
                         || from.getBlockZ() != to.getBlockZ();
 
         // retrieve data and calculate what we need
-        final var data = MovingData.get(player);
+        final MovingData data = MovingData.get(player);
         MovingUtil.updateMovingPlayer(data, from, to);
 
         // Check players for NoFall.

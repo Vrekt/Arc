@@ -33,10 +33,10 @@ public final class Exemptions implements Closeable {
      * @return {@code true} if so
      */
     public boolean isExempt(CheckType check) {
-        final var time = exemptions.getOrDefault(check, 0L);
+        final long time = exemptions.getOrDefault(check, 0L);
         if (time == 0) return false;
 
-        final var result = (System.currentTimeMillis() - time <= 0);
+        final boolean result = (System.currentTimeMillis() - time <= 0);
         if (!result) exemptions.remove(check);
         return result;
     }

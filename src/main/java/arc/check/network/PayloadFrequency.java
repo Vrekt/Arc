@@ -4,9 +4,11 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
+import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
+import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -61,7 +63,7 @@ public final class PayloadFrequency extends PacketCheck {
         addConfigurationValue("max-packets-per-interval", 1);
         addConfigurationValue("max-packet-size-kick", true);
         addConfigurationValue("max-packets-per-interval-kick", true);
-        addConfigurationValue("channels", List.of("MC|BSign", "MC|BEdit"));
+        addConfigurationValue("channels", Lists.newArrayList("MC|BSign", "MC|BEdit"));
 
         if (enabled()) load();
     }
@@ -73,8 +75,8 @@ public final class PayloadFrequency extends PacketCheck {
      * @param data   the packet data
      */
     private void check(Player player, PacketData data) {
-        final var count = data.payloadPacketCount();
-        final var result = new CheckResult();
+        final int count = data.payloadPacketCount();
+        final CheckResult result = new CheckResult();
 
         if (count > maxPacketsPerInterval) {
             result.setFailed("Too many payload packets per interval, count=" + count + " max=" + maxPacketsPerInterval);
@@ -83,7 +85,7 @@ public final class PayloadFrequency extends PacketCheck {
             }
         }
 
-        final var violation = result(player, result);
+        final ViolationResult violation = result(player, result);
         data.cancelPayloadPackets(violation.cancel());
         data.payloadPacketCount(0);
     }
@@ -97,24 +99,24 @@ public final class PayloadFrequency extends PacketCheck {
      */
     private void onPayload(PacketEvent event) {
         // retrieve the player, if they are not online cancel the event and return.
-        final var player = event.getPlayer();
+        final Player player = event.getPlayer();
         if (player == null || !player.isOnline()) {
             event.setCancelled(true);
             return;
         }
 
         // retrieve our data and the packet
-        final var data = PacketData.get(player);
+        final PacketData data = PacketData.get(player);
         if (data.cancelPayloadPackets()) event.setCancelled(true);
 
-        final var packet = new WrapperPlayClientCustomPayload(event.getPacket());
-        final var channel = packet.getChannel();
-        final var result = new CheckResult();
+        final WrapperPlayClientCustomPayload packet = new WrapperPlayClientCustomPayload(event.getPacket());
+        final String channel = packet.getChannel();
+        final CheckResult result = new CheckResult();
 
         // if we have a valid channel to check
         if (channels.contains(channel)) {
-            final var bytes = packet.getContents();
-            final var max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
+            final byte[] bytes = packet.getContents();
+            final int max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
             // check if the length is bigger than the allowed size
             if (bytes.length > max) {
                 result.setFailed("Payload packet size too big, len=" + bytes.length + " max=" + max);
@@ -126,7 +128,7 @@ public final class PayloadFrequency extends PacketCheck {
             data.incrementPayloadPacketCount();
         }
 
-        final var violation = result(player, result);
+        final ViolationResult violation = result(player, result);
         data.cancelPayloadPackets(violation.cancel());
     }
 
@@ -156,8 +158,8 @@ public final class PayloadFrequency extends PacketCheck {
         maxPacketsPerIntervalKick = getValueBoolean("max-packets-per-interval-kick");
         channels = getList("channels");
 
-        final var checkInterval = getValueInt("check-interval-milliseconds");
-        final var interval = (checkInterval / 1000) * 20;
+        final int checkInterval = getValueInt("check-interval-milliseconds");
+        final int interval = (checkInterval / 1000) * 20;
 
         registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
         scheduledCheck(() -> {

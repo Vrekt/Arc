@@ -5,6 +5,7 @@ import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
+import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
@@ -61,18 +62,18 @@ public final class Criticals extends PacketCheck {
      * @param event the event
      */
     private void onUseEntity(PacketEvent event) {
-        final var packet = new WrapperPlayClientUseEntity(event.getPacket());
+        final WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
-            final var player = event.getPlayer();
-            final var data = MovingData.get(player);
+            final Player player = event.getPlayer();
+            final MovingData data = MovingData.get(player);
 
             // If it was a possible critical hit and we are on-ground lets check.
             if (isPossibleCriticalHit(player, data) && data.onGround()) {
-                final var result = new CheckResult();
-                final var vertical = Math.floor(data.vertical() * 100) / 100;
-                final var last = Math.floor(data.lastVerticalDistance() * 100) / 100;
-                var similarVerticalAmount = data.similarVerticalAmount();
-                var noVerticalAmount = data.noVerticalAmount();
+                final CheckResult result = new CheckResult();
+                final double vertical = Math.floor(data.vertical() * 100) / 100;
+                final double last = Math.floor(data.lastVerticalDistance() * 100) / 100;
+                int similarVerticalAmount = data.similarVerticalAmount();
+                int noVerticalAmount = data.noVerticalAmount();
 
                 // Check if the difference between the last vertical and now is less than expected.
                 // If so, increment the amount.
@@ -107,7 +108,7 @@ public final class Criticals extends PacketCheck {
                 data.similarVerticalAmount(similarVerticalAmount);
 
                 // violation
-                final var violation = result(player, result);
+                final ViolationResult violation = result(player, result);
                 event.setCancelled(violation.cancel());
             }
         }

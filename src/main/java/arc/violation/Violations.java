@@ -30,7 +30,7 @@ public final class Violations {
      * @param checkName the check name
      */
     public int incrementViolationLevel(String checkName) {
-        final var level = getViolationLevel(checkName) + 1;
+        final int level = getViolationLevel(checkName) + 1;
         violations.put(checkName, level);
         return level;
     }

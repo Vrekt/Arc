@@ -52,7 +52,7 @@ public final class CheckManager implements Closeable {
      * @return the check
      */
     public Check getCheck(CheckType checkType) {
-        return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow();
+        return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow(NoSuchElementException::new);
     }
 
     /**

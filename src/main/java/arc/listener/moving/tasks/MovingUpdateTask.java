@@ -36,7 +36,7 @@ public final class MovingUpdateTask implements Runnable {
     @Override
     public void run() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            final var data = MovingData.get(player);
+            final MovingData data = MovingData.get(player);
 
             // update this players moving data if they haven't moved in the last half-second;
             // only update if we have moved.

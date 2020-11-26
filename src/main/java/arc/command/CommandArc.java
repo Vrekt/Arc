@@ -41,7 +41,7 @@ public class CommandArc extends ArcCommand implements CommandExecutor {
         }
 
         // retrieve the sub command and execute it.
-        final var subCommand = args[0];
+        final String subCommand = args[0];
         if (isSubCommand(subCommand))
             return executeSubCommand(subCommand, sender, ArrayUtils.remove(args, 0));
 

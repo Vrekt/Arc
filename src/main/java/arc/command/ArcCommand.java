@@ -76,7 +76,7 @@ public abstract class ArcCommand {
      * @return {@code true}
      */
     protected boolean executeSubCommand(String argument, CommandSender sender, String[] args) {
-        final var subCommand = subCommands.get(argument);
+        final ArcSubCommand subCommand = subCommands.get(argument);
         if (!sender.hasPermission(subCommand.permission()) || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
             ChatUtil.sendMessage(sender, ChatColor.RED + "You do not have permission to execute this sub-command.");
             return true;
@@ -123,14 +123,14 @@ public abstract class ArcCommand {
      * @return {@code true}
      */
     protected boolean printHelpMessage(CommandSender sender) {
-        final var builder = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         builder.append(HEADER);
         builder.append("\n");
 
-        final var count = new AtomicInteger(0);
+        final AtomicInteger count = new AtomicInteger(0);
         helpLinesWithPermissions.forEach((line, permission) -> {
             if (sender.hasPermission(permission)) {
-                final var get = count.addAndGet(1);
+                final int get = count.addAndGet(1);
                 builder.append(line);
                 if (get == helpLinesWithPermissions.size()) {
                     builder.append(STRIKETHROUGH);

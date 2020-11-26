@@ -153,7 +153,7 @@ public final class CheckConfigurationWriter {
      * @return a new check configuration
      */
     public CheckConfiguration finish() {
-        final var config = new CheckConfiguration(section);
+        final CheckConfiguration config = new CheckConfiguration(section);
         configuration = null;
         return config;
     }

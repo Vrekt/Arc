@@ -38,7 +38,7 @@ public abstract class PacketCheck extends Check {
      */
     protected void registerPacketListener(PacketType packetType, Consumer<PacketEvent> consumer) {
         if (packetType.isServer()) {
-            final var serverAdapter = new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
+            final PacketAdapter serverAdapter = new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
                 @Override
                 public void onPacketSending(PacketEvent event) {
                     if (!exempt(event.getPlayer())) {
@@ -50,7 +50,7 @@ public abstract class PacketCheck extends Check {
             listeners.add(serverAdapter);
             Arc.arc().protocol().addPacketListener(serverAdapter);
         } else {
-            final var clientAdapter = new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
+            final PacketAdapter clientAdapter = new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
                 @Override
                 public void onPacketReceiving(PacketEvent event) {
                     if (!exempt(event.getPlayer())) {

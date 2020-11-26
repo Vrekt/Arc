@@ -5,6 +5,7 @@ import arc.check.CheckType;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
 import arc.data.player.PlayerData;
+import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -40,8 +41,8 @@ public final class PlayerListener implements Listener {
 
         // only check if we have regained health from being satisfied.
         if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
-            final var player = (Player) event.getEntity();
-            final var data = PlayerData.get(player);
+            final Player player = (Player) event.getEntity();
+            final PlayerData data = PlayerData.get(player);
             if (data.lastHealthRegain() != 0) {
                 regeneration.check(player, data, (violation) -> event.setCancelled(violation.cancel()));
             }
@@ -54,14 +55,14 @@ public final class PlayerListener implements Listener {
     private void onBow(EntityShootBowEvent event) {
         if (event.getEntity() instanceof Player
                 && event.getProjectile() instanceof Arrow) {
-            final var player = (Player) event.getEntity();
-            final var data = PlayerData.get(player);
+            final Player player = (Player) event.getEntity();
+            final PlayerData data = PlayerData.get(player);
             if (data.lastBowShoot() == 0) {
                 data.lastBowShoot(System.currentTimeMillis());
                 return;
             }
 
-            final var result = fastUse.checkFastBow(player, data);
+            final ViolationResult result = fastUse.checkFastBow(player, data);
             event.setCancelled(result.cancel());
 
             data.lastBowShoot(System.currentTimeMillis());
@@ -70,9 +71,9 @@ public final class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     private void onConsumeItem(PlayerItemConsumeEvent event) {
-        final var player = event.getPlayer();
-        final var data = PlayerData.get(player);
-        final var result = fastUse.checkFastConsume(player, data);
+        final Player player = event.getPlayer();
+        final PlayerData data = PlayerData.get(player);
+        final ViolationResult result = fastUse.checkFastConsume(player, data);
         event.setCancelled(result.cancel());
     }
 

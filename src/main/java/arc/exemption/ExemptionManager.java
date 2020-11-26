@@ -49,7 +49,7 @@ public final class ExemptionManager implements Closeable {
      * @param player the player
      */
     public void onPlayerLeave(Player player) {
-        final var exemptions = this.exemptions.get(player.getUniqueId());
+        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.close();
         this.exemptions.remove(player.getUniqueId());
     }
@@ -67,7 +67,7 @@ public final class ExemptionManager implements Closeable {
         // check flying status
         if (isFlying(player) && isExemptWhenFlying(check)) return true;
         // check other added exemptions
-        final var exemptions = this.exemptions.get(player.getUniqueId());
+        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
         return exemptions.isExempt(check);
     }
 
@@ -90,7 +90,7 @@ public final class ExemptionManager implements Closeable {
      * @param duration the duration
      */
     public void addExemption(Player player, CheckType check, long duration) {
-        final var exemptions = this.exemptions.get(player.getUniqueId());
+        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.addExemption(check, System.currentTimeMillis() + duration);
     }
 

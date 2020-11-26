@@ -19,8 +19,8 @@ public final class ArcDebugCommand extends ArcSubCommand {
             return;
         }
 
-        final var player = (Player) sender;
-        final var state = Arc.arc().violations().isDebugViewer(player);
+        final Player player = (Player) sender;
+        final boolean state = Arc.arc().violations().isDebugViewer(player);
         Arc.arc().violations().toggleDebugViewer(player, !state);
 
         ChatUtil.sendMessage(player, ChatColor.GRAY + " Debug information is now " + (!state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));

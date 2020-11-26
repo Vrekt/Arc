@@ -50,8 +50,8 @@ public final class FastUse extends PacketCheck {
      * @param event the event
      */
     private void onBlockPlace(PacketEvent event) {
-        final var packet = new WrapperPlayClientBlockPlace(event.getPacket());
-        final var item = packet.getHeldItem().getType();
+        final WrapperPlayClientBlockPlace packet = new WrapperPlayClientBlockPlace(event.getPacket());
+        final Material item = packet.getHeldItem().getType();
 
         if (item == Material.BOW) {
             PlayerData.get(event.getPlayer()).lastBowUse(System.currentTimeMillis());
@@ -70,15 +70,15 @@ public final class FastUse extends PacketCheck {
     public ViolationResult checkFastBow(Player player, PlayerData data) {
         if (exempt(player) || !enabled()) return ViolationResult.EMPTY;
 
-        final var lastUse = data.lastBowUse();
-        final var lastShot = data.lastBowShoot();
+        final long lastUse = data.lastBowUse();
+        final long lastShot = data.lastBowShoot();
 
-        final var deltaUseToShot = Math.abs(lastUse - lastShot);
-        final var useDelta = System.currentTimeMillis() - lastUse;
+        final long deltaUseToShot = Math.abs(lastUse - lastShot);
+        final long useDelta = System.currentTimeMillis() - lastUse;
 
         // check the delta times against the configuration values.
         if (deltaUseToShot < deltaShotMinimum && useDelta < useDeltaMinimum) {
-            final var result = new CheckResult(CheckResult.Result.FAILED);
+            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Used a bow too fast, deltaShot=" + deltaUseToShot + " min=" + deltaShotMinimum + " + useDelta=" + useDelta + " min=" + useDeltaMinimum, "(FastBow)");
             return result(player, result);
         }
@@ -97,9 +97,9 @@ public final class FastUse extends PacketCheck {
         if (exempt(player) || !enabled()) return ViolationResult.EMPTY;
 
         // the time it took to consume the item
-        final var delta = System.currentTimeMillis() - data.consumeStartTime();
+        final long delta = System.currentTimeMillis() - data.consumeStartTime();
         if (delta < consumeTime) {
-            final var result = new CheckResult(CheckResult.Result.FAILED);
+            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Consumed an item too fast, delta=" + delta + ", min=" + consumeTime, "(FastConsume)");
             return result(player, result);
         }

@@ -4,6 +4,7 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
+import arc.violation.result.ViolationResult;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Bukkit;
@@ -51,7 +52,7 @@ public final class SwingFrequency extends PacketCheck {
      * @param data   the packet data
      */
     private void check(Player player, PacketData data) {
-        final var result = new CheckResult();
+        final CheckResult result = new CheckResult();
 
         if (data.swingPacketCount() > maxPackets) {
             result.setFailed("Too many swing packets per second, p=" + data.swingPacketCount() + " m=" + maxPackets);
@@ -63,7 +64,7 @@ public final class SwingFrequency extends PacketCheck {
 
         data.swingPacketCount(0);
 
-        final var violation = result(player, result);
+        final ViolationResult violation = result(player, result);
         if (violation.cancel()) {
             data.cancelSwingPackets(true);
         }
@@ -75,8 +76,8 @@ public final class SwingFrequency extends PacketCheck {
      * @param event the event
      */
     private void onArmAnimation(PacketEvent event) {
-        final var player = event.getPlayer();
-        final var data = PacketData.get(player);
+        final Player player = event.getPlayer();
+        final PacketData data = PacketData.get(player);
         if (data.cancelSwingPackets()) {
             event.setCancelled(true);
         }

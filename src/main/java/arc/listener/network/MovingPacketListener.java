@@ -2,6 +2,7 @@ package arc.listener.network;
 
 import arc.Arc;
 import arc.data.moving.MovingData;
+import arc.data.moving.packets.MovingPacketData;
 import com.comphenix.packetwrapper.WrapperPlayClientFlying;
 import com.comphenix.packetwrapper.WrapperPlayClientPosition;
 import com.comphenix.packetwrapper.WrapperPlayClientPositionLook;
@@ -10,6 +11,7 @@ import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
+import org.bukkit.entity.Player;
 
 /**
  * Listens for moving packets.
@@ -63,10 +65,10 @@ public final class MovingPacketListener {
      * @param event the event
      */
     private void onFlying(PacketEvent event) {
-        final var packet = new WrapperPlayClientFlying(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
+        final WrapperPlayClientFlying packet = new WrapperPlayClientFlying(event.getPacket());
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.get(player);
+        final MovingPacketData packets = data.packets();
 
         data.wasClientOnGround(data.clientOnGround());
         data.clientOnGround(packet.getOnGround());
@@ -81,10 +83,10 @@ public final class MovingPacketListener {
      * @param event the event
      */
     private void onPosition(PacketEvent event) {
-        final var packet = new WrapperPlayClientPosition(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
+        final WrapperPlayClientPosition packet = new WrapperPlayClientPosition(event.getPacket());
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.get(player);
+        final MovingPacketData packets = data.packets();
 
         data.wasClientOnGround(data.clientOnGround());
         data.clientOnGround(packet.getOnGround());
@@ -99,10 +101,10 @@ public final class MovingPacketListener {
      * @param event the event
      */
     private void onPositionLook(PacketEvent event) {
-        final var packet = new WrapperPlayClientPositionLook(event.getPacket());
-        final var player = event.getPlayer();
-        final var data = MovingData.get(player);
-        final var packets = data.packets();
+        final WrapperPlayClientPositionLook packet = new WrapperPlayClientPositionLook(event.getPacket());
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.get(player);
+        final MovingPacketData packets = data.packets();
 
         data.wasClientOnGround(data.clientOnGround());
         data.clientOnGround(packet.getOnGround());

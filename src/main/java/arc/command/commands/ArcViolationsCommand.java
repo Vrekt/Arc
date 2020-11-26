@@ -3,6 +3,7 @@ package arc.command.commands;
 import arc.Arc;
 import arc.command.ArcSubCommand;
 import arc.utility.ChatUtil;
+import arc.violation.ViolationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,8 +20,8 @@ public final class ArcViolationsCommand extends ArcSubCommand {
             return;
         }
 
-        final var player = (Player) sender;
-        final var violations = Arc.arc().violations();
+        final Player player = (Player) sender;
+        final ViolationManager violations = Arc.arc().violations();
         if (violations.isViolationViewer(player)) {
             ChatUtil.sendMessage(player, ChatColor.GREEN + " You will no longer see violations in chat.");
             violations.removeViolationViewer(player);

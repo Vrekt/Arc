@@ -72,12 +72,12 @@ public final class MovingUtil {
      */
     public static boolean onGround(Location location) {
         // test subtracted blocks next
-        final var selfBlock = location.clone().subtract(0, 0.5, 0).getBlock().getType();
+        final Material selfBlock = location.clone().subtract(0, 0.5, 0).getBlock().getType();
         if (CONSIDERED_SOLID.test(selfBlock)) return true;
 
         // else, get all blocks around us and check if they are solid
-        final var clone = location.clone();
-        final var neighbors0 = neighbors(clone, 0.3, -0.5, 0.3);
+        final Location clone = location.clone();
+        final List<Material> neighbors0 = neighbors(clone, 0.3, -0.5, 0.3);
         return neighbors0.stream().anyMatch(CONSIDERED_SOLID);
     }
 
@@ -88,11 +88,11 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean hasClimbable(Location location) {
-        final var selfBlock = location.getBlock().getType();
+        final Material selfBlock = location.getBlock().getType();
         if (isClimbable(selfBlock)) return true;
 
-        final var clone = location.clone();
-        final var neighbors = neighbors(clone, 0.1, -0.06, 0.1);
+        final Location clone = location.clone();
+        final List<Material> neighbors = neighbors(clone, 0.1, -0.06, 0.1);
         return neighbors.stream().anyMatch(MovingUtil::isClimbable);
     }
 
@@ -112,7 +112,7 @@ public final class MovingUtil {
      * @return if we are in or on liquid.
      */
     public static boolean isInOrOnLiquid(Location location) {
-        final var neighbors = neighbors(location, 0.1, -0.5, 0.1);
+        final List<Material> neighbors = neighbors(location, 0.1, -0.5, 0.1);
         return neighbors.stream().allMatch(material -> material == Material.STATIONARY_LAVA || material == Material.LAVA || material == Material.WATER || material == Material.STATIONARY_WATER);
     }
 
@@ -126,10 +126,10 @@ public final class MovingUtil {
      * @return the neighbors
      */
     public static List<Material> neighbors(Location location, double xModifier, double yModifier, double zModifier) {
-        final var originalX = location.getX();
-        final var originalY = location.getY();
-        final var originalZ = location.getZ();
-        final var neighbors = new ArrayList<Material>();
+        final double originalX = location.getX();
+        final double originalY = location.getY();
+        final double originalZ = location.getZ();
+        final List<Material> neighbors = new ArrayList<>();
 
         neighbors.add(modifyAndReset(location, xModifier, yModifier, -zModifier, originalX, originalY, originalZ));
         neighbors.add(modifyAndReset(location, -xModifier, yModifier, zModifier, originalX, originalY, originalZ));
@@ -151,7 +151,7 @@ public final class MovingUtil {
      * @return the material at the modified location
      */
     public static Material modifyAndReset(Location location, double xModifier, double yModifier, double zModifier, double originalX, double originalY, double originalZ) {
-        final var material = location.add(xModifier, yModifier, zModifier).getBlock().getType();
+        final Material material = location.add(xModifier, yModifier, zModifier).getBlock().getType();
         reset(location, originalX, originalY, originalZ);
         return material;
     }
@@ -182,8 +182,8 @@ public final class MovingUtil {
         data.to(to);
 
         // calculate ground
-        final var wasOnGround = data.onGround();
-        final var onGround = onGround(to);
+        final boolean wasOnGround = data.onGround();
+        final boolean onGround = onGround(to);
         data.onGround(onGround);
         data.wasOnGround(wasOnGround);
 
@@ -195,8 +195,8 @@ public final class MovingUtil {
         }
 
         // calculate vertical distance
-        final var distance = MathUtil.vertical(from, to);
-        final var last = data.vertical();
+        final double distance = MathUtil.vertical(from, to);
+        final double last = data.vertical();
         data.lastVerticalDistance(last);
         data.verticalDistance(distance);
 

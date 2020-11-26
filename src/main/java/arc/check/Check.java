@@ -2,6 +2,7 @@ package arc.check;
 
 import arc.Arc;
 import arc.check.result.CheckResult;
+import arc.configuration.ArcConfiguration;
 import arc.configuration.check.CheckConfiguration;
 import arc.configuration.check.CheckConfigurationWriter;
 import arc.permissions.Permissions;
@@ -254,7 +255,7 @@ public abstract class Check {
      * @param message the message to broadcast
      */
     protected void kick(Player player, String message) {
-        final var config = Arc.arc().configuration();
+        final ArcConfiguration config = Arc.arc().configuration();
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), ()
                 -> {
             player.kickPlayer(config.kickConfiguration().kickMessage().replace("%check%", getName()));

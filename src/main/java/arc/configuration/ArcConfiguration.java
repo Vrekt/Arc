@@ -116,7 +116,7 @@ public final class ArcConfiguration {
      */
     public void reload() {
         Arc.arc().reloadConfig();
-        final var config = Arc.arc().getConfig();
+        final FileConfiguration config = Arc.arc().getConfig();
 
         read(config);
         Arc.arc().checks().reloadConfigurations(config);

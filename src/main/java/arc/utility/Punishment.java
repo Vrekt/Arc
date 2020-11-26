@@ -6,6 +6,7 @@ import arc.configuration.punishment.ban.BanConfiguration;
 import arc.configuration.punishment.ban.BanLengthType;
 import arc.configuration.punishment.kick.KickConfiguration;
 import arc.permissions.Permissions;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.time.DateUtils;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
@@ -71,23 +72,32 @@ public final class Punishment {
         PENDING_PLAYER_BANS.add(player);
 
         // grab basic configuration values.
-        final var banLengthType = banConfiguration.banLengthType();
-        final var banDelay = banConfiguration.banDelay();
-        final var now = new Date();
+        final BanLengthType banLengthType = banConfiguration.banLengthType();
+        final int banDelay = banConfiguration.banDelay();
+        final Date now = new Date();
 
         // retrieve the date of how long the player should be banned.
-        final var banDate = banLengthType == BanLengthType.DAYS ?
+        final Date banDate = banLengthType == BanLengthType.DAYS ?
                 DateUtils.addDays(now, banConfiguration.banLength()) :
                 banLengthType == BanLengthType.YEARS ?
                         DateUtils.addYears(now, banConfiguration.banLength()) : null;
 
         // notify violation watchers of the ban.
+        // "%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc.arc().configuration().prefix()
+        //                 new MapBuilder()
+        //                        .pair("%player%", player.getName())
+        //                        .pair("%check%", check.getName())
+        //                        .pair("%time%", banDelay + "")
+        //                        .pair("%prefix%", Arc.arc().configuration().prefix())
+        //                        .build());
         final String banViolationMessage = replaceConfigurableMessage(banConfiguration.banMessageToViolations(),
-                Map.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc.arc().configuration().prefix()));
+                ImmutableMap.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc
+                        .arc().configuration().prefix()));
+
         Bukkit.broadcast(banViolationMessage, Permissions.ARC_VIOLATIONS);
 
-        final var banMessage = replaceConfigurableMessage(banConfiguration.banMessage(), Map.of("%check%", check.getName()));
-        final var broadcastBanMessage = replaceConfigurableMessage(banConfiguration.banBroadcastMessage(), Map.of("%player%", player.getName(), "%check%", check.getName()));
+        final String banMessage = replaceConfigurableMessage(banConfiguration.banMessage(), ImmutableMap.of("%check%", check.getName()));
+        final String broadcastBanMessage = replaceConfigurableMessage(banConfiguration.banBroadcastMessage(), ImmutableMap.of("%player%", player.getName(), "%check%", check.getName()));
 
         // finally, schedule the players ban.
         scheduleBan(player, banConfiguration.banType(), banMessage, broadcastBanMessage, check.getName(), banDate, banConfiguration.broadcastBan(), banDelay);
@@ -111,7 +121,7 @@ public final class Punishment {
                 return;
             }
             // add the ban to the list.
-            final var isIpBan = banType == BanList.Type.IP;
+            final boolean isIpBan = banType == BanList.Type.IP;
             Bukkit.getBanList(banType).addBan(isIpBan ? player.getAddress().getHostName() : player.getName(), banMessage, banLength, banMessage);
 
             // kick the player and remove them from pending bans.
@@ -121,7 +131,7 @@ public final class Punishment {
             // broadcast the ban if applicable.
             if (broadcastBan) {
                 final String banBroadcastMessage = replaceConfigurableMessage(broadcastMessage,
-                        Map.of("%player%", player.getName(), "%check%", checkName));
+                        ImmutableMap.of("%player%", player.getName(), "%check%", checkName));
                 Bukkit.broadcastMessage(banBroadcastMessage);
             }
         }, banDelay * 20);
@@ -145,7 +155,7 @@ public final class Punishment {
      */
     public static void kickPlayer(Player player, Check check, KickConfiguration kickConfiguration) {
         PENDING_PLAYER_KICKS.add(player.getUniqueId());
-        final var kickMessage = replaceConfigurableMessage(kickConfiguration.kickMessage(), Map.of("%check%", check.getName()));
+        final String kickMessage = replaceConfigurableMessage(kickConfiguration.kickMessage(), ImmutableMap.of("%check%", check.getName()));
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> {
             player.kickPlayer(kickMessage);
             PENDING_PLAYER_KICKS.remove(player.getUniqueId());

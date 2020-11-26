@@ -1,5 +1,7 @@
 package arc.configuration.punishment.ban;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * The ban length type.
  */
@@ -17,7 +19,7 @@ public enum BanLengthType {
      * @return the ban length type, {@code PERM} for default.
      */
     public static BanLengthType parse(String input) {
-        final var actualInput = input.toUpperCase().strip();
+        final String actualInput = StringUtils.deleteWhitespace(input.toUpperCase());
         return actualInput.equals("DAYS") ? DAYS : actualInput.equals("YEARS") ? YEARS : PERM;
     }
 

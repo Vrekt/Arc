@@ -5,6 +5,7 @@ import arc.check.CheckType;
 import arc.check.result.CheckCallback;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
+import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Player;
 
 /**
@@ -43,12 +44,12 @@ public final class Regeneration extends Check {
         if (exempt(player) || !enabled()) return;
 
         // the time from now to the last regain event.
-        final var time = System.currentTimeMillis() - data.lastHealthRegain();
+        final long time = System.currentTimeMillis() - data.lastHealthRegain();
         // if its less than the minimum then flag.
         if (time < regenerationTime) {
-            final var result = new CheckResult(CheckResult.Result.FAILED);
+            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Regaining health too fast, time=" + time + ", min=" + regenerationTime);
-            final var violation = result(player, result);
+            final ViolationResult violation = result(player, result);
             callback.onResult(violation);
         }
     }

@@ -54,9 +54,9 @@ public final class Jesus extends Check {
         if (exempt(player) || !enabled()) return;
 
         if (!data.onGround() && MovingUtil.isInOrOnLiquid(data.to())) {
-            final var blockFaceDown = data.to().getBlock().getRelative(BlockFace.DOWN).isLiquid();
-            final var blockFaceDown2 = data.to().getBlock().getRelative(0, -2, 0).isLiquid();
-            final var result = new CheckResult();
+            final boolean blockFaceDown = data.to().getBlock().getRelative(BlockFace.DOWN).isLiquid();
+            final boolean blockFaceDown2 = data.to().getBlock().getRelative(0, -2, 0).isLiquid();
+            final CheckResult result = new CheckResult();
 
             // we are on ground while on a liquid, check
             if (data.clientOnGround()) {
@@ -70,9 +70,9 @@ public final class Jesus extends Check {
                     result.setFailed("Client on ground while on layers of water.");
                 }
             } else {
-                final var vertical = data.vertical();
-                final var last = data.lastVerticalDistance();
-                var similarVerticalAmount = data.similarVerticalAmountJesus();
+                final double vertical = data.vertical();
+                final double last = data.lastVerticalDistance();
+                int similarVerticalAmount = data.similarVerticalAmountJesus();
 
                 // check when we are descending
                 if (data.descending()) {
@@ -88,7 +88,7 @@ public final class Jesus extends Check {
                 }
 
                 // the client isn't on ground, check further
-                final var blockFaceDown2Modifier = data.to().clone().add(0, -1.5, 0).getBlock().isLiquid();
+                final boolean blockFaceDown2Modifier = data.to().clone().add(0, -1.5, 0).getBlock().isLiquid();
                 if (data.vertical() == 0.0
                         && (blockFaceDown || blockFaceDown2Modifier)) {
                     // no vertical but on layers of water.

@@ -3,11 +3,14 @@ package arc.check.combat;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
+import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 
 /**
  * Checks if the player is attacking from too far away.
@@ -41,20 +44,20 @@ public final class Reach extends PacketCheck {
      * @param event the event
      */
     private void onUseEntity(PacketEvent event) {
-        final var packet = new WrapperPlayClientUseEntity(event.getPacket());
+        final WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             // we attacked, get the entity and distance check.
-            final var player = event.getPlayer();
-            final var entity = packet.getTarget(player.getWorld());
+            final Player player = event.getPlayer();
+            final Entity entity = packet.getTarget(player.getWorld());
             if (!entity.isDead()) {
-                final var py = player.getLocation().getY() + player.getEyeHeight();
-                final var dy = entity.getLocation().getY() + ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getEyeHeight() : 1.0);
+                final double py = player.getLocation().getY() + player.getEyeHeight();
+                final double dy = entity.getLocation().getY() + ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getEyeHeight() : 1.0);
                 
                 // set the respective Y values and then subtract.
-                final var length = entity.getLocation().toVector().setY(dy).subtract(player.getLocation().toVector().setY(py)).length();
+                final double length = entity.getLocation().toVector().setY(dy).subtract(player.getLocation().toVector().setY(py)).length();
                 if (length > maxDistance) {
                     // too far away, flag.
-                    final var violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + length + " max=" + maxDistance));
+                    final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + length + " max=" + maxDistance));
                     event.setCancelled(violation.cancel());
                 }
             }

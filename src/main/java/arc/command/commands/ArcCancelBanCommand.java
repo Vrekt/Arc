@@ -18,7 +18,7 @@ public final class ArcCancelBanCommand extends ArcSubCommand {
             return;
         }
 
-        final var name = arguments[0];
+        final String name = arguments[0];
         if (!Punishment.hasPendingBan(name)) {
             ChatUtil.sendMessage(sender, ChatColor.RED + " The player " + ChatColor.GREEN + name + ChatColor.RED + " does not have a pending ban.");
             return;

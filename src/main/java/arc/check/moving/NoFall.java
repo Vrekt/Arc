@@ -44,8 +44,8 @@ public final class NoFall extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player) || !enabled()) return;
 
-        final var result = new CheckResult();
-        final var nf = data.nf();
+        final CheckResult result = new CheckResult();
+        final NoFallData nf = data.nf();
         cancelIf(player, nf, data);
 
         // Checks if the client is saying we are not on the ground
@@ -76,12 +76,12 @@ public final class NoFall extends Check {
             // set our first check location, if we haven't already.
             // if we don't have ground we want to set it to the previous move.
             // calculate the distance we have fallen
-            final var distance = Math.floor(MathUtil.vertical(nf.location(), data.from()) * 100) / 100;
+            final double distance = Math.floor(MathUtil.vertical(nf.location(), data.from()) * 100) / 100;
             // make sure we have fallen a bit before checking
             if (distance > 1) {
                 nf.lastCheck(System.currentTimeMillis());
                 if (nf.lastCheckLocation() == null) nf.lastCheckLocation(data.from());
-                final var clientHasGround = data.clientOnGround();
+                final boolean clientHasGround = data.clientOnGround();
 
                 // Fixes regular NoFall and "Packet" types
                 if (clientHasGround && player.getFallDistance() == 0.0) {
@@ -94,7 +94,7 @@ public final class NoFall extends Check {
 
                 // Fixes other NoFall types where fall distance is accumulated but client is never on the ground
                 if (!clientHasGround) {
-                    final var difference = player.getFallDistance() - distance;
+                    final double difference = player.getFallDistance() - distance;
                     // we have too much off a difference between expected fall distance + player fall dist
                     if (difference > tolerance) {
                         result.setFailed("fall distance not expected, fDist=" + player.getFallDistance() + ", e=" + distance + ", t=" + tolerance);
@@ -121,7 +121,7 @@ public final class NoFall extends Check {
                 nf.reset();
                 return;
             }
-            final var distance = MathUtil.vertical(nf.location(), data.from()) - 3.0;
+            final double distance = MathUtil.vertical(nf.location(), data.from()) - 3.0;
             player.damage(distance);
             // reset and return
             nf.reset();
