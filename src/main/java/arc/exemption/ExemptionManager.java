@@ -120,7 +120,7 @@ public final class ExemptionManager implements Closeable {
      * @return {@code true} if so
      */
     private boolean isExemptWhenFlying(CheckType check) {
-        return check == CheckType.NOFALL || check == CheckType.FLIGHT || check == CheckType.SPEED;
+        return check == CheckType.NOFALL || check == CheckType.FLIGHT || check == CheckType.SPEED || check == CheckType.JESUS;
     }
 
     @Override

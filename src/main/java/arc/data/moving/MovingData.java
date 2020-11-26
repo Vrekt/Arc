@@ -58,7 +58,7 @@ public final class MovingData {
     /**
      * The amount of times the vertical has been similar.
      */
-    private int similarVerticalAmount, noVerticalAmount;
+    private int similarVerticalAmount, noVerticalAmount, similarVerticalAmountJesus;
 
     /**
      * The max difference allowed for similar vertical amounts.
@@ -246,5 +246,13 @@ public final class MovingData {
 
     public void noVerticalAmount(int noVerticalAmount) {
         this.noVerticalAmount = noVerticalAmount;
+    }
+
+    public int similarVerticalAmountJesus() {
+        return similarVerticalAmountJesus;
+    }
+
+    public void similarVerticalAmountJesus(int similarVerticalAmountJesus) {
+        this.similarVerticalAmountJesus = similarVerticalAmountJesus;
     }
 }

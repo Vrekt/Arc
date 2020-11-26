@@ -15,6 +15,17 @@ import org.bukkit.entity.Player;
  */
 public final class Jesus extends Check {
 
+    /**
+     * Max similar vertical allowed
+     * Max setback distance allowed
+     */
+    private int maxSimilarVerticalAllowed, maxSetbackDistance;
+
+    /**
+     * Difference allowed
+     */
+    private double difference;
+
     public Jesus() {
         super(CheckType.JESUS);
         enabled(true).
@@ -26,6 +37,9 @@ public final class Jesus extends Check {
                 kick(false).
                 write();
 
+        addConfigurationValue("max-similar-vertical-allowed", 5);
+        addConfigurationValue("difference", 0.03);
+        addConfigurationValue("max-setback-distance", 4);
         if (enabled()) load();
     }
 
@@ -56,12 +70,32 @@ public final class Jesus extends Check {
                     result.setFailed("Client on ground while on layers of water.");
                 }
             } else {
+                final var vertical = data.vertical();
+                final var last = data.lastVerticalDistance();
+                var similarVerticalAmount = data.similarVerticalAmountJesus();
+
+                // check when we are descending
+                if (data.descending()) {
+                    if (Math.abs((vertical - last)) < difference) {
+                        similarVerticalAmount++;
+                    } else {
+                        similarVerticalAmount = similarVerticalAmount <= maxSimilarVerticalAllowed ? 0 : similarVerticalAmount - maxSimilarVerticalAllowed;
+                    }
+                }
+
+                if (similarVerticalAmount >= maxSimilarVerticalAllowed) {
+                    result.setFailed("Client vertical too consistent diff=" + difference + " s=" + similarVerticalAmount + " m=" + maxSimilarVerticalAllowed);
+                }
+
                 // the client isn't on ground, check further
                 final var blockFaceDown2Modifier = data.to().clone().add(0, -1.5, 0).getBlock().isLiquid();
-                if (data.vertical() == 0.0 && (blockFaceDown || blockFaceDown2Modifier)) {
+                if (data.vertical() == 0.0
+                        && (blockFaceDown || blockFaceDown2Modifier)) {
                     // no vertical but on layers of water.
                     result.setFailed("Client has no vertical while on layers of water.");
                 }
+
+                data.similarVerticalAmount(similarVerticalAmount);
             }
             callback.onResult(result(player, result));
         }
@@ -69,16 +103,25 @@ public final class Jesus extends Check {
 
     @Override
     public void reloadConfig() {
-        // No reloading required.
+        if (enabled()) load();
     }
 
     @Override
     public void load() {
-        // No loading required
+        maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
+        difference = getValueDouble("difference");
+        maxSetbackDistance = getValueInt("max-setback-distance");
     }
 
     @Override
     public void unload() {
         // No unloading required
+    }
+
+    /**
+     * @return the max setback distance
+     */
+    public int maxSetbackDistance() {
+        return maxSetbackDistance;
     }
 }

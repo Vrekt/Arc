@@ -83,7 +83,7 @@ public final class Criticals extends PacketCheck {
                 }
 
                 // First, check for similar vertical amounts.
-                if (similarVerticalAmount >= maxNoVerticalAllowed) {
+                if (similarVerticalAmount >= maxSimilarVerticalAllowed) {
                     result.setFailed("Vertical not changed overtime, v=" + vertical + " amt=" + similarVerticalAmount + ", max=" + maxSimilarVerticalAllowed);
                 }
 

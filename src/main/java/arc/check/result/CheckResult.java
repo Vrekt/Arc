@@ -5,11 +5,6 @@ package arc.check.result;
  */
 public final class CheckResult {
 
-    /**
-     * Empty/Default check result
-     */
-    public static final CheckResult EMPTY = new CheckResult(Result.PASSED);
-
     public enum Result {
 
         /**
@@ -32,6 +27,17 @@ public final class CheckResult {
      * The name to append;
      */
     private String information, appendName;
+
+    /**
+     * Initialize this check result with a result and information
+     *
+     * @param result      the result
+     * @param information the info
+     */
+    public CheckResult(Result result, String information) {
+        this.result = result;
+        this.information = information;
+    }
 
     /**
      * Initialize this check result with a result

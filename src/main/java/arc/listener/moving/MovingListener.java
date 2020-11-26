@@ -6,6 +6,7 @@ import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
 import arc.permissions.Permissions;
+import arc.utility.MathUtil;
 import arc.utility.MovingUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -67,15 +68,13 @@ public final class MovingListener implements Listener {
         noFall.check(player, data);
 
         if (hasMovedByBlock) {
-            // TODO: Distance check the ground location
-            // TODO: We don't want to teleport back really far away
-            // TODO: Also check the Y-0.1 stuff, don't wanna create a phase.
             jesus.check(player, data, (result) -> {
                 if (result.cancel()) {
-                    if (data.hasGround()) {
+                    if (data.hasGround() && MathUtil.distance(data.ground(), data.to())
+                            <= jesus.maxSetbackDistance()) {
                         event.setTo(data.ground());
                     } else {
-                        event.setTo(event.getFrom().add(0, -0.1, 0));
+                        event.setTo(event.getFrom().add(0, -0.01, 0));
                     }
                 }
             });

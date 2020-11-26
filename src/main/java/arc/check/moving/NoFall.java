@@ -76,7 +76,7 @@ public final class NoFall extends Check {
             // set our first check location, if we haven't already.
             // if we don't have ground we want to set it to the previous move.
             // calculate the distance we have fallen
-            final var distance = Math.floor(MathUtil.distance(nf.location(), data.from()) * 100) / 100;
+            final var distance = Math.floor(MathUtil.vertical(nf.location(), data.from()) * 100) / 100;
             // make sure we have fallen a bit before checking
             if (distance > 1) {
                 nf.lastCheck(System.currentTimeMillis());
@@ -121,7 +121,7 @@ public final class NoFall extends Check {
                 nf.reset();
                 return;
             }
-            final var distance = MathUtil.distance(nf.location(), data.from()) - 3.0;
+            final var distance = MathUtil.vertical(nf.location(), data.from()) - 3.0;
             player.damage(distance);
             // reset and return
             nf.reset();

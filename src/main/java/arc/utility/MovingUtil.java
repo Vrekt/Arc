@@ -195,7 +195,7 @@ public final class MovingUtil {
         }
 
         // calculate vertical distance
-        final var distance = MathUtil.distance(from, to);
+        final var distance = MathUtil.vertical(from, to);
         final var last = data.vertical();
         data.lastVerticalDistance(last);
         data.verticalDistance(distance);

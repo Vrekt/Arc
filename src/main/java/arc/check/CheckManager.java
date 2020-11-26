@@ -1,6 +1,7 @@
 package arc.check;
 
 import arc.check.combat.Criticals;
+import arc.check.combat.Reach;
 import arc.check.moving.Jesus;
 import arc.check.moving.MorePackets;
 import arc.check.moving.NoFall;
@@ -32,6 +33,7 @@ public final class CheckManager implements Closeable {
         checks.add(new Regeneration());
         checks.add(new FastUse());
         checks.add(new Jesus());
+        checks.add(new Reach());
     }
 
     /**

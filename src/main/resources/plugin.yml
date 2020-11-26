@@ -20,9 +20,11 @@ permissions:
   arc.commands.toggledebug:
     description: Allows the player to toggle debug information.
   arc.bypass:
+    default: false
     description: Allows the player to bypass all Arc checks.
     children:
       arc.bypass.moving:
+        default: false
         description: Allows the player to bypass all Moving checks.
         children:
           arc.bypass.moving.morepackets:
@@ -32,6 +34,7 @@ permissions:
           arc.bypass.moving.jesus:
             description: Allows the player to bypass the Jesus check.
       arc.bypass.player:
+        default: false
         description: Allows the player to bypass all Player checks.
         children:
           arc.bypass.player.regeneration:
@@ -39,6 +42,7 @@ permissions:
           arc.bypass.player.fastuse:
             description: Allows the player to bypass the FastUse check
       arc.bypass.network:
+        default: false
         description: Allows the player to bypass all network/packet checks.
         children:
           arc.bypass.network.payloadfrequency:
@@ -46,10 +50,13 @@ permissions:
           arc.bypass.network.swingfrequency:
             description: Allows the player to bypass the swing packet checks.
       arc.bypass.combat:
+        default: false
         description: Allows the player to bypass all combat checks.
         children:
           arc.bypass.combat.criticals:
             description: Allows the player to bypass the criticals check.
+          arc.bypass.combat.reach:
+            description: Allows the player to bypass the reach check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:
