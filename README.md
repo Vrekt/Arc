@@ -62,3 +62,4 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [ ] Inventory UI
 - [ ] Player summaries
 - [ ] One listener for all combat checks
+- [ ] Improve/Fix reach (add velocity? ) IDK
