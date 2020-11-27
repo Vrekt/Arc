@@ -51,15 +51,6 @@ public final class MovingPacketListener {
     }
 
     /**
-     * Remove all packet listeners.
-     *
-     * @param protocol the protocol.
-     */
-    public void removePacketListeners(ProtocolManager protocol) {
-
-    }
-
-    /**
      * Invoked when the client sends FLYING
      *
      * @param event the event

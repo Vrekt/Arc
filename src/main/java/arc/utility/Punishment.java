@@ -83,13 +83,6 @@ public final class Punishment {
                         DateUtils.addYears(now, banConfiguration.banLength()) : null;
 
         // notify violation watchers of the ban.
-        // "%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc.arc().configuration().prefix()
-        //                 new MapBuilder()
-        //                        .pair("%player%", player.getName())
-        //                        .pair("%check%", check.getName())
-        //                        .pair("%time%", banDelay + "")
-        //                        .pair("%prefix%", Arc.arc().configuration().prefix())
-        //                        .build());
         final String banViolationMessage = replaceConfigurableMessage(banConfiguration.banMessageToViolations(),
                 ImmutableMap.of("%player%", player.getName(), "%check%", check.getName(), "%time%", banDelay + "", "%prefix%", Arc
                         .arc().configuration().prefix()));

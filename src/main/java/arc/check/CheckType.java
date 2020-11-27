@@ -54,7 +54,12 @@ public enum CheckType {
     /**
      * Checks if the player is attacking too far.
      */
-    REACH("Reach", CheckCategory.COMBAT);
+    REACH("Reach", CheckCategory.COMBAT),
+
+    /**
+     * Checks if the player isn't swinging their arm when attacking
+     */
+    NO_SWING("NoSwing", CheckCategory.COMBAT);
 
     /**
      * The name

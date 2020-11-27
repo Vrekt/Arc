@@ -52,7 +52,7 @@ public final class Reach extends PacketCheck {
             if (!entity.isDead()) {
                 final double py = player.getLocation().getY() + player.getEyeHeight();
                 final double dy = entity.getLocation().getY() + ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getEyeHeight() : 1.0);
-                
+
                 // set the respective Y values and then subtract.
                 final double length = entity.getLocation().toVector().setY(dy).subtract(player.getLocation().toVector().setY(py)).length();
                 if (length > maxDistance) {

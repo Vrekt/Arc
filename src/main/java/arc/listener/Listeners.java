@@ -1,5 +1,6 @@
 package arc.listener;
 
+import arc.Arc;
 import arc.listener.connection.ConnectionListener;
 import arc.listener.moving.MovingListener;
 import arc.listener.moving.tasks.MovingUpdateTask;
@@ -62,7 +63,7 @@ public final class Listeners {
         HandlerList.unregisterAll(MOVING_LISTENER);
         HandlerList.unregisterAll(PLAYER_LISTENER);
         HandlerList.unregisterAll(CONNECTION_LISTENER);
-        MOVING_PACKET_LISTENER.removePacketListeners(protocol);
+        protocol.removePacketListeners(Arc.arc());
         MOVING_UPDATE_TASK.stop();
     }
 

@@ -57,6 +57,8 @@ permissions:
             description: Allows the player to bypass the criticals check.
           arc.bypass.combat.reach:
             description: Allows the player to bypass the reach check.
+          arc.bypass.combat.noswing:
+            description: Allows the player to bypass the NoSwing check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:
