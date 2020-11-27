@@ -16,13 +16,14 @@ import org.bukkit.entity.Player;
 /**
  * Listens for moving packets.
  */
-public final class MovingPacketListener {
+public final class MovingPacketListener implements IPacketListener {
 
     /**
      * Register all packet listeners.
      *
      * @param protocol the protocol
      */
+    @Override
     public void createPacketListeners(ProtocolManager protocol) {
         // flying
         protocol.addPacketListener(new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, PacketType.Play.Client.FLYING) {

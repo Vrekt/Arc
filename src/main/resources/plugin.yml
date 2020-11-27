@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 1.0.6
+version: 1.0.7
 description: Arc is an anticheat built for legacy verisons of Spigot.
 author: Vrekt
 depend:

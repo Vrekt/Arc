@@ -5,8 +5,6 @@ import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
 import arc.violation.result.ViolationResult;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -70,20 +68,6 @@ public final class SwingFrequency extends PacketCheck {
         }
     }
 
-    /**
-     * Invoked when the player sends arm animation
-     *
-     * @param event the event
-     */
-    private void onArmAnimation(PacketEvent event) {
-        final Player player = event.getPlayer();
-        final PacketData data = PacketData.get(player);
-        if (data.cancelSwingPackets()) {
-            event.setCancelled(true);
-        }
-        data.incrementSwingPacketCount();
-    }
-
     @Override
     public void reloadConfig() {
         unload();
@@ -96,7 +80,6 @@ public final class SwingFrequency extends PacketCheck {
         maxPackets = getValueInt("max-packets");
         maxPacketsKick = getValueInt("max-packets-kick");
 
-        registerPacketListener(PacketType.Play.Client.ARM_ANIMATION, this::onArmAnimation);
         scheduledCheck(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!exempt(player)) check(player, PacketData.get(player));
@@ -106,7 +89,6 @@ public final class SwingFrequency extends PacketCheck {
 
     @Override
     public void unload() {
-        unregisterPacketListeners();
         cancelScheduled();
     }
 }

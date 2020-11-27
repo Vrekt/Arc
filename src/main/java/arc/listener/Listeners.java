@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.listener.connection.ConnectionListener;
 import arc.listener.moving.MovingListener;
 import arc.listener.moving.tasks.MovingUpdateTask;
+import arc.listener.network.CombatPacketListener;
 import arc.listener.network.MovingPacketListener;
 import arc.listener.player.PlayerListener;
 import com.comphenix.protocol.ProtocolManager;
@@ -41,6 +42,11 @@ public final class Listeners {
     private static final MovingUpdateTask MOVING_UPDATE_TASK = new MovingUpdateTask();
 
     /**
+     * Combat listener
+     */
+    private static final CombatPacketListener COMBAT_PACKET_LISTENER = new CombatPacketListener();
+
+    /**
      * Register all listeners
      *
      * @param plugin   the plugin
@@ -51,6 +57,7 @@ public final class Listeners {
         plugin.getServer().getPluginManager().registerEvents(PLAYER_LISTENER, plugin);
         plugin.getServer().getPluginManager().registerEvents(CONNECTION_LISTENER, plugin);
         MOVING_PACKET_LISTENER.createPacketListeners(protocol);
+        COMBAT_PACKET_LISTENER.createPacketListeners(protocol);
         MOVING_UPDATE_TASK.start();
     }
 

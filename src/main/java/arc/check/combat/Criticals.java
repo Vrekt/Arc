@@ -7,8 +7,6 @@ import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
 import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -59,12 +57,11 @@ public final class Criticals extends PacketCheck {
     /**
      * Invoked when we interact with an entity.
      *
-     * @param event the event
+     * @param player the player
+     * @param packet the packet
      */
-    private void onUseEntity(PacketEvent event) {
-        final WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
+    public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
-            final Player player = event.getPlayer();
             final MovingData data = MovingData.get(player);
 
             // If it was a possible critical hit and we are on-ground lets check.
@@ -109,9 +106,10 @@ public final class Criticals extends PacketCheck {
 
                 // violation
                 final ViolationResult violation = result(player, result);
-                event.setCancelled(violation.cancel());
+                return violation.cancel();
             }
         }
+        return false;
     }
 
     /**
@@ -130,11 +128,7 @@ public final class Criticals extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unload();
-
-        if (enabled()) {
-            load();
-        }
+        if (enabled()) load();
     }
 
     @Override
@@ -143,11 +137,5 @@ public final class Criticals extends PacketCheck {
         difference = getValueDouble("difference");
         maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
         maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
-        registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
-    }
-
-    @Override
-    public void unload() {
-        unregisterPacketListeners();
     }
 }

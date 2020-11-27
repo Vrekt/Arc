@@ -303,9 +303,10 @@ public abstract class Check {
     public abstract void load();
 
     /**
-     * Unload the check
+     * Unload the check if needed.
      */
-    public abstract void unload();
+    public void unload() {
+    }
 
     /**
      * @return {@code true} if the check is enabled.

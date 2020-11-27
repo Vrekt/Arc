@@ -5,8 +5,6 @@ import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -39,15 +37,14 @@ public final class Reach extends PacketCheck {
     }
 
     /**
-     * Invoked when the player uses an entity
+     * Invoked when we interact with an entity.
      *
-     * @param event the event
+     * @param player the player
+     * @param packet the packet
      */
-    private void onUseEntity(PacketEvent event) {
-        final WrapperPlayClientUseEntity packet = new WrapperPlayClientUseEntity(event.getPacket());
+    public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             // we attacked, get the entity and distance check.
-            final Player player = event.getPlayer();
             final Entity entity = packet.getTarget(player.getWorld());
             if (!entity.isDead()) {
                 final double py = player.getLocation().getY() + player.getEyeHeight();
@@ -58,26 +55,20 @@ public final class Reach extends PacketCheck {
                 if (length > maxDistance) {
                     // too far away, flag.
                     final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + length + " max=" + maxDistance));
-                    event.setCancelled(violation.cancel());
+                    return violation.cancel();
                 }
             }
         }
+        return false;
     }
 
     @Override
     public void reloadConfig() {
-        unload();
         if (enabled()) load();
     }
 
     @Override
     public void load() {
         maxDistance = getValueDouble("max-distance");
-        registerPacketListener(PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
-    }
-
-    @Override
-    public void unload() {
-        unregisterPacketListeners();
     }
 }

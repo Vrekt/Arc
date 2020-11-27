@@ -132,18 +132,11 @@ public final class NoFall extends Check {
 
     @Override
     public void reloadConfig() {
-        if (enabled()) {
-            load();
-        }
+        if (enabled()) load();
     }
 
     @Override
     public void load() {
         tolerance = getValueDouble("tolerance");
-    }
-
-    @Override
-    public void unload() {
-        // no unloading required
     }
 }

@@ -113,11 +113,6 @@ public final class Jesus extends Check {
         maxSetbackDistance = getValueInt("max-setback-distance");
     }
 
-    @Override
-    public void unload() {
-        // No unloading required
-    }
-
     /**
      * @return the max setback distance
      */
