@@ -19,9 +19,11 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 # Current Checks
 ### Combat
 - Criticals
+- Reach
 ### Moving
 - MorePackets
 - NoFall
+- Jesus (Water Walk/LiquidWalk)
 ### Network
 - Swing Frequency (Server Crashing)
 - Payload Frequency (Server Crashing)
@@ -30,13 +32,11 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - FastUse (FastConsume) (FastBow)
 
 # Future TODO
-- ~[ ] 1.12 Support~
-- ~[ ] 1.15 Support~
 - [ ] 1.16 Support
 
 # TODO LIST
 
-- [ ] ~CONVERT CODE BACK TO JAVA 8 FROM 11.~
+- [x] CONVERT CODE BACK TO JAVA 8 FROM 11.
 - [x] Permissions for each check to bypass
 - [ ] Improve MorePackets
 - [ ] Patch more crashing exploits
