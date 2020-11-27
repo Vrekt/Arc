@@ -61,3 +61,4 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [ ] Lag/TPS watch
 - [ ] Inventory UI
 - [ ] Player summaries
+- [ ] One listener for all combat checks
