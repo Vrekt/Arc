@@ -1,6 +1,10 @@
 # Arc
 An anticheat for legacy Spigot version 1.8.8
 
+# Whats Required
+- ProtocolLib
+- Java 8
+
 # Current Features
 - Customizable checks and check parameters.
 - Permissions for each type of check and category.
