@@ -1,5 +1,11 @@
 # Arc
-An anticheat for legacy Spigot version 1.8.8
+An anticheat for PaperSpigot.
+
+The main supported version of Arc is 1.8.8. This is the active developed version.
+
+Arc also supports 1.15.2, 1.16 may be supported but not yet tested.
+
+Support for 1.15.2 is very experimental.
 
 # Whats Required
 - ProtocolLib
@@ -34,9 +40,6 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 ### Player
 - Regeneration
 - FastUse (FastConsume) (FastBow)
-
-# Future TODO
-- [ ] 1.16 Support
 
 # TODO LIST
 
