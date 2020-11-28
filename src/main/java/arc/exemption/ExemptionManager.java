@@ -38,6 +38,9 @@ public final class ExemptionManager implements Closeable {
 
     /**
      * Exempt players when joining.
+     * MORE_PACKETS because sometimes when joining their is client lag that will batch and spam packets.
+     *
+     * @param player player
      */
     private void doJoinExemptions(Player player) {
         addExemption(player, CheckType.MORE_PACKETS, 500);

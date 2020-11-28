@@ -24,7 +24,7 @@ tps-helper: true
 # When TPS to this or below TPS helper will engage.
 tps-lower-limit: 17
 # The message to display when a violation occurs
-violation-notify-message: "%prefix% &9%player%&f has violated check &c%check%&8(&c%level%&8)&7 [%information%]"
+violation-notify-message: "%prefix% &9%player%&f has violated check &c%check%&8(&c%level%&8)&7 %information%"
 # The message to display when the sender has no permission for the /arc command.
 arc-command-no-permission-message: "Unknown command. Type /help for help."
 # The prefix to show in chat.

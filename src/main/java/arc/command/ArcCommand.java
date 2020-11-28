@@ -10,22 +10,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A basic arc command.
  */
 public abstract class ArcCommand {
-
-    /**
-     * Strikethrough
-     */
-    private static final String STRIKETHROUGH = ChatColor.RED + (ChatColor.STRIKETHROUGH + "----------------------------------------");
-
-    /**
-     * The header
-     */
-    private static final String HEADER = STRIKETHROUGH + "\n" + ChatColor.RED + "Arc [" + Arc.VERSION + "]" + "\n" + STRIKETHROUGH;
 
     /**
      * The help messages with their respective permissions.
@@ -124,19 +113,9 @@ public abstract class ArcCommand {
      */
     protected boolean printHelpMessage(CommandSender sender) {
         final StringBuilder builder = new StringBuilder();
-        builder.append(HEADER);
-        builder.append("\n");
-
-        final AtomicInteger count = new AtomicInteger(0);
         helpLinesWithPermissions.forEach((line, permission) -> {
             if (sender.hasPermission(permission)) {
-                final int get = count.addAndGet(1);
-                builder.append(line);
-                if (get == helpLinesWithPermissions.size()) {
-                    builder.append(STRIKETHROUGH);
-                } else {
-                    builder.append("\n").append(" ").append("\n");
-                }
+                builder.append(Arc.arc().configuration().prefix()).append(line).append("\n");
             }
         });
 
