@@ -7,6 +7,7 @@ import arc.check.combat.NoSwing;
 import arc.check.combat.Reach;
 import arc.data.combat.CombatData;
 import arc.data.packet.PacketData;
+import arc.listener.IPacketListener;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;

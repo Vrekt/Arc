@@ -27,8 +27,9 @@ public final class ArcConfiguration {
 
     /**
      * The lower limit of when to optimize checks to up the TPS.
+     * The violation data timeout
      */
-    private int tpsLowerLimit;
+    private int tpsLowerLimit, violationDataTimeout;
 
     /**
      * The violation message
@@ -38,25 +39,17 @@ public final class ArcConfiguration {
     private String violationMessage, noPermissionMessage, prefix;
 
     /**
-     * Initializes the configuration and starts reading
-     *
-     * @param configuration the configuration
-     */
-    public ArcConfiguration(FileConfiguration configuration) {
-        read(configuration);
-    }
-
-    /**
      * Read
      *
      * @param configuration the configuration
      */
-    private void read(FileConfiguration configuration) {
+    public void read(FileConfiguration configuration) {
         banConfiguration = new BanConfiguration(configuration);
         kickConfiguration = new KickConfiguration(configuration);
 
         watchTps = configuration.getBoolean("tps-helper");
         tpsLowerLimit = configuration.getInt("tps-lower-limit");
+        violationDataTimeout = configuration.getInt("violation-data-timeout");
         violationMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("violation-notify-message"));
         noPermissionMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-command-no-permission-message"));
         prefix = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-prefix"));
@@ -91,6 +84,13 @@ public final class ArcConfiguration {
     }
 
     /**
+     * @return the violation data timeout
+     */
+    public int violationDataTimeout() {
+        return violationDataTimeout;
+    }
+
+    /**
      * @return the violation message.
      */
     public String violationMessage() {
@@ -112,14 +112,22 @@ public final class ArcConfiguration {
     }
 
     /**
-     * Reload configuration
+     * @return the {@link FileConfiguration} from {@link Arc}
      */
-    public void reload() {
+    public FileConfiguration fileConfiguration() {
+        return Arc.arc().getConfig();
+    }
+
+    /**
+     * Reload the configuration
+     */
+    public void reloadConfiguration() {
         Arc.arc().reloadConfig();
         final FileConfiguration config = Arc.arc().getConfig();
 
         read(config);
-        Arc.arc().checks().reloadConfigurations(config);
+        Arc.arc().checks().reloadConfiguration(this);
+        Arc.arc().violations().reloadConfiguration(this);
     }
 
 }

@@ -15,6 +15,6 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
+    compile files('paper.jar')
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
 }

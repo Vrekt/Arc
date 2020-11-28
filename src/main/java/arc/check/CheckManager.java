@@ -10,22 +10,28 @@ import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
-import arc.utility.Closeable;
-import org.bukkit.configuration.file.FileConfiguration;
+import arc.configuration.ArcConfiguration;
+import arc.configuration.Reloadable;
 
-import java.util.*;
+import java.io.Closeable;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 /**
  * A check manager
  */
-public final class CheckManager implements Closeable {
+public final class CheckManager implements Closeable, Reloadable {
 
     /**
      * All the checks
      */
     private final Set<Check> checks = new HashSet<>();
 
-    public CheckManager() {
+    /**
+     * Populate the check map.
+     */
+    public void initialize() {
         checks.add(new Criticals());
         checks.add(new MorePackets());
         checks.add(new NoFall());
@@ -38,13 +44,9 @@ public final class CheckManager implements Closeable {
         checks.add(new NoSwing());
     }
 
-    /**
-     * Reload check configurations
-     *
-     * @param configuration the configuration
-     */
-    public void reloadConfigurations(FileConfiguration configuration) {
-        checks.forEach(check -> check.reloadConfigInternal(configuration));
+    @Override
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        checks.forEach(check -> check.reloadConfigInternal(configuration.fileConfiguration()));
     }
 
     /**

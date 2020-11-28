@@ -1,8 +1,8 @@
 package arc.exemption;
 
 import arc.check.CheckType;
-import arc.utility.Closeable;
 
+import java.io.Closeable;
 import java.util.HashMap;
 import java.util.Map;
 

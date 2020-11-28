@@ -3,11 +3,11 @@ package arc.exemption;
 import arc.Arc;
 import arc.check.CheckType;
 import arc.permissions.Permissions;
-import arc.utility.Closeable;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;

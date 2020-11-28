@@ -44,11 +44,4 @@ public final class Violations {
         violations.put(checkName, getViolationLevel(checkName) - 1);
     }
 
-    /**
-     * Dispose
-     */
-    public void dispose() {
-        violations.clear();
-    }
-
 }

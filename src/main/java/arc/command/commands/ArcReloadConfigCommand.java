@@ -17,7 +17,7 @@ public final class ArcReloadConfigCommand extends ArcSubCommand {
         ChatUtil.sendMessage(sender, ChatColor.RED + " All players will be exempt for 2 seconds afterwards.");
 
         try {
-            Arc.arc().configuration().reload();
+            Arc.arc().configuration().reloadConfiguration();
             Arc.arc().exemptions().exemptAllPlayersFromAllChecksFor(2000);
             ChatUtil.sendMessage(sender, ChatColor.GREEN + " Configuration successfully reloaded.");
         } catch (Exception exception) {

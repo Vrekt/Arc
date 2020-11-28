@@ -5,25 +5,29 @@ import arc.api.events.PostPlayerViolationEvent;
 import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
+import arc.configuration.Reloadable;
 import arc.configuration.punishment.ban.BanConfiguration;
 import arc.configuration.punishment.kick.KickConfiguration;
 import arc.permissions.Permissions;
-import arc.utility.Closeable;
 import arc.utility.Punishment;
 import arc.violation.result.ViolationResult;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import java.io.Closeable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Manages violations
  */
-public final class ViolationManager implements Closeable {
+public final class ViolationManager implements Closeable, Reloadable {
 
     /**
      * Violation history
@@ -36,29 +40,39 @@ public final class ViolationManager implements Closeable {
     private final Map<Player, Boolean> violationViewers = new ConcurrentHashMap<>();
 
     /**
+     * Keeps track of when to expire history
+     */
+    private Cache<UUID, Violations> historyCache;
+
+    /**
      * The arc configuration.
      */
-    private final ArcConfiguration configuration;
+    private ArcConfiguration configuration;
 
     /**
      * The ban configuration.
      */
-    private final BanConfiguration banConfiguration;
+    private BanConfiguration banConfiguration;
 
     /**
      * The kick configuration.
      */
-    private final KickConfiguration kickConfiguration;
+    private KickConfiguration kickConfiguration;
+
 
     /**
      * Initialize
      *
-     * @param configuration the configuration.
+     * @param configuration the configuration
      */
-    public ViolationManager(ArcConfiguration configuration) {
+    public void initialize(ArcConfiguration configuration) {
         this.configuration = configuration;
         this.banConfiguration = configuration.banConfiguration();
         this.kickConfiguration = configuration.kickConfiguration();
+
+        historyCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
+                .build();
     }
 
     /**
@@ -67,7 +81,13 @@ public final class ViolationManager implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        history.put(player.getUniqueId(), new Violations());
+        final Violations cached = historyCache.getIfPresent(player.getUniqueId());
+        if (cached != null) {
+            historyCache.invalidate(player.getUniqueId());
+            history.put(player.getUniqueId(), cached);
+        } else {
+            history.put(player.getUniqueId(), new Violations());
+        }
         if (Permissions.canViewViolations(player)) violationViewers.put(player, Boolean.FALSE);
     }
 
@@ -77,8 +97,7 @@ public final class ViolationManager implements Closeable {
      * @param player the player
      */
     public void onPlayerLeave(Player player) {
-        history.get(player.getUniqueId()).dispose();
-        history.remove(player.getUniqueId());
+        historyCache.put(player.getUniqueId(), history.get(player.getUniqueId()));
         violationViewers.remove(player);
     }
 
@@ -213,8 +232,22 @@ public final class ViolationManager implements Closeable {
     }
 
     @Override
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        this.configuration = configuration;
+        this.kickConfiguration = configuration.kickConfiguration();
+        this.banConfiguration = configuration.banConfiguration();
+
+        historyCache.invalidateAll();
+        historyCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
+                .build();
+    }
+
+    @Override
     public void close() {
         history.clear();
         violationViewers.clear();
+        historyCache.invalidateAll();
     }
+
 }

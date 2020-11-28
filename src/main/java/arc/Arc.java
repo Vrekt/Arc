@@ -20,7 +20,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION = "1.0.7";
+    public static final String VERSION = "1.0.8";
 
     /**
      * The file configuration
@@ -30,17 +30,17 @@ public final class Arc extends JavaPlugin {
     /**
      * The arc configuration
      */
-    private ArcConfiguration arcConfiguration;
+    private final ArcConfiguration arcConfiguration = new ArcConfiguration();
 
     /**
      * The violation manager.
      */
-    private ViolationManager violationManager;
+    private final ViolationManager violationManager = new ViolationManager();
 
     /**
      * The check manager
      */
-    private CheckManager checkManager;
+    private final CheckManager checkManager = new CheckManager();
 
     /**
      * The exemption manager
@@ -56,23 +56,22 @@ public final class Arc extends JavaPlugin {
     public void onEnable() {
         arc = this;
 
-        getLogger().info("Arc version " + VERSION);
+        getLogger().info("[INFO] Arc version " + VERSION + ". This build is for 1.8.8 only.");
         getLogger().info("[INFO] Loading configuration");
 
         saveDefaultConfig();
-        arcConfiguration = new ArcConfiguration(getConfig());
+        arcConfiguration.read(getConfig());
         protocolManager = ProtocolLibrary.getProtocolManager();
 
         getLogger().info("[INFO] Registering checks and listeners");
-        checkManager = new CheckManager();
-        violationManager = new ViolationManager(arcConfiguration);
+        checkManager.initialize();
+        violationManager.initialize(arcConfiguration);
 
         Listeners.register(this, protocolManager);
 
         getLogger().info("[INFO] Registering base command.");
         getCommand("arc").setExecutor(new CommandArc());
 
-        // save the configuration now since checks were registered.
         getLogger().info("[INFO] Saving configuration");
         saveConfig();
 
