@@ -1,11 +1,11 @@
 # Arc
-An anticheat for PaperSpigot.
+An anticheat built for PaperSpigot.
 
-The main supported version of Arc is 1.8.8. This is the active developed version.
+# Supported Versions
+- 1.8.8 
+- 1.15.2 in the [mc15 branch](https://github.com/Vrekt/Arc/tree/mc15)
 
-Arc also supports 1.15.2, 1.16 may be supported but not yet tested.
-
-Support for 1.15.2 is very experimental.
+*1.15.2 support is current experimental and not everything is implemented.*
 
 # Whats Required
 - ProtocolLib
