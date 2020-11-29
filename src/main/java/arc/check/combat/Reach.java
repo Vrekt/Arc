@@ -3,12 +3,15 @@ package arc.check.combat;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
+import arc.utility.MathUtil;
 import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 /**
  * Checks if the player is attacking from too far away.
@@ -17,9 +20,23 @@ import org.bukkit.entity.Player;
 public final class Reach extends PacketCheck {
 
     /**
-     * The max distance allowed.
+     * Creative reach distance.
      */
-    private double maxDistance;
+    private static final double CREATIVE_REACH_DISTANCE = 6D;
+
+    /**
+     * The max distance allowed.
+     * The max velocity to subtract from the distance
+     * The min velocity required to be subtracted
+     */
+    private double maxDistance, maxVelocityLength, minVelocityLength, nonLivingEyeHeight;
+
+    /**
+     * If the Y axis should be ignored.
+     * If velocity should be subtracted
+     * If eye heights should be subtracted
+     */
+    private boolean ignoreYAxis, subtractVelocity, subtractEye;
 
     public Reach() {
         super(CheckType.REACH);
@@ -33,6 +50,12 @@ public final class Reach extends PacketCheck {
                 .write();
 
         addConfigurationValue("max-distance", 3.88);
+        addConfigurationValue("max-velocity-length", 1.0);
+        addConfigurationValue("min-velocity-length", 0.2);
+        addConfigurationValue("ignore-y-value", true);
+        addConfigurationValue("subtract-velocity", true);
+        addConfigurationValue("subtract-eye", true);
+        addConfigurationValue("non-living-eye-height", 1.75);
         if (enabled()) load();
     }
 
@@ -47,15 +70,38 @@ public final class Reach extends PacketCheck {
             // we attacked, get the entity and distance check.
             final Entity entity = packet.getTarget(player.getWorld());
             if (!entity.isDead()) {
-                final double py = player.getLocation().getY() + player.getEyeHeight();
-                final double dy = entity.getLocation().getY() + ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getEyeHeight() : 1.0);
+                // get our entities Y locations
+                final double py = ignoreYAxis ? 1.0 : player.getLocation().getY();
+                final double dy = ignoreYAxis ? 1.0 : entity.getLocation().getY();
+                // subtract our eye height from the entities.
+                final double ey = subtractEye ? player.getEyeHeight() - ((entity instanceof LivingEntity) ? ((LivingEntity) entity).getEyeHeight() : nonLivingEyeHeight) : 0.0;
 
-                // set the respective Y values and then subtract.
-                final double length = entity.getLocation().toVector().setY(dy).subtract(player.getLocation().toVector().setY(py)).length();
-                if (length > maxDistance) {
-                    // too far away, flag.
-                    final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + length + " max=" + maxDistance));
+                // retrieve the clamped entity velocity
+                final double entityVel = entity.getVelocity().length();
+                final double velocity = subtractVelocity ? entityVel > minVelocityLength ? MathUtil.clamp(entityVel, minVelocityLength, maxVelocityLength) : 0.0 : 0.0;
+
+                // clone vectors and set the respective Y values.
+                final Vector playerVec = player.getLocation().toVector().clone();
+                final Vector entityVec = entity.getLocation().toVector().clone();
+
+                // calculate distance and subtract velocity/eye if applicable
+                playerVec.setY(py);
+                entityVec.setY(dy);
+                double distance = playerVec.subtract(entityVec).length();
+                if (subtractVelocity) distance -= velocity;
+                if (subtractEye) distance -= ey;
+
+                // check if we are in creative, if so check against Magic value
+                if (player.getGameMode() == GameMode.CREATIVE && distance > CREATIVE_REACH_DISTANCE) {
+                    final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Creative reach distance >6"));
                     return violation.cancel();
+                } else {
+                    // otherwise check
+                    if (distance > maxDistance) {
+                        // too far away, flag.
+                        final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + distance + " max=" + maxDistance));
+                        return violation.cancel();
+                    }
                 }
             }
         }
@@ -70,5 +116,11 @@ public final class Reach extends PacketCheck {
     @Override
     public void load() {
         maxDistance = getValueDouble("max-distance");
+        maxVelocityLength = getValueDouble("max-velocity-length");
+        minVelocityLength = getValueDouble("min-velocity-length");
+        ignoreYAxis = getValueBoolean("ignore-y-value");
+        subtractVelocity = getValueBoolean("subtract-velocity");
+        subtractEye = getValueBoolean("subtract-eye");
+        nonLivingEyeHeight = getValueDouble("non-living-eye-height");
     }
 }
