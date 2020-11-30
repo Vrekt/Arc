@@ -23,10 +23,10 @@ public final class ArcViolationsCommand extends ArcSubCommand {
         final Player player = (Player) sender;
         final ViolationManager violations = Arc.arc().violations();
         if (violations.isViolationViewer(player)) {
-            ChatUtil.sendMessage(player, ChatColor.GREEN + " You will no longer see violations in chat.");
+            ChatUtil.sendMessage(player, ChatColor.GRAY + " Violations are now " + ChatColor.RED + "off.");
             violations.removeViolationViewer(player);
         } else {
-            ChatUtil.sendMessage(player, ChatColor.GREEN + " You will now see violations in chat.");
+            ChatUtil.sendMessage(player, ChatColor.GRAY + " Violations are now " + ChatColor.GREEN + "on.");
             violations.addViolationViewer(player);
         }
 

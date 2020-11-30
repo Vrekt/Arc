@@ -285,6 +285,17 @@ public abstract class Check {
     }
 
     /**
+     * Check if the player is exempt from a sub-type
+     *
+     * @param player  player
+     * @param subtype the type
+     * @return {@code true} if so
+     */
+    protected boolean exemptSubType(Player player, String subtype) {
+        return player.hasPermission(Permissions.ARC_BYPASS + "." + checkType.category().name().toLowerCase() + "." + getName() + "." + subtype);
+    }
+
+    /**
      * Reload the configuration.
      */
     public void reloadConfigInternal(FileConfiguration configuration) {

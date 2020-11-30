@@ -3,6 +3,7 @@ package arc.listener.network;
 import arc.Arc;
 import arc.check.CheckType;
 import arc.check.combat.Criticals;
+import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
 import arc.check.combat.Reach;
 import arc.data.combat.CombatData;
@@ -37,10 +38,16 @@ public final class CombatPacketListener implements IPacketListener {
      */
     private final NoSwing noSwing;
 
+    /**
+     * KillAura
+     */
+    private final KillAura killAura;
+
     public CombatPacketListener() {
         criticals = (Criticals) Arc.arc().checks().getCheck(CheckType.CRITICALS);
         reach = (Reach) Arc.arc().checks().getCheck(CheckType.REACH);
         noSwing = (NoSwing) Arc.arc().checks().getCheck(CheckType.NO_SWING);
+        killAura = (KillAura) Arc.arc().checks().getCheck(CheckType.KILL_AURA);
     }
 
     @Override
@@ -72,11 +79,12 @@ public final class CombatPacketListener implements IPacketListener {
             // the player attacked an entity, run checks.
             final Player player = event.getPlayer();
 
+            boolean killauraCheck = killAura.onAttack(player, packet);
             boolean criticalsCheck = criticals.onAttack(player, packet);
             boolean reachCheck = reach.onAttack(player, packet);
             boolean noSwingCheck = noSwing.onAttack(player, packet);
 
-            if (criticalsCheck || reachCheck || noSwingCheck) event.setCancelled(true);
+            if (criticalsCheck || reachCheck || noSwingCheck || killauraCheck) event.setCancelled(true);
         }
     }
 

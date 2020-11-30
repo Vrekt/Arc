@@ -38,7 +38,7 @@ public final class SwingFrequency extends PacketCheck {
                 kickLevel(5).
                 write();
 
-        addConfigurationValue("max-packets", 30);
+        addConfigurationValue("max-packets", 50);
         addConfigurationValue("max-packets-kick", 100);
         if (enabled()) load();
     }

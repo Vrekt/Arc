@@ -63,4 +63,26 @@ public final class MathUtil {
         return Math.max(min, Math.min(max, value));
     }
 
+    /**
+     * Dot function
+     *
+     * @param x1 X1
+     * @param x2 X2
+     * @param y1 Y1
+     * @param y2 Y2
+     * @param z1 Z1
+     * @param z2 Z1
+     * @return dot product
+     */
+    public static double dot(double x1, double x2, double y1, double y2, double z1, double z2) {
+        return x1 * x2 + y1 * y2 + z1 * z2;
+    }
+
+    public static double wrapAngle(double angle) {
+        angle %= 360.0F;
+        if (angle >= 180.0F) angle -= 360.0F;
+        if (angle < -180.0F) angle += 360.0F;
+        return angle;
+    }
+
 }

@@ -59,6 +59,11 @@ permissions:
             description: Allows the player to bypass the reach check.
           arc.bypass.combat.noswing:
             description: Allows the player to bypass the NoSwing check.
+          arc.bypass.combat.killaura:
+            description: Allows the player to bypass all killaura checks.
+            children:
+              arc.bypass.combat.killaura.direction:
+                description: Allows the player to bypass KillAura direction check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:

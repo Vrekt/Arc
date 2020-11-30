@@ -1,6 +1,7 @@
 package arc.check;
 
 import arc.check.combat.Criticals;
+import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
 import arc.check.combat.Reach;
 import arc.check.moving.Jesus;
@@ -42,6 +43,7 @@ public final class CheckManager implements Closeable, Reloadable {
         checks.add(new Jesus());
         checks.add(new Reach());
         checks.add(new NoSwing());
+        checks.add(new KillAura());
     }
 
     @Override
@@ -56,7 +58,7 @@ public final class CheckManager implements Closeable, Reloadable {
      * @return the check
      */
     public Check getCheck(CheckType checkType) {
-        return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow(NoSuchElementException::new);
+        return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow(() -> new NoSuchElementException("Could not find check " + checkType.getName()));
     }
 
     /**

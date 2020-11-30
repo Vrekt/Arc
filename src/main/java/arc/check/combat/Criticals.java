@@ -61,6 +61,7 @@ public final class Criticals extends PacketCheck {
      * @param packet the packet
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
+        if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             final MovingData data = MovingData.get(player);
 
@@ -71,7 +72,6 @@ public final class Criticals extends PacketCheck {
                 final double last = Math.floor(data.lastVerticalDistance() * 100) / 100;
                 int similarVerticalAmount = data.similarVerticalAmount();
                 int noVerticalAmount = data.noVerticalAmount();
-
                 // Check if the difference between the last vertical and now is less than expected.
                 // If so, increment the amount.
                 if (Math.abs((vertical - last)) < difference) {

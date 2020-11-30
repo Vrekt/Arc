@@ -13,13 +13,13 @@ public final class ArcReloadConfigCommand extends ArcSubCommand {
 
     @Override
     protected void execute(CommandSender sender, String[] arguments) {
-        ChatUtil.sendMessage(sender, ChatColor.RED + " Reloading the configuration....");
-        ChatUtil.sendMessage(sender, ChatColor.RED + " All players will be exempt for 2 seconds afterwards.");
+        ChatUtil.sendMessage(sender, ChatColor.RED + " Reloading " + ChatColor.GRAY + "the configuration.");
+        ChatUtil.sendMessage(sender, ChatColor.RED + " All " + ChatColor.GRAY + "players will be exempt for 2 seconds afterwards.");
 
         try {
             Arc.arc().configuration().reloadConfiguration();
             Arc.arc().exemptions().exemptAllPlayersFromAllChecksFor(2000);
-            ChatUtil.sendMessage(sender, ChatColor.GREEN + " Configuration successfully reloaded.");
+            ChatUtil.sendMessage(sender, ChatColor.GRAY + " Configuration successfully reloaded.");
         } catch (Exception exception) {
             ChatUtil.sendMessage(sender, ChatColor.RED + " An error occurred while trying to reload, it has been printed to the console.");
             exception.printStackTrace();

@@ -59,7 +59,12 @@ public enum CheckType {
     /**
      * Checks if the player isn't swinging their arm when attacking
      */
-    NO_SWING("NoSwing", CheckCategory.COMBAT);
+    NO_SWING("NoSwing", CheckCategory.COMBAT),
+
+    /**
+     * Kill aura
+     */
+    KILL_AURA("KillAura", CheckCategory.COMBAT);
 
     /**
      * The name

@@ -41,6 +41,7 @@ public final class NoSwing extends PacketCheck {
      * @param packet the packet
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
+        if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             final long delta = (System.currentTimeMillis()) - CombatData.get(player).lastSwingTime();
             if (delta > swingTime) {

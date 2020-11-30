@@ -3,6 +3,8 @@ package arc.check.combat;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
+import arc.utility.AxisAlignedBB;
+import arc.utility.Entities;
 import arc.utility.MathUtil;
 import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
@@ -35,8 +37,9 @@ public final class Reach extends PacketCheck {
      * If the Y axis should be ignored.
      * If velocity should be subtracted
      * If eye heights should be subtracted
+     * If bounding boxes should be used.
      */
-    private boolean ignoreYAxis, subtractVelocity, subtractEye;
+    private boolean ignoreYAxis, subtractVelocity, subtractEye, useBoundingBoxes;
 
     public Reach() {
         super(CheckType.REACH);
@@ -56,6 +59,7 @@ public final class Reach extends PacketCheck {
         addConfigurationValue("subtract-velocity", true);
         addConfigurationValue("subtract-eye", true);
         addConfigurationValue("non-living-eye-height", 1.75);
+        addConfigurationValue("use-bounding-boxes", true);
         if (enabled()) load();
     }
 
@@ -66,6 +70,7 @@ public final class Reach extends PacketCheck {
      * @param packet the packet
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
+        if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             // we attacked, get the entity and distance check.
             final Entity entity = packet.getTarget(player.getWorld());
@@ -80,13 +85,20 @@ public final class Reach extends PacketCheck {
                 final double entityVel = entity.getVelocity().length();
                 final double velocity = subtractVelocity ? entityVel > minVelocityLength ? MathUtil.clamp(entityVel, minVelocityLength, maxVelocityLength) : 0.0 : 0.0;
 
-                // clone vectors and set the respective Y values.
-                final Vector playerVec = player.getLocation().toVector().clone();
-                final Vector entityVec = entity.getLocation().toVector().clone();
+                // retrieve bounding box
+                final AxisAlignedBB entityBB = useBoundingBoxes ? Entities.getBoundingBox(entity) : null;
+                // retrieve vectors and set bounding box values
+                final Vector playerVec = player.getLocation().clone().toVector();
+                final Vector entityVec = entity.getLocation().clone().toVector();
+                if (useBoundingBoxes && entityBB != null) {
+                    entityVec.setX(entityBB.minX());
+                    entityVec.setZ(entityBB.minZ());
+                }
 
-                // calculate distance and subtract velocity/eye if applicable
                 playerVec.setY(py);
                 entityVec.setY(dy);
+
+                // calculate distance and subtract velocity/eye if applicable
                 double distance = playerVec.subtract(entityVec).length();
                 if (subtractVelocity) distance -= velocity;
                 if (subtractEye) distance -= ey;
@@ -122,5 +134,6 @@ public final class Reach extends PacketCheck {
         subtractVelocity = getValueBoolean("subtract-velocity");
         subtractEye = getValueBoolean("subtract-eye");
         nonLivingEyeHeight = getValueDouble("non-living-eye-height");
+        useBoundingBoxes = getValueBoolean("use-bounding-boxes");
     }
 }
