@@ -58,11 +58,11 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [x] Better permissions
 - [x] Improve NoFall 
 - [x] Lag Checking/Refactoring before continuing
-- [ ] Lag Checking #2 - After 3 more checks
+- [x] Lag Checking #2 - After 3 more checks
 - [ ] Lag Checking #3 - After 6 more checks
 - [ ] Timings
 - [ ] Lag/TPS watch
 - [ ] Inventory UI
 - [ ] Player summaries
-- [ ] One listener for all combat checks
+- [x] One listener for all combat checks
 - [ ] Improve/Fix reach (add velocity? ) IDK
