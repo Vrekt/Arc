@@ -1,5 +1,6 @@
 package arc.data.combat;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -41,6 +42,21 @@ public final class CombatData {
      */
     private long lastSwingTime, lastAttackTime;
 
+    /**
+     * last attacked entity
+     */
+    private Entity lastAttackedEntity;
+
+    /**
+     * When we last attacked this entity
+     */
+    private long lastAttackedEntityTime;
+
+    /**
+     * The last angle.
+     */
+    private double lastAngle;
+
     public long lastSwingTime() {
         return lastSwingTime;
     }
@@ -55,5 +71,29 @@ public final class CombatData {
 
     public void lastAttackTime(long lastAttackTime) {
         this.lastAttackTime = lastAttackTime;
+    }
+
+    public double lastAngle() {
+        return lastAngle;
+    }
+
+    public void lastAngle(double lastAngle) {
+        this.lastAngle = lastAngle;
+    }
+
+    public Entity lastAttackedEntity() {
+        return lastAttackedEntity;
+    }
+
+    public void lastAttackedEntity(Entity lastAttackedEntity) {
+        this.lastAttackedEntity = lastAttackedEntity;
+    }
+
+    public long lastAttackedEntityTime() {
+        return lastAttackedEntityTime;
+    }
+
+    public void lastAttackedEntityTime(long lastAttackedEntityTime) {
+        this.lastAttackedEntityTime = lastAttackedEntityTime;
     }
 }

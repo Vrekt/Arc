@@ -64,7 +64,6 @@ public final class Criticals extends PacketCheck {
         if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             final MovingData data = MovingData.get(player);
-
             // If it was a possible critical hit and we are on-ground lets check.
             if (isPossibleCriticalHit(player, data) && data.onGround()) {
                 final CheckResult result = new CheckResult();

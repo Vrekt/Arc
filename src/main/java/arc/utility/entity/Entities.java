@@ -1,4 +1,4 @@
-package arc.utility;
+package arc.utility.entity;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;

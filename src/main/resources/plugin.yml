@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 1.0.8
+version: 1.0.9
 description: Arc is an anticheat built PaperSpigot 1.8.8.
 author: Vrekt
 depend:
@@ -41,6 +41,11 @@ permissions:
             description: Allows the player to bypass the Regeneration check
           arc.bypass.player.fastuse:
             description: Allows the player to bypass the FastUse check
+            children:
+              arc.bypass.player.fastuse.fastconsume:
+                description: Allows the player to bypass the FastUse FastConsume check.
+              arc.bypass.player.fastuse.fastbow:
+                description: Allows the player to bypass the FastUse FastBow check.
       arc.bypass.network:
         default: false
         description: Allows the player to bypass all network/packet checks.
@@ -64,6 +69,8 @@ permissions:
             children:
               arc.bypass.combat.killaura.direction:
                 description: Allows the player to bypass KillAura direction check.
+              arc.bypass.combat.killaura.angle:
+                description: Allows the player to bypass the KillAura angle check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:

@@ -52,10 +52,13 @@ public final class FastUse extends PacketCheck {
     private void onBlockPlace(PacketEvent event) {
         final WrapperPlayClientBlockPlace packet = new WrapperPlayClientBlockPlace(event.getPacket());
         final Material item = packet.getHeldItem().getType();
+        final Player player = event.getPlayer();
 
         if (item == Material.BOW) {
+            if (exemptSubType(player, "fastbow")) return;
             PlayerData.get(event.getPlayer()).lastBowUse(System.currentTimeMillis());
         } else if (item.isEdible() || item == Material.POTION) {
+            if (exemptSubType(player, "fastconsume")) return;
             PlayerData.get(event.getPlayer()).consumeStartTime(System.currentTimeMillis());
         }
     }
@@ -68,7 +71,7 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public ViolationResult checkFastBow(Player player, PlayerData data) {
-        if (exempt(player) || !enabled()) return ViolationResult.EMPTY;
+        if (!enabled() || exempt(player) || exemptSubType(player, "fastbow")) return ViolationResult.EMPTY;
 
         final long lastUse = data.lastBowUse();
         final long lastShot = data.lastBowShoot();
@@ -94,7 +97,7 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public ViolationResult checkFastConsume(Player player, PlayerData data) {
-        if (exempt(player) || !enabled()) return ViolationResult.EMPTY;
+        if (!enabled() || exempt(player) || exemptSubType(player, "fastconsume")) return ViolationResult.EMPTY;
 
         // the time it took to consume the item
         final long delta = System.currentTimeMillis() - data.consumeStartTime();

@@ -6,7 +6,6 @@ import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
 import arc.permissions.Permissions;
-import arc.utility.MathUtil;
 import arc.utility.MovingUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -70,16 +69,8 @@ public final class MovingListener implements Listener {
         noFall.check(player, data);
 
         if (hasMovedByBlock) {
-            jesus.check(player, data, (result) -> {
-                if (result.cancel()) {
-                    if (data.hasGround() && MathUtil.distance(data.ground(), data.to())
-                            <= jesus.maxSetbackDistance()) {
-                        event.setTo(data.ground());
-                    } else {
-                        event.setTo(event.getFrom().add(0, -0.01, 0));
-                    }
-                }
-            });
+            // check players for Jesus.
+            jesus.check(player, data, event);
         }
     }
 }

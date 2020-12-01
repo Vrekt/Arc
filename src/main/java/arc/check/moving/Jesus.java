@@ -2,12 +2,14 @@ package arc.check.moving;
 
 import arc.check.Check;
 import arc.check.CheckType;
-import arc.check.result.CheckCallback;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
+import arc.utility.math.MathUtil;
 import arc.utility.MovingUtil;
+import arc.violation.result.ViolationResult;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
  * Checks if the player is walking on water.
@@ -46,11 +48,11 @@ public final class Jesus extends Check {
     /**
      * Check this player
      *
-     * @param player   the player
-     * @param data     their data
-     * @param callback the callback
+     * @param player the player
+     * @param data   their data
+     * @param event  the event
      */
-    public void check(Player player, MovingData data, CheckCallback callback) {
+    public void check(Player player, MovingData data, PlayerMoveEvent event) {
         if (exempt(player) || !enabled()) return;
 
         if (!data.onGround() && MovingUtil.isInOrOnLiquid(data.to())) {
@@ -95,9 +97,19 @@ public final class Jesus extends Check {
                     result.setFailed("Client has no vertical while on layers of water.");
                 }
 
-                data.similarVerticalAmount(similarVerticalAmount);
+                data.similarVerticalAmountJesus(similarVerticalAmount);
             }
-            callback.onResult(result(player, result));
+
+            final ViolationResult violation = result(player, result);
+            if (violation.cancel()) {
+                // set the player back in the event.
+                if (data.hasGround() && MathUtil.distance(data.ground(), data.to())
+                        <= maxSetbackDistance) {
+                    event.setTo(data.ground());
+                } else {
+                    event.setTo(event.getFrom().add(0, -0.01, 0));
+                }
+            }
         }
     }
 
@@ -111,12 +123,5 @@ public final class Jesus extends Check {
         maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
         difference = getValueDouble("difference");
         maxSetbackDistance = getValueInt("max-setback-distance");
-    }
-
-    /**
-     * @return the max setback distance
-     */
-    public int maxSetbackDistance() {
-        return maxSetbackDistance;
     }
 }

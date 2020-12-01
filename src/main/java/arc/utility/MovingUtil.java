@@ -1,6 +1,7 @@
 package arc.utility;
 
 import arc.data.moving.MovingData;
+import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.material.Gate;

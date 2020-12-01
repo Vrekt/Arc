@@ -1,16 +1,14 @@
-package arc.utility;
-
-import org.bukkit.util.Vector;
+package arc.utility.entity;
 
 /**
- * An axis aligned bounding box.
+ * A basic AxisAlignedBB.
  */
 public final class AxisAlignedBB {
 
     /**
      * Coordinates
      */
-    private double minX, minY, minZ, maxX, maxY, maxZ;
+    private final double minX, minY, minZ, maxX, maxY, maxZ;
 
     public AxisAlignedBB(double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {
         this.minX = minX;
@@ -47,14 +45,6 @@ public final class AxisAlignedBB {
 
     public double maxZ() {
         return maxZ;
-    }
-
-    /**
-     * Returns if the supplied Vec3D is completely inside the bounding box
-     */
-    public boolean isVecInside(Vector vec)
-    {
-        return vec.getX() > this.minX && vec.getX() < this.maxX && (vec.getY() > this.minY && vec.getY() < this.maxY && vec.getZ() > this.minZ && vec.getZ() < this.maxZ);
     }
 
 }

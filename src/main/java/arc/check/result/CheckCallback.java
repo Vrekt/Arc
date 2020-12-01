@@ -7,7 +7,6 @@ import arc.violation.result.ViolationResult;
  */
 public interface CheckCallback {
 
-
     /**
      * Invoked when the result is received.
      *

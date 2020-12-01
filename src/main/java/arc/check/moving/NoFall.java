@@ -5,7 +5,7 @@ import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.data.moving.nf.NoFallData;
-import arc.utility.MathUtil;
+import arc.utility.math.MathUtil;
 import org.bukkit.entity.Player;
 
 /**

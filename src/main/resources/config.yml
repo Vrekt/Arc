@@ -29,6 +29,5 @@ violation-notify-message: "%prefix% &9%player%&f has violated check &c%check%&8(
 arc-command-no-permission-message: "Unknown command. Type /help for help."
 # The prefix to show in chat.
 arc-prefix: "&8[&cArc&8]"
-# The amount of time after a player leaves their violation data will be removed.
-# In minutes
+# The amount of time after a player leaves their violation data will be removed, in minutes.
 violation-data-timeout: 30
