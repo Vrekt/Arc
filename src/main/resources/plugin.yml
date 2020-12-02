@@ -19,6 +19,8 @@ permissions:
     description: Allows the player to use all Arc commands.
   arc.commands.toggledebug:
     description: Allows the player to toggle debug information.
+  arc.commands.summary:
+    description: Allows the player to access player summary information.
   arc.bypass:
     default: false
     description: Allows the player to bypass all Arc checks.

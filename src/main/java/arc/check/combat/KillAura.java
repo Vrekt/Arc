@@ -4,13 +4,13 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
-import arc.utility.entity.AxisAlignedBB;
 import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.inventivetalent.boundingbox.BoundingBox;
 
 /**
  * Checks multiple fight related things
@@ -130,13 +130,13 @@ public final class KillAura extends PacketCheck {
      */
     private double getAngle(boolean useBoundingBoxes, Entity entity, Player player) {
         final Vector eye = player.getEyeLocation().clone().toVector();
-        final AxisAlignedBB bb = directionUseBoundingBoxes ? Entities.getBoundingBox(entity) : null;
+        final BoundingBox bb = directionUseBoundingBoxes ? Entities.getBoundingBox(entity) : null;
         final Vector entityVec = entity.getLocation().clone().toVector();
 
         if (useBoundingBoxes && bb != null) {
-            final double midpointX = (bb.minX() + bb.maxX()) / 2;
-            final double midpointY = (bb.minY() + bb.maxY()) / 2;
-            final double midpointZ = (bb.minZ() + bb.maxZ()) / 2;
+            final double midpointX = (bb.minX + bb.maxX) / 2;
+            final double midpointY = (bb.minY + bb.maxY) / 2;
+            final double midpointZ = (bb.minZ + bb.maxZ) / 2;
             entityVec.setX(midpointX).setY(midpointY).setZ(midpointZ);
         }
 

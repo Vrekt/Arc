@@ -3,7 +3,6 @@ package arc.check.combat;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
-import arc.utility.entity.AxisAlignedBB;
 import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
 import arc.violation.result.ViolationResult;
@@ -14,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.inventivetalent.boundingbox.BoundingBox;
 
 /**
  * Checks if the player is attacking from too far away.
@@ -86,13 +86,13 @@ public final class Reach extends PacketCheck {
                 final double velocity = subtractVelocity ? entityVel > minVelocityLength ? MathUtil.clamp(entityVel, minVelocityLength, maxVelocityLength) : 0.0 : 0.0;
 
                 // retrieve bounding box
-                final AxisAlignedBB entityBB = useBoundingBoxes ? Entities.getBoundingBox(entity) : null;
+                final BoundingBox entityBB = useBoundingBoxes ? Entities.getBoundingBox(entity) : null;
                 // retrieve vectors and set bounding box values
                 final Vector playerVec = player.getLocation().clone().toVector();
                 final Vector entityVec = entity.getLocation().clone().toVector();
                 if (useBoundingBoxes && entityBB != null) {
-                    entityVec.setX(entityBB.minX());
-                    entityVec.setZ(entityBB.minZ());
+                    entityVec.setX(entityBB.minX);
+                    entityVec.setZ(entityBB.minZ);
                 }
 
                 playerVec.setY(py);

@@ -5,6 +5,7 @@ import java.util.Map;
 
 /**
  * Keeps track of player violations
+ * TODO: Why is this a string and not {@link arc.check.CheckType}
  */
 public final class Violations {
 

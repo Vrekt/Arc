@@ -1,5 +1,7 @@
 package arc.check.network;
 
+import arc.Arc;
+import arc.bridge.Version;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -21,12 +23,6 @@ import java.util.List;
 public final class PayloadFrequency extends PacketCheck {
 
     /**
-     * The kick broadcast message.
-     */
-    private final String kickBroadcastMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
-            + "%player%" + ChatColor.WHITE + " was kicked for invalid payload packets. ";
-
-    /**
      * Channels to monitor
      */
     private List<String> channels;
@@ -44,8 +40,18 @@ public final class PayloadFrequency extends PacketCheck {
      */
     private boolean maxPacketSizeKick, maxPacketsPerIntervalKick;
 
+    /**
+     * The kick broadcast message
+     */
+    private String kickBroadcastMessage;
+
+    /**
+     * Check only enables if the version is legacy.
+     */
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
+        if (disableIfNewerThan(Version.VERSION_1_8)) return;
+
         enabled(true).
                 cancel(true).
                 cancelLevel(0).
@@ -93,7 +99,6 @@ public final class PayloadFrequency extends PacketCheck {
     /**
      * Invoked when payload is received
      * TODO: Monitor outside configured channels?
-     * TODO: Information may get omitted, need better system.
      *
      * @param event the event
      */
@@ -157,6 +162,8 @@ public final class PayloadFrequency extends PacketCheck {
         maxPacketSizeKick = getValueBoolean("max-packet-size-kick");
         maxPacketsPerIntervalKick = getValueBoolean("max-packets-per-interval-kick");
         channels = getList("channels");
+        kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
+                " %player% was kicked for sending too many swing packets.";
 
         final int checkInterval = getValueInt("check-interval-milliseconds");
         final int interval = (checkInterval / 1000) * 20;

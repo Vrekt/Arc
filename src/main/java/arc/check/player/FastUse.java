@@ -1,11 +1,11 @@
 package arc.check.player;
 
+import arc.bridge.packets.BridgePlayClientBlockPlace;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
 import arc.violation.result.ViolationResult;
-import com.comphenix.packetwrapper.WrapperPlayClientBlockPlace;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Material;
@@ -50,16 +50,16 @@ public final class FastUse extends PacketCheck {
      * @param event the event
      */
     private void onBlockPlace(PacketEvent event) {
-        final WrapperPlayClientBlockPlace packet = new WrapperPlayClientBlockPlace(event.getPacket());
-        final Material item = packet.getHeldItem().getType();
+        final BridgePlayClientBlockPlace packet = new BridgePlayClientBlockPlace(event.getPacket());
         final Player player = event.getPlayer();
 
+        final Material item = packet.getHeldItem(player).getType();
         if (item == Material.BOW) {
             if (exemptSubType(player, "fastbow")) return;
-            PlayerData.get(event.getPlayer()).lastBowUse(System.currentTimeMillis());
+            PlayerData.get(player).lastBowUse(System.currentTimeMillis());
         } else if (item.isEdible() || item == Material.POTION) {
             if (exemptSubType(player, "fastconsume")) return;
-            PlayerData.get(event.getPlayer()).consumeStartTime(System.currentTimeMillis());
+            PlayerData.get(player).consumeStartTime(System.currentTimeMillis());
         }
     }
 

@@ -33,17 +33,26 @@ public final class CheckManager implements Closeable, Reloadable {
      * Populate the check map.
      */
     public void initialize() {
-        checks.add(new Criticals());
-        checks.add(new MorePackets());
-        checks.add(new NoFall());
-        checks.add(new PayloadFrequency());
-        checks.add(new SwingFrequency());
-        checks.add(new Regeneration());
-        checks.add(new FastUse());
-        checks.add(new Jesus());
-        checks.add(new Reach());
-        checks.add(new NoSwing());
-        checks.add(new KillAura());
+        add(new Criticals());
+        add(new MorePackets());
+        add(new NoFall());
+        add(new PayloadFrequency());
+        add(new SwingFrequency());
+        add(new Regeneration());
+        add(new FastUse());
+        add(new Jesus());
+        add(new Reach());
+        add(new NoSwing());
+        add(new KillAura());
+    }
+
+    /**
+     * Add a check
+     *
+     * @param check the check
+     */
+    private void add(Check check) {
+        checks.add(check);
     }
 
     @Override

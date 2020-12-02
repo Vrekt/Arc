@@ -113,6 +113,7 @@ public final class Criticals extends PacketCheck {
 
     /**
      * Check if the hit could be a critical one.
+     * TODO: Cooldown checking somehow.
      *
      * @param player the player
      * @param data   data
@@ -122,7 +123,8 @@ public final class Criticals extends PacketCheck {
         return !data.clientOnGround()
                 && !player.isInsideVehicle()
                 && !player.hasPotionEffect(PotionEffectType.BLINDNESS)
-                && !MovingUtil.hasClimbable(player.getLocation());
+                && !MovingUtil.hasClimbable(player.getLocation())
+                && !MovingUtil.isInOrOnLiquid(player.getLocation());
     }
 
     @Override

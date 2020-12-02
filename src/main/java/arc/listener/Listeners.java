@@ -74,5 +74,4 @@ public final class Listeners {
         MOVING_UPDATE_TASK.stop();
     }
 
-
 }

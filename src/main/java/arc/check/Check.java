@@ -1,6 +1,7 @@
 package arc.check;
 
 import arc.Arc;
+import arc.bridge.Version;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.check.CheckConfiguration;
@@ -38,6 +39,11 @@ public abstract class Check {
      * The scheduled task.
      */
     protected BukkitTask scheduled;
+
+    /**
+     * If this check is permanently disabled.
+     */
+    protected boolean permanentlyDisabled;
 
     /**
      * Initialize the check
@@ -296,6 +302,20 @@ public abstract class Check {
     }
 
     /**
+     * Disable this check if its newer than the other version.
+     *
+     * @param version the other version
+     * @return {@code true} if the check is disabled.
+     */
+    protected boolean disableIfNewerThan(Version version) {
+        if (Arc.version().isNewerThan(version)) {
+            permanentlyDisabled = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Reload the configuration.
      */
     public void reloadConfigInternal(FileConfiguration configuration) {
@@ -323,7 +343,7 @@ public abstract class Check {
      * @return {@code true} if the check is enabled.
      */
     public boolean enabled() {
-        return configuration.enabled();
+        return !permanentlyDisabled && configuration.enabled();
     }
 
     /**

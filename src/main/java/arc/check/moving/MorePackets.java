@@ -1,5 +1,6 @@
 package arc.check.moving;
 
+import arc.Arc;
 import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
@@ -17,17 +18,16 @@ import org.bukkit.entity.Player;
 public final class MorePackets extends Check {
 
     /**
-     * The kick broadcast message
-     */
-    private final String kickBroadcastMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
-            + "%player%" + ChatColor.WHITE + " was kicked for sending too many packets. ";
-
-    /**
      * Max flying packets allowed
      * Max position packets allowed
      * Max packets allowed before kicking
      */
     private int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
+
+    /**
+     * The kick broadcast message.
+     */
+    private String kickBroadcastMessage;
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
@@ -114,6 +114,8 @@ public final class MorePackets extends Check {
         maxFlyingPackets = getValueInt("max-flying-packets");
         maxPositionPackets = getValueInt("max-position-packets");
         maxPacketsToKick = getValueInt("max-packets-kick");
+        kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
+                " %player% was kicked for sending too many swing packets.";
 
         scheduledCheck(() -> {
             for (final Player player : Bukkit.getOnlinePlayers()) {

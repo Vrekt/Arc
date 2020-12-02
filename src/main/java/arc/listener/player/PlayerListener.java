@@ -38,6 +38,7 @@ public final class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     private void onRegain(EntityRegainHealthEvent event) {
         if (!(event.getEntity() instanceof Player)) return;
+        if (!regeneration.enabled()) return;
 
         // only check if we have regained health from being satisfied.
         if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {

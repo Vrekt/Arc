@@ -1,8 +1,10 @@
 package arc.violation;
 
+import arc.Arc;
 import arc.api.events.PlayerViolationEvent;
 import arc.api.events.PostPlayerViolationEvent;
 import arc.check.Check;
+import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Reloadable;
@@ -17,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 
 import java.io.Closeable;
 import java.util.Map;
@@ -114,7 +117,7 @@ public final class ViolationManager implements Closeable, Reloadable {
 
         // call our violation event.
         final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result.information());
-        Bukkit.getPluginManager().callEvent(event);
+        triggerSync(event);
         // if the event is cancelled, remove the violation level and return no result.
         if (event.isCancelled()) {
             // reverse.
@@ -164,9 +167,20 @@ public final class ViolationManager implements Closeable, Reloadable {
 
         // fire the post event
         final PostPlayerViolationEvent postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
-        Bukkit.getPluginManager().callEvent(postEvent);
+        triggerSync(postEvent);
 
         return violationResult;
+    }
+
+    /**
+     * Trigger a bukkit event sync.
+     * TODO: Could cause a problem with a-lot of violations?
+     * TODO: Maybe move it into a queue with a thread constantly processing them.
+     *
+     * @param event the event
+     */
+    private void triggerSync(Event event) {
+        Bukkit.getScheduler().runTask(Arc.arc(), () -> Bukkit.getServer().getPluginManager().callEvent(event));
     }
 
     /**
@@ -215,6 +229,17 @@ public final class ViolationManager implements Closeable, Reloadable {
      */
     public void toggleDebugViewer(Player player, boolean state) {
         violationViewers.put(player, state);
+    }
+
+    /**
+     * Get the violation level
+     *
+     * @param player the player
+     * @param check  the check
+     * @return the level
+     */
+    public int getViolationLevel(Player player, CheckType check) {
+        return history.get(player.getUniqueId()).getViolationLevel(check.getName());
     }
 
     /**

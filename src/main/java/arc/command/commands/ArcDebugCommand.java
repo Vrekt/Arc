@@ -15,7 +15,7 @@ public final class ArcDebugCommand extends ArcSubCommand {
     @Override
     protected void execute(CommandSender sender, String[] arguments) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + " You must be a player to run this command.");
+            sender.sendMessage(ChatColor.RED + "You must be a player to run this command.");
             return;
         }
 

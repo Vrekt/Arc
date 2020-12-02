@@ -1,9 +1,6 @@
 package arc.command;
 
-import arc.command.commands.ArcCancelBanCommand;
-import arc.command.commands.ArcDebugCommand;
-import arc.command.commands.ArcReloadConfigCommand;
-import arc.command.commands.ArcViolationsCommand;
+import arc.command.commands.*;
 import arc.permissions.Permissions;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.ChatColor;
@@ -14,7 +11,7 @@ import org.bukkit.command.CommandSender;
 /**
  * The base Arc command.
  */
-public class CommandArc extends ArcCommand implements CommandExecutor {
+public final class CommandArc extends ArcCommand implements CommandExecutor {
 
     public CommandArc() {
         super(Permissions.ARC_COMMANDS_BASE, Permissions.ARC_COMMANDS_ALL);
@@ -30,6 +27,7 @@ public class CommandArc extends ArcCommand implements CommandExecutor {
         addHelpLine(ChatColor.DARK_AQUA + " /arc violations: " + ChatColor.GRAY + "Allows you to toggle violations on or off.", Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
         addHelpLine(ChatColor.DARK_AQUA + " /arc debug: " + ChatColor.GRAY + "Allows you to toggle debug information.", Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
     }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

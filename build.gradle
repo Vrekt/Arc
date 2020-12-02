@@ -12,9 +12,15 @@ repositories {
         url 'https://papermc.io/repo/repository/maven-public/'
     }
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url "https://repo.inventivetalent.org/content/groups/public/"}
 }
 
 dependencies {
-    compile files('paper.jar')
+    compile files('spigot.jar')
+   // compileOnly 'com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT'
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
+    compile "org.apache.commons:commons-lang3:3.11"
+    compile group: 'io.netty', name: 'netty-buffer', version: '4.1.54.Final'
+    compile "org.inventivetalent:reflectionhelper:1.15.2-SNAPSHOT"
+    compile "org.inventivetalent:vectors:1.0.1-SNAPSHOT"
 }

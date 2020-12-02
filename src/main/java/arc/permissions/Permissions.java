@@ -55,6 +55,11 @@ public final class Permissions {
     public static final String ARC_COMMANDS_ALL = "arc.commands.all";
 
     /**
+     * The permission to view player summaries.
+     */
+    public static final String ARC_COMMANDS_SUMMARY = "arc.commands.summary";
+
+    /**
      * Check if the player can view violations
      *
      * @param player the player

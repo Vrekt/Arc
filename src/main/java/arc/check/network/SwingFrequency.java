@@ -1,5 +1,6 @@
 package arc.check.network;
 
+import arc.Arc;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -15,15 +16,14 @@ import org.bukkit.entity.Player;
 public final class SwingFrequency extends PacketCheck {
 
     /**
-     * The kick broadcast message
-     */
-    private final String kickBroadcastMessage = ChatColor.DARK_GRAY + "[" + ChatColor.RED + "Arc" + ChatColor.DARK_GRAY + "] " + ChatColor.BLUE
-            + "%player%" + ChatColor.WHITE + " was kicked for sending too many swing packets.";
-
-    /**
      * Max packets and max packets to kick.
      */
     private int maxPackets, maxPacketsKick;
+
+    /**
+     * Kick broadcast message
+     */
+    private String kickBroadcastMessage;
 
     public SwingFrequency() {
         super(CheckType.SWING_FREQUENCY);
@@ -79,6 +79,8 @@ public final class SwingFrequency extends PacketCheck {
     public void load() {
         maxPackets = getValueInt("max-packets");
         maxPacketsKick = getValueInt("max-packets-kick");
+        kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
+                " %player% was kicked for sending too many swing packets.";
 
         scheduledCheck(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {

@@ -1,5 +1,7 @@
 package arc.check.combat;
 
+import arc.Arc;
+import arc.bridge.Version;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -29,8 +31,12 @@ public final class NoSwing extends PacketCheck {
                 .kick(false)
                 .write();
 
-        addConfigurationValue("swing-time", 100);
-
+        // add config value based on version.
+        if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
+            addConfigurationValue("swing-time", 750);
+        } else {
+            addConfigurationValue("swing-time", 100);
+        }
         if (enabled()) load();
     }
 

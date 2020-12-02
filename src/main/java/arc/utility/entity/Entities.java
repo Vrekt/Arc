@@ -2,9 +2,10 @@ package arc.utility.entity;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.inventivetalent.boundingbox.BoundingBox;
+import org.inventivetalent.boundingbox.BoundingBoxAPI;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,21 +51,21 @@ public final class Entities {
     }
 
     /**
-     * Get a bounding box of an entity
+     * Get the bounding box of an entity
      *
      * @param entity the entity
-     * @return the bounding box.
+     * @return the {@link BoundingBox}
      */
-    public static AxisAlignedBB getBoundingBox(Entity entity) {
-        final Pair<Float, Float> bounds = ENTITY_BOUNDS.get(entity.getType());
-        if (bounds == null) {
-            return new AxisAlignedBB(((CraftEntity) entity).getHandle().getBoundingBox());
+    public static BoundingBox getBoundingBox(Entity entity) {
+        if (!ENTITY_BOUNDS.containsKey(entity.getType())) {
+            return BoundingBoxAPI.getBoundingBox(entity);
         }
+        final Pair<Float, Float> bounds = ENTITY_BOUNDS.get(entity.getType());
         final Location location = entity.getLocation();
         final float width = bounds.getLeft() / 2.0F;
         final float height = bounds.getRight();
 
-        return new AxisAlignedBB(location.getX() - width, location.getY(), location.getZ() - width,
+        return new BoundingBox(location.getX() - width, location.getY(), location.getZ() - width,
                 location.getX() + width, location.getY() + height, location.getZ() + width);
     }
 

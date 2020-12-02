@@ -1,5 +1,6 @@
 package arc.check.player;
 
+import arc.bridge.Version;
 import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckCallback;
@@ -20,6 +21,8 @@ public final class Regeneration extends Check {
 
     public Regeneration() {
         super(CheckType.REGENERATION);
+        if (disableIfNewerThan(Version.VERSION_1_8)) return;
+
         enabled(true)
                 .cancel(true)
                 .cancelLevel(0)
@@ -41,7 +44,7 @@ public final class Regeneration extends Check {
      * @param callback the action callback
      */
     public void check(Player player, PlayerData data, CheckCallback callback) {
-        if (exempt(player) || !enabled()) return;
+        if (exempt(player)) return;
 
         // the time from now to the last regain event.
         final long time = System.currentTimeMillis() - data.lastHealthRegain();
