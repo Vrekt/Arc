@@ -7,6 +7,7 @@ An anticheat built for PaperSpigot.
 - 1.16.4*
 
 *1.15.2 support is currently experimental and not everything is implemented.*
+
 *1.16.4 support is currently experimental and not everything is implemented.*
 
 # Whats Required
