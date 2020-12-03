@@ -302,7 +302,7 @@ public abstract class Check {
     }
 
     /**
-     * Disable this check if its newer than the other version.
+     * Disable this check if the current version is newer than {@code version}
      *
      * @param version the other version
      * @return {@code true} if the check is disabled.
@@ -316,9 +316,25 @@ public abstract class Check {
     }
 
     /**
+     * Disable this check if the current version is older than {@code version}
+     *
+     * @param version the version
+     * @return {@code true} if the check is disabled.
+     */
+    protected boolean disableIfOlderThan(Version version) {
+        if (Arc.version().isOlderThan(version)) {
+            permanentlyDisabled = true;
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Reload the configuration.
      */
     public void reloadConfigInternal(FileConfiguration configuration) {
+        if (permanentlyDisabled) return;
+
         this.configuration.reload(configuration.getConfigurationSection(getName().toLowerCase()));
         reloadConfig();
     }

@@ -5,6 +5,7 @@ import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.data.moving.nf.NoFallData;
+import arc.utility.MovingUtil;
 import arc.utility.math.MathUtil;
 import org.bukkit.entity.Player;
 
@@ -41,7 +42,7 @@ public final class NoFall extends Check {
      * @param player the player
      * @param data   the data
      */
-    public void check(Player player, MovingData data) {
+    public void    check(Player player, MovingData data) {
         if (exempt(player) || !enabled()) return;
 
         final CheckResult result = new CheckResult();
@@ -70,7 +71,8 @@ public final class NoFall extends Check {
             }
         }
 
-        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle()) {
+        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle()
+                && !MovingUtil.isInOrOnLiquid(data.to())) {
             // if we have no ground and haven't been descending for that long just return
             if (nf.location() == null) nf.location(data.from());
             // set our first check location, if we haven't already.
@@ -78,7 +80,7 @@ public final class NoFall extends Check {
             // calculate the distance we have fallen
             final double distance = Math.floor(MathUtil.vertical(nf.location(), data.from()) * 100) / 100;
             // make sure we have fallen a bit before checking
-            if (distance > 1) {
+            if (distance > 2) {
                 nf.lastCheck(System.currentTimeMillis());
                 if (nf.lastCheckLocation() == null) nf.lastCheckLocation(data.from());
                 final boolean clientHasGround = data.clientOnGround();

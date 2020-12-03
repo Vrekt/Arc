@@ -6,6 +6,7 @@ import arc.data.moving.MovingData;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,13 +55,16 @@ public final class MovingUtil {
     }
 
     /**
-     * TODO: Maybe bypass with values greater than 0.5
-     *
      * @return if we are in or on liquid.
      */
     public static boolean isInOrOnLiquid(Location location) {
-        final List<Block> neighbors = neighbors(location, 0.1, -0.5, 0.1);
-        return neighbors.stream().allMatch(block -> BRIDGE.materials().isLiquid(block));
+        if (BRIDGE.materials().isLiquid(location.getBlock())
+                || BRIDGE.materials().isLiquid(location.getBlock().getRelative(BlockFace.DOWN))) return true;
+
+        final List<Block> neighbors0 = neighbors(location, 0.3, -0.01, 0.3);
+        final List<Block> neighbors1 = neighbors(location, 0.1, -0.5, 0.1);
+        return neighbors0.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block))
+                || neighbors1.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
     }
 
     /**
@@ -150,6 +154,18 @@ public final class MovingUtil {
         // set ascending/descending states
         data.ascending(to.getY() > from.getY() && distance > 0.0);
         data.descending(from.getY() > to.getY() && distance > 0.0);
+        if (data.descending()) {
+            data.descendingTime(data.descendingTime() + 1);
+        } else {
+            data.descendingTime(0);
+        }
+
+        if (data.ascending()) {
+            data.ascendingTime(data.ascendingTime() + 1);
+        } else {
+            data.ascendingTime(0);
+        }
+
         data.climbing(distance > 0.0 && hasClimbable(to));
         data.lastMovingUpdate(System.currentTimeMillis());
     }

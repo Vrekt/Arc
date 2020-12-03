@@ -2,6 +2,7 @@ package arc.listener.moving;
 
 import arc.Arc;
 import arc.check.CheckType;
+import arc.check.moving.Flight;
 import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.data.moving.MovingData;
@@ -30,18 +31,24 @@ public final class MovingListener implements Listener {
     private final Jesus jesus;
 
     /**
+     * The flight check
+     */
+    private final Flight flight;
+
+    /**
      * Initialize and add all the checks we need.
      */
     public MovingListener() {
         noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
         jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
+        flight = (Flight) Arc.arc().checks().getCheck(CheckType.FLIGHT);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     private void onMove(PlayerMoveEvent event) {
-
         final Location from = event.getFrom();
         final Location to = event.getTo();
+        if (to == null) return;
 
         // first, check some things before grabbing moving data and all that
         // to avoid wasting resources/time
@@ -64,6 +71,9 @@ public final class MovingListener implements Listener {
         // retrieve data and calculate what we need
         final MovingData data = MovingData.get(player);
         MovingUtil.updateMovingPlayer(data, from, to);
+
+        // Check players for Flight.
+        flight.check(player, data, event);
 
         // Check players for NoFall.
         noFall.check(player, data);

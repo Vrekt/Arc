@@ -5,6 +5,7 @@ import arc.data.moving.packets.MovingPacketData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,13 +53,19 @@ public final class MovingData {
 
     /**
      * The time we have been on ground
+     * The time we have been descending
      */
-    private int onGroundTime;
+    private int onGroundTime, descendingTime, ascendingTime;
 
     /**
      * The amount of times the vertical has been similar.
      */
     private int similarVerticalAmount, noVerticalAmount, similarVerticalAmountJesus;
+
+    /**
+     * The time we have been in water
+     */
+    private int inWaterTime;
 
     /**
      * The max difference allowed for similar vertical amounts.
@@ -80,6 +87,11 @@ public final class MovingData {
      * The vertical distances traveled.
      */
     private double lastVerticalDistance, verticalDistance;
+
+    /**
+     * Average in water diffs
+     */
+    private List<Double> averageInWaterDifferences;
 
     /**
      * No fall data
@@ -232,14 +244,6 @@ public final class MovingData {
         this.similarVerticalAmount = similarVerticalAmount;
     }
 
-    public double similarVerticalDifference() {
-        return similarVerticalDifference;
-    }
-
-    public void similarVerticalDifference(double similarVerticalDifference) {
-        this.similarVerticalDifference = similarVerticalDifference;
-    }
-
     public int noVerticalAmount() {
         return noVerticalAmount;
     }
@@ -248,11 +252,35 @@ public final class MovingData {
         this.noVerticalAmount = noVerticalAmount;
     }
 
-    public int similarVerticalAmountJesus() {
-        return similarVerticalAmountJesus;
+    public int inWaterTime() {
+        return inWaterTime;
     }
 
-    public void similarVerticalAmountJesus(int similarVerticalAmountJesus) {
-        this.similarVerticalAmountJesus = similarVerticalAmountJesus;
+    public void inWaterTime(int inWaterTime) {
+        this.inWaterTime = inWaterTime;
+    }
+
+    public List<Double> averageInWaterDifferences() {
+        return averageInWaterDifferences;
+    }
+
+    public void averageInWaterDifferences(List<Double> averageInWaterDifferences) {
+        this.averageInWaterDifferences = averageInWaterDifferences;
+    }
+
+    public int descendingTime() {
+        return descendingTime;
+    }
+
+    public void descendingTime(int descendingTime) {
+        this.descendingTime = descendingTime;
+    }
+
+    public int ascendingTime() {
+        return ascendingTime;
+    }
+
+    public void ascendingTime(int ascendingTime) {
+        this.ascendingTime = ascendingTime;
     }
 }

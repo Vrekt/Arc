@@ -38,6 +38,16 @@ public enum Version {
     }
 
     /**
+     * Check if this version is older than the other
+     *
+     * @param other the other
+     * @return {@code true} if so
+     */
+    public boolean isOlderThan(Version other) {
+        return this.number < other.number;
+    }
+
+    /**
      * Check if {@code v1} is newer than {@code v2}
      *
      * @param v1 version 1
