@@ -8,3 +8,5 @@
 /gradle/
 /.gradle/
 /spigot.jar
+*.jar
+*.class

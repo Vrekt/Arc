@@ -1,7 +1,7 @@
 package arc.utility;
 
 import arc.Arc;
-import arc.bridge.Bridge;
+import bridge.Bridge;
 import arc.data.moving.MovingData;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;

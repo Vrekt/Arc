@@ -1,7 +1,7 @@
 package arc.bridge.packets;
 
 import arc.Arc;
-import arc.bridge.Version;
+import bridge.Version;
 import com.comphenix.packetwrapper.AbstractPacket;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketContainer;

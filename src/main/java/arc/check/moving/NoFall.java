@@ -70,7 +70,7 @@ public final class NoFall extends Check {
             }
         }
 
-        if (data.descending() && !data.onGround() && !data.climbing()) {
+        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle()) {
             // if we have no ground and haven't been descending for that long just return
             if (nf.location() == null) nf.location(data.from());
             // set our first check location, if we haven't already.

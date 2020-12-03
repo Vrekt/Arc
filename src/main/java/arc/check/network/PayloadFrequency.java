@@ -1,7 +1,7 @@
 package arc.check.network;
 
 import arc.Arc;
-import arc.bridge.Version;
+import bridge.Version;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;

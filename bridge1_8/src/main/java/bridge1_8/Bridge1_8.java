@@ -1,8 +1,8 @@
-package arc.bridge.version1_8;
+package bridge1_8;
 
-import arc.bridge.Bridge;
-import arc.bridge.MaterialsBridge;
-import arc.bridge.Version;
+import bridge.Bridge;
+import bridge.MaterialsBridge;
+import bridge.Version;
 
 /**
  * Legacy bridge for 1.8

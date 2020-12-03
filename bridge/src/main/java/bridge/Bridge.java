@@ -1,4 +1,4 @@
-package arc.bridge;
+package bridge;
 
 /**
  * A basic bridge.

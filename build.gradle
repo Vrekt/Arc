@@ -17,7 +17,10 @@ repositories {
 
 dependencies {
     compile files('spigot.jar')
-   // compileOnly 'com.destroystokyo.paper:paper-api:1.16.4-R0.1-SNAPSHOT'
+    compile project(':bridge')
+    compile project(':bridge1_8')
+    compile project(':bridge1_15')
+    compile project(':bridge1_16')
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
     compile "org.apache.commons:commons-lang3:3.11"
     compile group: 'io.netty', name: 'netty-buffer', version: '4.1.54.Final'

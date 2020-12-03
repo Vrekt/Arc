@@ -16,6 +16,8 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
@@ -70,6 +72,7 @@ public final class CombatPacketListener implements IPacketListener {
 
     /**
      * Invoked when the player tries to use an entity.
+     * TODO: LivingEntities only.
      *
      * @param event the event
      */
@@ -78,13 +81,15 @@ public final class CombatPacketListener implements IPacketListener {
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             // the player attacked an entity, run checks.
             final Player player = event.getPlayer();
+            final Entity entity = packet.getTarget(player.getWorld());
+            if (entity instanceof LivingEntity) {
+                boolean killauraCheck = killAura.onAttack(player, packet);
+                boolean criticalsCheck = criticals.onAttack(player, packet);
+                boolean reachCheck = reach.onAttack(player, packet);
+                boolean noSwingCheck = noSwing.onAttack(player, packet);
 
-            boolean killauraCheck = killAura.onAttack(player, packet);
-            boolean criticalsCheck = criticals.onAttack(player, packet);
-            boolean reachCheck = reach.onAttack(player, packet);
-            boolean noSwingCheck = noSwing.onAttack(player, packet);
-
-            if (criticalsCheck || reachCheck || noSwingCheck || killauraCheck) event.setCancelled(true);
+                if (criticalsCheck || reachCheck || noSwingCheck || killauraCheck) event.setCancelled(true);
+            }
         }
     }
 

@@ -1,10 +1,5 @@
 package arc;
 
-import arc.bridge.Bridge;
-import arc.bridge.Version;
-import arc.bridge.version1_15.Bridge1_15;
-import arc.bridge.version1_16.Bridge1_16;
-import arc.bridge.version1_8.Bridge1_8;
 import arc.check.CheckManager;
 import arc.command.CommandArc;
 import arc.configuration.ArcConfiguration;
@@ -12,11 +7,16 @@ import arc.data.DataUtility;
 import arc.exemption.ExemptionManager;
 import arc.listener.Listeners;
 import arc.violation.ViolationManager;
+import bridge.Bridge;
+import bridge.Version;
+import bridge1_15.Bridge1_15;
+import bridge1_16.Bridge1_16;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
+import bridge1_8.Bridge1_8;
 
 import java.util.Objects;
 
@@ -70,6 +70,11 @@ public final class Arc extends JavaPlugin {
      */
     private ProtocolManager protocolManager;
 
+    /**
+     * If the version is incompatible
+     */
+    private boolean incompatible = false;
+
     @Override
     public void onEnable() {
         arc = this;
@@ -105,6 +110,7 @@ public final class Arc extends JavaPlugin {
      */
     @Override
     public void onDisable() {
+        if (incompatible) return;
         Listeners.unregister(protocolManager);
 
         exemptionManager.close();
@@ -126,14 +132,15 @@ public final class Arc extends JavaPlugin {
             getLogger().info(ChatColor.RED + "Initializing Arc for: " + Bukkit.getVersion());
             loadFor1_16();
             return true;
-        } else if(Bukkit.getVersion().contains("1.15")) {
+        } else if (Bukkit.getVersion().contains("1.15")) {
             getLogger().info(ChatColor.RED + "Initializing Arc for: " + Bukkit.getVersion());
             loadFor1_15();
             return true;
         } else {
-            // TODO: Incompatible versions
+            getLogger().info("[INCOMPATIBLE] Arc is not compatible with this version: " + Bukkit.getVersion());
+            incompatible = true;
+            return false;
         }
-        return true;
     }
 
     /**

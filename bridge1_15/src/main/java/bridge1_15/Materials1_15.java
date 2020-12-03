@@ -1,6 +1,6 @@
-package arc.bridge.version1_16;
+package bridge1_15;
 
-import arc.bridge.MaterialsBridge;
+import bridge.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
@@ -8,7 +8,7 @@ import org.bukkit.block.data.type.*;
 /**
  * Current materials API
  */
-public final class Materials1_16 implements MaterialsBridge {
+public final class Materials1_15 implements MaterialsBridge {
 
     @Override
     public boolean isFence(Block block) {
@@ -33,9 +33,7 @@ public final class Materials1_16 implements MaterialsBridge {
     @Override
     public boolean isClimbable(Block block) {
         return block.getState().getBlock() instanceof Ladder
-                || block.getType() == Material.VINE
-                || block.getType() == Material.TWISTING_VINES
-                || block.getType() == Material.WEEPING_VINES;
+                || block.getType() == Material.VINE;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package arc.check.player;
 
-import arc.bridge.Version;
+import bridge.Version;
 import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckCallback;

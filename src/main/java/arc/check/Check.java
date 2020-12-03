@@ -1,7 +1,7 @@
 package arc.check;
 
 import arc.Arc;
-import arc.bridge.Version;
+import bridge.Version;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.check.CheckConfiguration;

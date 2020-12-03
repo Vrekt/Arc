@@ -1,8 +1,8 @@
-package arc.bridge.version1_15;
+package bridge1_15;
 
-import arc.bridge.Bridge;
-import arc.bridge.MaterialsBridge;
-import arc.bridge.Version;
+import bridge.Bridge;
+import bridge.MaterialsBridge;
+import bridge.Version;
 
 /**
  * Current bridge for 1.16
