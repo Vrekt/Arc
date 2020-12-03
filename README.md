@@ -48,7 +48,7 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 
 - [x] CONVERT CODE BACK TO JAVA 8 FROM 11.
 - [x] Permissions for each check to bypass
-- [ ] Improve MorePackets
+- [x] ~Improve MorePackets~
 - [ ] Patch more crashing exploits
 - [x] ~Workaround /effect for BadEffects check~
 - [x] ~Fix BadEffects potion duration~
@@ -57,7 +57,7 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [x] Debug/Information commands to toggle
 - [x] Commands in general
 - [x] Exemptions 
-- [ ] More checks, obviously
+- [x] More checks, obviously
 - [x] Better permissions
 - [x] Improve NoFall 
 - [x] Lag Checking/Refactoring before continuing
@@ -68,4 +68,4 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [ ] Inventory UI
 - [ ] Player summaries
 - [x] One listener for all combat checks
-- [ ] Improve/Fix reach (add velocity? ) IDK
+- [x] Improve/Fix reach (add velocity? ) IDK
