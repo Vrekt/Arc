@@ -29,18 +29,23 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 
 # Current Checks
 ### Combat
+- KillAura
+  - Direction
+  - TODO.
 - Criticals
 - Reach
 ### Moving
 - MorePackets
 - NoFall
-- Jesus (Water Walk/LiquidWalk)
+- Jesus
 ### Network
 - Swing Frequency (Server Crashing)
 - Payload Frequency (Server Crashing)
 ### Player
 - Regeneration
-- FastUse (FastConsume) (FastBow)
+- FastUse
+  - Fast Consume
+  - Fast Bow
 
 # TODO LIST
 
