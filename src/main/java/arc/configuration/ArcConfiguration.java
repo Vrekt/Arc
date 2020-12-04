@@ -22,8 +22,9 @@ public final class ArcConfiguration {
 
     /**
      * If TPS should be watched
+     * If the event API should be enabled.
      */
-    private boolean watchTps;
+    private boolean watchTps, enableEventApi;
 
     /**
      * The lower limit of when to optimize checks to up the TPS.
@@ -40,6 +41,7 @@ public final class ArcConfiguration {
 
     /**
      * Read
+     * TODO: Invalid configuration
      *
      * @param configuration the configuration
      */
@@ -49,6 +51,7 @@ public final class ArcConfiguration {
 
         watchTps = configuration.getBoolean("tps-helper");
         tpsLowerLimit = configuration.getInt("tps-lower-limit");
+        enableEventApi = configuration.getBoolean("enable-event-api");
         violationDataTimeout = configuration.getInt("violation-data-timeout");
         violationMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("violation-notify-message"));
         noPermissionMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-command-no-permission-message"));
@@ -74,6 +77,13 @@ public final class ArcConfiguration {
      */
     public boolean watchTps() {
         return watchTps;
+    }
+
+    /**
+     * @return if the event API should be enabled.
+     */
+    public boolean enableEventApi() {
+        return enableEventApi;
     }
 
     /**

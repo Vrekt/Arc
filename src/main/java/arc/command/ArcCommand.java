@@ -2,7 +2,7 @@ package arc.command;
 
 import arc.Arc;
 import arc.permissions.Permissions;
-import arc.utility.ChatUtil;
+import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 

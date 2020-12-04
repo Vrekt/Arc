@@ -1,4 +1,4 @@
-package bridge;
+package bridge.materials;
 
 import org.bukkit.block.Block;
 
@@ -56,13 +56,21 @@ public interface MaterialsBridge {
     boolean isLiquid(Block block);
 
     /**
+     * Check if the block is a trapdoor
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isTrapdoor(Block block);
+
+    /**
      * Check if a block is solid
      *
      * @param block the block
      * @return {@code true} if so
      */
     default boolean isSolid(Block block) {
-        return block.getType().isSolid() || isSlab(block) || isStair(block) || isFence(block) || isFenceGate(block);
+        return block.getType().isSolid() || isSlab(block) || isStair(block) || isFence(block) || isFenceGate(block) || isTrapdoor(block);
     }
 
 }

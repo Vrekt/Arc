@@ -1,6 +1,6 @@
 package bridge1_15;
 
-import bridge.MaterialsBridge;
+import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
@@ -32,12 +32,17 @@ public final class Materials1_15 implements MaterialsBridge {
 
     @Override
     public boolean isClimbable(Block block) {
-        return block.getState().getBlock() instanceof Ladder
+        return block.getState() instanceof Ladder
                 || block.getType() == Material.VINE;
     }
 
     @Override
     public boolean isLiquid(Block block) {
         return block.isLiquid();
+    }
+
+    @Override
+    public boolean isTrapdoor(Block block) {
+        return block.getState() instanceof TrapDoor;
     }
 }

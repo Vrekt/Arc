@@ -12,17 +12,18 @@ import arc.configuration.punishment.ban.BanConfiguration;
 import arc.configuration.punishment.kick.KickConfiguration;
 import arc.permissions.Permissions;
 import arc.utility.Punishment;
+import arc.utility.chat.PlaceholderStringReplacer;
 import arc.violation.result.ViolationResult;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.ImmutableMap;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
 import java.io.Closeable;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,7 @@ public final class ViolationManager implements Closeable, Reloadable {
     /**
      * A list of players who can view violations/debug information
      */
-    private final Map<Player, Boolean> violationViewers = new ConcurrentHashMap<>();
+    private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
 
     /**
      * Keeps track of when to expire history
@@ -61,7 +62,6 @@ public final class ViolationManager implements Closeable, Reloadable {
      * The kick configuration.
      */
     private KickConfiguration kickConfiguration;
-
 
     /**
      * Initialize
@@ -91,7 +91,7 @@ public final class ViolationManager implements Closeable, Reloadable {
         } else {
             history.put(player.getUniqueId(), new Violations());
         }
-        if (Permissions.canViewViolations(player)) violationViewers.put(player, Boolean.FALSE);
+        if (Permissions.canViewViolations(player)) violationViewers.add(player);
     }
 
     /**
@@ -101,6 +101,7 @@ public final class ViolationManager implements Closeable, Reloadable {
      */
     public void onPlayerLeave(Player player) {
         historyCache.put(player.getUniqueId(), history.get(player.getUniqueId()));
+        history.remove(player.getUniqueId());
         violationViewers.remove(player);
     }
 
@@ -116,13 +117,15 @@ public final class ViolationManager implements Closeable, Reloadable {
         final int level = violations.incrementViolationLevel(check.getName());
 
         // call our violation event.
-        final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result.information());
-        triggerSync(event);
-        // if the event is cancelled, remove the violation level and return no result.
-        if (event.isCancelled()) {
-            // reverse.
-            violations.decreaseViolationLevel(check.getName());
-            return ViolationResult.EMPTY;
+        if (configuration.enableEventApi()) {
+            final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result.information());
+            triggerSync(event);
+            // if the event is cancelled, remove the violation level and return no result.
+            if (event.isCancelled()) {
+                // reverse.
+                violations.decreaseViolationLevel(check.getName());
+                return ViolationResult.EMPTY;
+            }
         }
 
         // create a new result if we haven't cancelled.
@@ -131,21 +134,20 @@ public final class ViolationManager implements Closeable, Reloadable {
         // handle violation
         if (check.configuration().notifyViolation()
                 && check.configuration().shouldNotify(level)) {
+            // add that we are going to notify.
             violationResult.addResult(ViolationResult.Result.NOTIFY);
-            // grab our violation message and then replace placeholders.
-            final String rawMessage = configuration.violationMessage();
-            final boolean hasAppend = result.appendName() != null;
-            // the violation message,
-            final String messageNoInfo = replaceConfigurableMessage(rawMessage,
-                    ImmutableMap.of("%player%", player.getName(), "%check%", (
-                            hasAppend ? check.getName() + ChatColor.GRAY + " " + result.appendName() + " "
-                                    : check.getName()), "%level%", level + "", "%prefix%", configuration.prefix()));
+            // replace the place holders within the message
+            final String violationMessage = new PlaceholderStringReplacer(configuration.violationMessage())
+                    .replacePlayer(player)
+                    .replaceCheck(check, result.appendName())
+                    .replaceLevel(level)
+                    .replacePrefix(configuration.prefix())
+                    .build();
 
-            // notify, check debug status too.
-            violationViewers.forEach((viewer, debug) -> {
-                final String messageInfo = messageNoInfo.replace("%information%", debug ? result.information() : "");
-                viewer.sendMessage(messageInfo);
-            });
+            // build the text component and then send to all viewers.
+            final TextComponent component = new TextComponent(violationMessage);
+            Arc.bridge().chat().addHoverEvent(component, result.information());
+            violationViewers.forEach(viewer -> viewer.spigot().sendMessage(component));
         }
 
         // add a cancel result if this check should cancel.
@@ -166,8 +168,10 @@ public final class ViolationManager implements Closeable, Reloadable {
         }
 
         // fire the post event
-        final PostPlayerViolationEvent postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
-        triggerSync(postEvent);
+        if (configuration.enableEventApi()) {
+            final PostPlayerViolationEvent postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
+            triggerSync(postEvent);
+        }
 
         return violationResult;
     }
@@ -190,7 +194,7 @@ public final class ViolationManager implements Closeable, Reloadable {
      * @return {@code true} if so
      */
     public boolean isViolationViewer(Player player) {
-        return violationViewers.containsKey(player);
+        return violationViewers.contains(player);
     }
 
     /**
@@ -199,7 +203,7 @@ public final class ViolationManager implements Closeable, Reloadable {
      * @param player the player
      */
     public void addViolationViewer(Player player) {
-        violationViewers.put(player, false);
+        violationViewers.add(player);
     }
 
     /**
@@ -212,26 +216,6 @@ public final class ViolationManager implements Closeable, Reloadable {
     }
 
     /**
-     * Check if the player can view debug information
-     *
-     * @param player the player
-     * @return {@code true} if so
-     */
-    public boolean isDebugViewer(Player player) {
-        return violationViewers.containsKey(player) && violationViewers.get(player);
-    }
-
-    /**
-     * Toggle debug viewer
-     *
-     * @param player the player
-     * @param state  the state
-     */
-    public void toggleDebugViewer(Player player, boolean state) {
-        violationViewers.put(player, state);
-    }
-
-    /**
      * Get the violation level
      *
      * @param player the player
@@ -240,20 +224,6 @@ public final class ViolationManager implements Closeable, Reloadable {
      */
     public int getViolationLevel(Player player, CheckType check) {
         return history.get(player.getUniqueId()).getViolationLevel(check.getName());
-    }
-
-    /**
-     * Replace placeholders within a configurable message.
-     *
-     * @param message the message
-     * @param entries the entries
-     * @return the string
-     */
-    private String replaceConfigurableMessage(String message, Map<String, String> entries) {
-        for (Map.Entry<String, String> entry : entries.entrySet()) {
-            message = message.replace(entry.getKey(), entry.getValue());
-        }
-        return message;
     }
 
     @Override

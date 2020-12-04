@@ -2,7 +2,7 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.command.ArcSubCommand;
-import arc.utility.ChatUtil;
+import arc.utility.chat.ChatUtil;
 import arc.violation.ViolationManager;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;

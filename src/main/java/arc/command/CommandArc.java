@@ -20,12 +20,10 @@ public final class CommandArc extends ArcCommand implements CommandExecutor {
         addSubCommand("reload", Permissions.ARC_COMMANDS_RELOAD_CONFIG, new ArcReloadConfigCommand());
         addSubCommand("cancelban", Permissions.ARC_COMMANDS_CANCEL_BAN, new ArcCancelBanCommand());
         addSubCommand("violations", Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS, new ArcViolationsCommand());
-        addSubCommand("debug", Permissions.ARC_COMMANDS_TOGGLE_DEBUG, new ArcDebugCommand());
         // help lines
         addHelpLine(ChatColor.DARK_AQUA + " /arc reload: " + ChatColor.GRAY + "Allows you to reload the configuration.", Permissions.ARC_COMMANDS_RELOAD_CONFIG);
         addHelpLine(ChatColor.DARK_AQUA + " /arc cancelban: " + ChatColor.GRAY + "Cancels a ban scheduled by Arc.", Permissions.ARC_COMMANDS_CANCEL_BAN);
         addHelpLine(ChatColor.DARK_AQUA + " /arc violations: " + ChatColor.GRAY + "Allows you to toggle violations on or off.", Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
-        addHelpLine(ChatColor.DARK_AQUA + " /arc debug: " + ChatColor.GRAY + "Allows you to toggle debug information.", Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
     }
 
 

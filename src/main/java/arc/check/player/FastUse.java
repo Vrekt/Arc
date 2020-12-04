@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
  * use-delta-min: If higher, check is more relaxed.
  * delta-shot-min: If higher, check is more relaxed.
  * consume-time-ms: If less, check is more strict. (avg time with 0 ping is 1500ms)
+ * TODO: Disable with versions > 1.8?
  */
 public final class FastUse extends PacketCheck {
 

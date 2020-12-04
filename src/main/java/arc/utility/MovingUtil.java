@@ -19,7 +19,7 @@ public final class MovingUtil {
     /**
      * The bridge
      */
-    private static final Bridge BRIDGE = Arc.arc().bridge();
+    private static final Bridge BRIDGE = Arc.bridge();
 
     /**
      * Check if the location is on a solid block
@@ -35,7 +35,7 @@ public final class MovingUtil {
 
         // else, get all blocks around us and check if they are solid
         final Location clone = location.clone();
-        final List<Block> neighbors = neighbors(clone, 0.3, -0.5, 0.3);
+        final List<Block> neighbors = neighbors(clone, 0.3, -0.1, 0.3);
         return neighbors.stream().anyMatch(block -> BRIDGE.materials().isSolid(block));
     }
 
@@ -61,10 +61,9 @@ public final class MovingUtil {
         if (BRIDGE.materials().isLiquid(location.getBlock())
                 || BRIDGE.materials().isLiquid(location.getBlock().getRelative(BlockFace.DOWN))) return true;
 
-        final List<Block> neighbors0 = neighbors(location, 0.3, -0.01, 0.3);
-        final List<Block> neighbors1 = neighbors(location, 0.1, -0.5, 0.1);
-        return neighbors0.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block))
-                || neighbors1.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
+        final List<Block> neighbors0 = neighbors(location, 0.1, -0.01, 0.1);
+        // final List<Block> neighbors1 = neighbors(location, 0.1, -0.5, 0.1);
+        return neighbors0.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
     }
 
     /**

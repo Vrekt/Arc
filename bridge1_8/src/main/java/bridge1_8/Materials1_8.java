@@ -1,11 +1,12 @@
 package bridge1_8;
 
-import bridge.MaterialsBridge;
+import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
 import org.bukkit.material.Step;
+import org.bukkit.material.TrapDoor;
 
 /**
  * Legacy materials API.
@@ -54,6 +55,10 @@ public final class Materials1_8 implements MaterialsBridge {
         return block.isLiquid();
     }
 
+    @Override
+    public boolean isTrapdoor(Block block) {
+        return block.getType().getData().equals(TrapDoor.class);
+    }
 }
 
 

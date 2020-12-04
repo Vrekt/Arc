@@ -1,5 +1,8 @@
 package bridge;
 
+import bridge.chat.ChatBridge;
+import bridge.materials.MaterialsBridge;
+
 /**
  * A basic bridge.
  */
@@ -10,7 +13,7 @@ public interface Bridge {
      *
      * @return the version
      */
-    Version current();
+    Version version();
 
     /**
      * The bridge materials data
@@ -18,5 +21,12 @@ public interface Bridge {
      * @return the {@link MaterialsBridge}
      */
     MaterialsBridge materials();
+
+    /**
+     * The bridge for chat
+     *
+     * @return the {@link ChatBridge}
+     */
+    ChatBridge chat();
 
 }

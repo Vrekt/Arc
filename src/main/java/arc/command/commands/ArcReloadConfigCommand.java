@@ -2,7 +2,7 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.command.ArcSubCommand;
-import arc.utility.ChatUtil;
+import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -14,7 +14,8 @@ public final class ArcReloadConfigCommand extends ArcSubCommand {
     @Override
     protected void execute(CommandSender sender, String[] arguments) {
         ChatUtil.sendMessage(sender, ChatColor.RED + " Reloading " + ChatColor.GRAY + "the configuration.");
-        ChatUtil.sendMessage(sender, ChatColor.RED + " All " + ChatColor.GRAY + "players will be exempt for 2 seconds afterwards.");
+        ChatUtil.sendMessage(sender, " [1] " + ChatColor.RED + "All " + ChatColor.GRAY + "players will be exempt for 2 seconds afterwards.");
+        ChatUtil.sendMessage(sender, " [2] " + ChatColor.RED + "All " + ChatColor.GRAY + "violation data will be reset/removed.");
 
         try {
             Arc.arc().configuration().reloadConfiguration();

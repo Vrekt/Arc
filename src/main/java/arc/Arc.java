@@ -41,6 +41,11 @@ public final class Arc extends JavaPlugin {
     private static Version version;
 
     /**
+     * The bridge
+     */
+    private static Bridge bridge;
+
+    /**
      * The arc configuration
      */
     private final ArcConfiguration arcConfiguration = new ArcConfiguration();
@@ -59,11 +64,6 @@ public final class Arc extends JavaPlugin {
      * The exemption manager
      */
     private final ExemptionManager exemptionManager = new ExemptionManager();
-
-    /**
-     * The bridge
-     */
-    private Bridge bridge;
 
     /**
      * The protocol manager.
@@ -189,6 +189,13 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
+     * @return the bridge
+     */
+    public static Bridge bridge() {
+        return bridge;
+    }
+
+    /**
      * @return the arc configuration
      */
     public ArcConfiguration configuration() {
@@ -221,12 +228,5 @@ public final class Arc extends JavaPlugin {
      */
     public ProtocolManager protocol() {
         return protocolManager;
-    }
-
-    /**
-     * @return the bridge
-     */
-    public Bridge bridge() {
-        return bridge;
     }
 }

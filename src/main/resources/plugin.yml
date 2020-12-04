@@ -17,8 +17,6 @@ permissions:
     description: Allows the player to execute /arc
   arc.commands.all:
     description: Allows the player to use all Arc commands.
-  arc.commands.toggledebug:
-    description: Allows the player to toggle debug information.
   arc.commands.summary:
     description: Allows the player to access player summary information.
   arc.bypass:

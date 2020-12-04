@@ -35,11 +35,6 @@ public final class Permissions {
     public static final String ARC_COMMANDS_TOGGLE_VIOLATIONS = "arc.commands.toggleviolations";
 
     /**
-     * The permission to toggle debug
-     */
-    public static final String ARC_COMMANDS_TOGGLE_DEBUG = "arc.commands.toggledebug";
-
-    /**
      * The permission to cancel player bans
      */
     public static final String ARC_COMMANDS_CANCEL_BAN = "arc.commands.cancelban";
