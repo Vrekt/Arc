@@ -3,12 +3,8 @@ An anticheat built for PaperSpigot.
 
 # Supported Versions
 - 1.8.8 
-- 1.15.2*
-- 1.16.4*
-
-*1.15.2 support is currently experimental and not everything is implemented.*
-
-*1.16.4 support is currently experimental and not everything is implemented.*
+- 1.15.2
+- 1.16.4
 
 # Whats Required
 - ProtocolLib
