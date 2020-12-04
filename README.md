@@ -2,9 +2,11 @@
 An anticheat built for PaperSpigot.
 
 # Supported Versions
-- 1.8.8 
+- 1.8.8 *
 - 1.15.2
 - 1.16.4
+
+*1.8.8 is the main supported version of Arc. All checks will be developed FIRST for 1.8.8
 
 # Whats Required
 - ProtocolLib
