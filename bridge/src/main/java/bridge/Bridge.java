@@ -1,6 +1,7 @@
 package bridge;
 
 import bridge.chat.ChatBridge;
+import bridge.entities.EntitiesBridge;
 import bridge.materials.MaterialsBridge;
 
 /**
@@ -28,5 +29,12 @@ public interface Bridge {
      * @return the {@link ChatBridge}
      */
     ChatBridge chat();
+
+    /**
+     * The bridge for entities
+     *
+     * @return the {@link EntitiesBridge}
+     */
+    EntitiesBridge entities();
 
 }

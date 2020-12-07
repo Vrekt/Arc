@@ -1,41 +1,36 @@
 package arc.check.combat;
 
+import arc.Arc;
+import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
 import arc.utility.entity.Entities;
-import arc.utility.math.MathUtil;
+import bridge.BoundingBox;
+import bridge.Version;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.inventivetalent.boundingbox.BoundingBox;
 
 /**
  * Checks multiple fight related things
  * direction-use-bounding-boxes=true slightly more accurate
  * direction-max-angle-difference<=1.25 strict
- * TODO: Avoid calculating angle multiple times
  */
 public final class KillAura extends PacketCheck {
 
     /**
      * If bounding boxes should be used
      */
-    private boolean directionUseBoundingBoxes, angleUseBoundingBoxes;
+    private boolean directionUseBoundingBoxes;
 
     /**
      * Max angle difference for direction checking
-     * Max angle difference for angle checking
-     * Max distance allowed to check for angle
      */
-    private double directionMaxAngleDifference, angleMaxAngleDifference, angleMaxAngleDifferenceDistance;
-
-    /**
-     * The min attack time required between entities
-     */
-    private long angleMinAttackTime;
+    private double directionMaxAngleDifference;
 
     public KillAura() {
         super(CheckType.KILL_AURA);
@@ -46,14 +41,12 @@ public final class KillAura extends PacketCheck {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
-        addConfigurationValue("direction-use-bounding-boxes", true);
-        addConfigurationValue("direction-max-angle-difference", 1.2);
-        addConfigurationValue("angle-use-bounding-boxes", true);
-        addConfigurationValue("angle-max-angle-difference", 1.0);
-        addConfigurationValue("angle-max-angle-difference-distance", 6.0);
-        addConfigurationValue("angle-min-attack-time", 100);
+        createSubTypeSections(CheckSubType.KILL_AURA_DIRECTION);
+        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "use-bounding-boxes", true);
+        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "max-angle-difference", 1.2);
+
         if (enabled()) load();
     }
 
@@ -65,13 +58,18 @@ public final class KillAura extends PacketCheck {
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (!enabled() || exempt(player)) return false;
+        start(player);
+
+        // grab a new result, our entity and player data.
         final CheckResult result = new CheckResult();
         final Entity entity = packet.getTarget(player.getWorld());
         final CombatData data = CombatData.get(player);
+        // check direction
         direction(player, entity, result);
-        angle(player, entity, result, data);
 
-        return result(player, result).cancel();
+        // return result.
+        stop(player);
+        return checkViolation(player, result).cancel();
     }
 
     /**
@@ -82,7 +80,7 @@ public final class KillAura extends PacketCheck {
      * @param result result
      */
     private void direction(Player player, Entity entity, CheckResult result) {
-        if (exemptSubType(player, "direction")) return;
+        if (exempt(player, CheckSubType.KILL_AURA_DIRECTION)) return;
 
         // grab angle.
         final double angle = getAngle(directionUseBoundingBoxes, entity, player);
@@ -90,34 +88,6 @@ public final class KillAura extends PacketCheck {
             result.information("Angle difference over max, angle=" + angle + ", max=" + directionMaxAngleDifference, "(Direction)");
             result.setFailed();
         }
-    }
-
-    /**
-     * Check for angle
-     * TODO: Doesn't work (!) Needs a REWORK.
-     *
-     * @param player the player
-     * @param entity the entity
-     * @param result the result
-     */
-    private void angle(Player player, Entity entity, CheckResult result, CombatData data) {
-        if (exemptSubType(player, "angle")) return;
-        // check if we have switched different targets
-        if (data.lastAttackedEntity() != null
-                && data.lastAttackedEntity().getEntityId() != entity.getEntityId()) {
-            final double currentAngle = getAngle(angleUseBoundingBoxes, entity, player);
-            final double lastAngle = getAngle(angleUseBoundingBoxes, data.lastAttackedEntity(), player);
-            final double difference = Math.abs(currentAngle - lastAngle);
-            final double distance = MathUtil.distance(data.lastAttackedEntity().getLocation(), entity.getLocation());
-            if (difference > angleMaxAngleDifference && distance <= angleMaxAngleDifferenceDistance
-                    && (System.currentTimeMillis() - data.lastAttackedEntityTime() <= angleMinAttackTime)) {
-                result.information("dif > angleMax dif=" + difference + " max=" + angleMaxAngleDifference + " dist=" + distance + " max=" + angleMaxAngleDifferenceDistance, "(Angle)");
-                result.setFailed();
-            }
-        }
-
-        data.lastAttackedEntityTime(System.currentTimeMillis());
-        data.lastAttackedEntity(entity);
     }
 
     /**
@@ -129,14 +99,15 @@ public final class KillAura extends PacketCheck {
      * @return the angle
      */
     private double getAngle(boolean useBoundingBoxes, Entity entity, Player player) {
+        final boolean compatibility = Arc.version().isOlderThan(Version.VERSION_1_16);
         final Vector eye = player.getEyeLocation().clone().toVector();
         final BoundingBox bb = directionUseBoundingBoxes ? Entities.getBoundingBox(entity) : null;
         final Vector entityVec = entity.getLocation().clone().toVector();
 
-        if (useBoundingBoxes && bb != null) {
-            final double midpointX = (bb.minX + bb.maxX) / 2;
-            final double midpointY = (bb.minY + bb.maxY) / 2;
-            final double midpointZ = (bb.minZ + bb.maxZ) / 2;
+        if (useBoundingBoxes && compatibility && bb != null) {
+            final double midpointX = (bb.minX() + bb.maxX()) / 2;
+            final double midpointY = (bb.minY() + bb.maxY()) / 2;
+            final double midpointZ = (bb.minZ() + bb.maxZ()) / 2;
             entityVec.setX(midpointX).setY(midpointY).setZ(midpointZ);
         }
 
@@ -150,11 +121,9 @@ public final class KillAura extends PacketCheck {
 
     @Override
     public void load() {
-        directionUseBoundingBoxes = getValueBoolean("direction-use-bounding-boxes");
-        directionMaxAngleDifference = getValueDouble("direction-max-angle-difference");
-        angleUseBoundingBoxes = getValueBoolean("angle-use-bounding-boxes");
-        angleMaxAngleDifference = getValueDouble("angle-max-angle-difference");
-        angleMaxAngleDifferenceDistance = getValueDouble("angle-max-angle-difference-distance");
-        angleMinAttackTime = getValueLong("angle-min-attack-time");
+        useTimings();
+        final ConfigurationSection directionSection = configuration.subTypeSection(CheckSubType.KILL_AURA_DIRECTION);
+        directionUseBoundingBoxes = directionSection.getBoolean("use-bounding-boxes");
+        directionMaxAngleDifference = directionSection.getDouble("max-angle-difference");
     }
 }

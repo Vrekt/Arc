@@ -1,7 +1,5 @@
 package arc.check.combat;
 
-import arc.Arc;
-import bridge.Version;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -22,6 +20,8 @@ public final class NoSwing extends PacketCheck {
 
     public NoSwing() {
         super(CheckType.NO_SWING);
+        if (disableIfNewerThan18()) return;
+
         enabled(true)
                 .cancel(true)
                 .cancelLevel(0)
@@ -29,14 +29,9 @@ public final class NoSwing extends PacketCheck {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
-        // add config value based on version.
-        if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
-            addConfigurationValue("swing-time", 750);
-        } else {
-            addConfigurationValue("swing-time", 100);
-        }
+        addConfigurationValue("swing-time", 100);
         if (enabled()) load();
     }
 
@@ -48,11 +43,12 @@ public final class NoSwing extends PacketCheck {
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (!enabled() || exempt(player)) return false;
+
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             final long delta = (System.currentTimeMillis()) - CombatData.get(player).lastSwingTime();
             if (delta > swingTime) {
                 final CheckResult result = new CheckResult(CheckResult.Result.FAILED, "No swing animation, delta=" + delta + " min=" + swingTime);
-                return result(player, result).cancel();
+                return checkViolation(player, result).cancel();
             }
         }
         return false;
@@ -65,6 +61,6 @@ public final class NoSwing extends PacketCheck {
 
     @Override
     public void load() {
-        swingTime = getValueLong("swing-time");
+        swingTime = configuration.getLong("swing-time");
     }
 }

@@ -97,11 +97,22 @@ public final class Permissions {
 
         for (CheckType check : checks) {
             if (canBypassCategory(player, check.category())) return true;
-            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getName()))
+            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getName().toLowerCase()))
                 return true;
 
         }
         return false;
+    }
+
+    /**
+     * Check if a player can do something
+     *
+     * @param player  the player
+     * @param command the command permission
+     * @return {@code true} if so
+     */
+    public static boolean canExecuteAction(Player player, String command) {
+        return player.hasPermission(ARC_COMMANDS_ALL) || player.hasPermission(command);
     }
 
 }

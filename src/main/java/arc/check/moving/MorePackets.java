@@ -31,15 +31,15 @@ public final class MorePackets extends Check {
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
-        enabled(true).
-                cancel(true).
-                cancelLevel(0).
-                notify(true).
-                notifyEvery(1).
-                ban(true).
-                banLevel(20).
-                kick(false).
-                write();
+        enabled(true)
+                .cancel(true)
+                .cancelLevel(0)
+                .notify(true)
+                .notifyEvery(1)
+                .ban(true)
+                .banLevel(20)
+                .kick(false)
+                .build();
 
         addConfigurationValue("max-flying-packets", 30);
         addConfigurationValue("max-position-packets", 30);
@@ -89,7 +89,7 @@ public final class MorePackets extends Check {
             packets.cancelPositionPackets(false);
         }
 
-        final ViolationResult violation = result(player, result);
+        final ViolationResult violation = checkViolation(player, result);
         if (violation.cancel()) {
             packets.cancelFlyingPackets(failedFlying);
             packets.cancelPositionPackets(failedPosition);
@@ -111,13 +111,13 @@ public final class MorePackets extends Check {
 
     @Override
     public void load() {
-        maxFlyingPackets = getValueInt("max-flying-packets");
-        maxPositionPackets = getValueInt("max-position-packets");
-        maxPacketsToKick = getValueInt("max-packets-kick");
+        maxFlyingPackets = configuration.getInt("max-flying-packets");
+        maxPositionPackets = configuration.getInt("max-position-packets");
+        maxPacketsToKick = configuration.getInt("max-packets-kick");
         kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
                 " %player% was kicked for sending too many swing packets.";
 
-        scheduledCheck(() -> {
+        schedule(() -> {
             for (final Player player : Bukkit.getOnlinePlayers()) {
                 if (!exempt(player)) check(player, MovingData.get(player));
             }

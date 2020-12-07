@@ -6,6 +6,7 @@ import arc.check.result.CheckResult;
 import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
 import arc.violation.result.ViolationResult;
+import bridge.BoundingBox;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.GameMode;
@@ -13,7 +14,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.inventivetalent.boundingbox.BoundingBox;
 
 /**
  * Checks if the player is attacking from too far away.
@@ -50,7 +50,7 @@ public final class Reach extends PacketCheck {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
         addConfigurationValue("max-distance", 3.88);
         addConfigurationValue("max-velocity-length", 1.0);
@@ -75,6 +75,8 @@ public final class Reach extends PacketCheck {
             // we attacked, get the entity and distance check.
             final Entity entity = packet.getTarget(player.getWorld());
             if (!entity.isDead()) {
+                start(player);
+
                 // get our entities Y locations
                 final double py = ignoreYAxis ? 1.0 : player.getLocation().getY();
                 final double dy = ignoreYAxis ? 1.0 : entity.getLocation().getY();
@@ -91,8 +93,8 @@ public final class Reach extends PacketCheck {
                 final Vector playerVec = player.getLocation().clone().toVector();
                 final Vector entityVec = entity.getLocation().clone().toVector();
                 if (useBoundingBoxes && entityBB != null) {
-                    entityVec.setX(entityBB.minX);
-                    entityVec.setZ(entityBB.minZ);
+                    entityVec.setX(entityBB.minX());
+                    entityVec.setZ(entityBB.minZ());
                 }
 
                 playerVec.setY(py);
@@ -102,16 +104,17 @@ public final class Reach extends PacketCheck {
                 double distance = playerVec.subtract(entityVec).length();
                 if (subtractVelocity) distance -= velocity;
                 if (subtractEye) distance -= ey;
-
-                // check if we are in creative, if so check against Magic value
+                stop(player);
+                // check if we are in creative
+                // , if so check against Magic value
                 if (player.getGameMode() == GameMode.CREATIVE && distance > CREATIVE_REACH_DISTANCE) {
-                    final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Creative reach distance >6"));
+                    final ViolationResult violation = checkViolation(player, new CheckResult(CheckResult.Result.FAILED, "Creative reach distance >6"));
                     return violation.cancel();
                 } else {
                     // otherwise check
                     if (distance > maxDistance) {
                         // too far away, flag.
-                        final ViolationResult violation = result(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + distance + " max=" + maxDistance));
+                        final ViolationResult violation = checkViolation(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + distance + " max=" + maxDistance));
                         return violation.cancel();
                     }
                 }
@@ -127,13 +130,14 @@ public final class Reach extends PacketCheck {
 
     @Override
     public void load() {
-        maxDistance = getValueDouble("max-distance");
-        maxVelocityLength = getValueDouble("max-velocity-length");
-        minVelocityLength = getValueDouble("min-velocity-length");
-        ignoreYAxis = getValueBoolean("ignore-y-value");
-        subtractVelocity = getValueBoolean("subtract-velocity");
-        subtractEye = getValueBoolean("subtract-eye");
-        nonLivingEyeHeight = getValueDouble("non-living-eye-height");
-        useBoundingBoxes = getValueBoolean("use-bounding-boxes");
+        useTimings();
+        maxDistance = configuration.getDouble("max-distance");
+        maxVelocityLength = configuration.getDouble("max-velocity-length");
+        minVelocityLength = configuration.getDouble("min-velocity-length");
+        ignoreYAxis = configuration.getBoolean("ignore-y-value");
+        subtractVelocity = configuration.getBoolean("subtract-velocity");
+        subtractEye = configuration.getBoolean("subtract-eye");
+        nonLivingEyeHeight = configuration.getDouble("non-living-eye-height");
+        useBoundingBoxes = configuration.getBoolean("use-bounding-boxes");
     }
 }

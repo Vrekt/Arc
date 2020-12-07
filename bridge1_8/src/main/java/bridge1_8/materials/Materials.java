@@ -1,8 +1,9 @@
-package bridge1_8;
+package bridge1_8.materials;
 
 import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
 import org.bukkit.material.Step;
@@ -12,7 +13,7 @@ import org.bukkit.material.TrapDoor;
  * Legacy materials API.
  */
 @SuppressWarnings("Deprecated")
-public final class Materials1_8 implements MaterialsBridge {
+public final class Materials implements MaterialsBridge {
 
     @Override
     public boolean isFence(Block block) {
@@ -59,6 +60,22 @@ public final class Materials1_8 implements MaterialsBridge {
     public boolean isTrapdoor(Block block) {
         return block.getType().getData().equals(TrapDoor.class);
     }
+
+    @Override
+    public Material getMaterial(String name) {
+        return Material.getMaterial(name);
+    }
+
+    @Override
+    public ItemStack createItem(String material) {
+        return new ItemStack(getMaterial(material));
+    }
+
+    @Override
+    public ItemStack createItem(String material, short data) {
+        return new ItemStack(getMaterial(material), 1, data);
+    }
 }
+
 
 

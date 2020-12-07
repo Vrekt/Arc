@@ -1,6 +1,5 @@
 package arc.check.player;
 
-import bridge.Version;
 import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckCallback;
@@ -21,7 +20,7 @@ public final class Regeneration extends Check {
 
     public Regeneration() {
         super(CheckType.REGENERATION);
-        if (disableIfNewerThan(Version.VERSION_1_8)) return;
+        if (disableIfNewerThan18()) return;
 
         enabled(true)
                 .cancel(true)
@@ -30,7 +29,7 @@ public final class Regeneration extends Check {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
         addConfigurationValue("regeneration-time-ms", 3400);
         load();
@@ -52,7 +51,7 @@ public final class Regeneration extends Check {
         if (time < regenerationTime) {
             final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Regaining health too fast, time=" + time + ", min=" + regenerationTime);
-            final ViolationResult violation = result(player, result);
+            final ViolationResult violation = checkViolation(player, result);
             callback.onResult(violation);
         }
     }
@@ -64,6 +63,6 @@ public final class Regeneration extends Check {
 
     @Override
     public void load() {
-        regenerationTime = getValueLong("regeneration-time-ms");
+        regenerationTime = configuration.getLong("regeneration-time-ms");
     }
 }

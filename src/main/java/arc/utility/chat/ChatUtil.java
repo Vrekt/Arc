@@ -16,17 +16,17 @@ public final class ChatUtil {
      * @param message the message
      */
     public static void sendMessage(Player player, String message) {
-        player.sendMessage(Arc.arc().configuration().prefix() + message);
+        player.sendMessage(Arc.arc().configuration().prefix() + " " + message);
     }
 
     /**
      * Send a message
      *
-     * @param sender the sender
+     * @param sender  the sender
      * @param message the message
      */
     public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(Arc.arc().configuration().prefix() + message);
+        sender.sendMessage(Arc.arc().configuration().prefix() + " " + message);
     }
 
 }

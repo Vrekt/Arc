@@ -1,11 +1,30 @@
 package arc.configuration.check;
 
+import arc.Arc;
+import arc.check.CheckSubType;
+import arc.check.CheckType;
+import arc.configuration.ArcConfiguration;
+import arc.configuration.Reloadable;
 import org.bukkit.configuration.ConfigurationSection;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A check configuration format.
  */
-public final class CheckConfiguration {
+public final class CheckConfiguration implements Reloadable {
+
+    /**
+     * The check for this configuration.
+     */
+    private final CheckType check;
+
+    /**
+     * The map of sub-type sections.
+     */
+    private final Map<CheckSubType, ConfigurationSection> subTypeSections = new HashMap<>();
 
     /**
      * The section for this check
@@ -22,38 +41,51 @@ public final class CheckConfiguration {
      */
     private int cancelLevel, notifyLevel, banLevel, kickLevel;
 
+
     /**
      * Initialize this check configuration
      *
-     * @param configuration the configuration
+     * @param check   the check type
+     * @param section the section
      */
-    public CheckConfiguration(ConfigurationSection configuration) {
-        this.section = configuration;
-        read();
-    }
-
-    /**
-     * Reload this check configuration
-     */
-    public void reload(ConfigurationSection section) {
+    public CheckConfiguration(CheckType check, ConfigurationSection section) {
+        this.check = check;
         this.section = section;
-        read();
+        load();
+    }
+
+    @Override
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        this.section = configuration.fileConfiguration().getConfigurationSection(check.getName());
+        load();
     }
 
     /**
-     * Read from the configuration
+     * Load the configuration
      */
-    private void read() {
+    private void load() {
+        // retrieve booleans
         enabled = section.getBoolean("enabled");
         cancel = section.getBoolean("cancel");
         notify = section.getBoolean("notify");
         ban = section.getBoolean("ban");
         kick = section.getBoolean("kick");
 
+        // retrieve levels
         cancelLevel = section.getInt("cancel-level");
         notifyLevel = section.getInt("notify-every");
         banLevel = section.getInt("ban-level");
         kickLevel = section.getInt("kick-level");
+
+        // retrieve sub-types
+        CheckSubType.getSubTypesFor(check).forEach(subType -> {
+            // retrieve the section.
+            final ConfigurationSection subTypeSection = section.getConfigurationSection(subType.getName());
+            // put it in the map
+            if (subTypeSection != null) {
+                subTypeSections.put(subType, subTypeSection);
+            }
+        });
     }
 
     /**
@@ -61,6 +93,105 @@ public final class CheckConfiguration {
      */
     public ConfigurationSection section() {
         return section;
+    }
+
+    /**
+     * Get the sub-type section
+     *
+     * @param subType the sub-type
+     * @return the section
+     */
+    public ConfigurationSection subTypeSection(CheckSubType subType) {
+        return subTypeSections.getOrDefault(subType, null);
+    }
+
+    /**
+     * Create a sub-type section
+     *
+     * @param subType the sub-type
+     */
+    public void createSubTypeSection(CheckSubType subType) {
+        if (section.isConfigurationSection(subType.getName())) return;
+        final ConfigurationSection newSection = section.createSection(subType.getName());
+        subTypeSections.put(subType, newSection);
+    }
+
+    /**
+     * Add a configuration value
+     *
+     * @param valueName the value name
+     * @param value     the value
+     */
+    public void addConfigurationValue(String valueName, Object value) {
+        if (containsValue(valueName)) return;
+        section.set(valueName, value);
+    }
+
+    /**
+     * Add a configuration value to a sub-type
+     *
+     * @param type      the type
+     * @param valueName the value name
+     * @param value     the value
+     */
+    public void addConfigurationValue(CheckSubType type, String valueName, Object value) {
+        final ConfigurationSection section = subTypeSection(type);
+        if (section == null) {
+            Arc.arc().getLogger().warning("Failed to write to sub-type: " + type.getName());
+            return;
+        }
+        if (section.contains(valueName)) return;
+        section.set(valueName, value);
+    }
+
+    /**
+     * Get a long
+     *
+     * @param name the name
+     * @return a long
+     */
+    public long getLong(String name) {
+        return section.getLong(name);
+    }
+
+    /**
+     * Get a double
+     *
+     * @param name the name
+     * @return the double
+     */
+    public double getDouble(String name) {
+        return section.getDouble(name);
+    }
+
+    /**
+     * Get a boolean
+     *
+     * @param name the name
+     * @return the boolean
+     */
+    public boolean getBoolean(String name) {
+        return section.getBoolean(name);
+    }
+
+    /**
+     * Get a int
+     *
+     * @param name the name
+     * @return the int
+     */
+    public int getInt(String name) {
+        return section.getInt(name);
+    }
+
+    /**
+     * Get a list
+     *
+     * @param name the name
+     * @return the list
+     */
+    public List<String> getList(String name) {
+        return section.getStringList(name);
     }
 
     /**
@@ -136,6 +267,16 @@ public final class CheckConfiguration {
      */
     public boolean shouldKick(int violationLevel) {
         return kick() && violationLevel >= kickLevel;
+    }
+
+    /**
+     * Check if a value exists.
+     *
+     * @param valueName the value name
+     * @return {@code true} if so.
+     */
+    private boolean containsValue(String valueName) {
+        return section.contains(valueName);
     }
 
 }

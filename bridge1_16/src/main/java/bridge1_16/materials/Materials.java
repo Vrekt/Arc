@@ -1,14 +1,15 @@
-package bridge1_16;
+package bridge1_16.materials;
 
 import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Current materials API
  */
-public final class Materials1_16 implements MaterialsBridge {
+public final class Materials implements MaterialsBridge {
 
     @Override
     public boolean isFence(Block block) {
@@ -48,4 +49,18 @@ public final class Materials1_16 implements MaterialsBridge {
         return block.getState() instanceof TrapDoor;
     }
 
+    @Override
+    public Material getMaterial(String name) {
+        return Material.getMaterial(name);
+    }
+
+    @Override
+    public ItemStack createItem(String material) {
+        return new ItemStack(getMaterial(material));
+    }
+
+    @Override
+    public ItemStack createItem(String material, short data) {
+        return createItem(material);
+    }
 }

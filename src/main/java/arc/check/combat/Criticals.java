@@ -5,7 +5,6 @@ import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
-import arc.violation.result.ViolationResult;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Player;
@@ -17,9 +16,6 @@ import org.bukkit.potion.PotionEffectType;
  * difference=>0.1: Strict
  * max-similar-vertical-allowed=<5: Strict
  * max-no-vertical-allowed>=5: Relaxed
- * <p>
- * TODO: Possible bypass: Keep track of no vertical amount and then once its 2 or above add a jump height.
- * TODO: Maybe move this to an event.
  */
 public final class Criticals extends PacketCheck {
 
@@ -44,7 +40,7 @@ public final class Criticals extends PacketCheck {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
         addConfigurationValue("distance", 0.09);
         addConfigurationValue("difference", 0.05);
@@ -63,6 +59,8 @@ public final class Criticals extends PacketCheck {
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
+            start(player);
+
             final MovingData data = MovingData.get(player);
             // If it was a possible critical hit and we are on-ground lets check.
             if (isPossibleCriticalHit(player, data) && data.onGround()) {
@@ -104,8 +102,10 @@ public final class Criticals extends PacketCheck {
                 data.similarVerticalAmount(similarVerticalAmount);
 
                 // violation
-                final ViolationResult violation = result(player, result);
-                return violation.cancel();
+                stop(player);
+                return checkViolation(player, result).cancel();
+            } else {
+                stop(player);
             }
         }
         return false;
@@ -134,9 +134,10 @@ public final class Criticals extends PacketCheck {
 
     @Override
     public void load() {
-        distance = getValueDouble("distance");
-        difference = getValueDouble("difference");
-        maxSimilarVerticalAllowed = getValueInt("max-similar-vertical-allowed");
-        maxNoVerticalAllowed = getValueInt("max-no-vertical-allowed");
+        useTimings();
+        distance = configuration.getDouble("distance");
+        difference = configuration.getDouble("difference");
+        maxSimilarVerticalAllowed = configuration.getInt("max-similar-vertical-allowed");
+        maxNoVerticalAllowed = configuration.getInt("max-no-vertical-allowed");
     }
 }

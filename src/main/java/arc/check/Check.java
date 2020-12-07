@@ -1,24 +1,23 @@
 package arc.check;
 
 import arc.Arc;
-import bridge.Version;
 import arc.check.result.CheckResult;
+import arc.check.timings.CheckTiming;
 import arc.configuration.ArcConfiguration;
+import arc.configuration.Reloadable;
 import arc.configuration.check.CheckConfiguration;
-import arc.configuration.check.CheckConfigurationWriter;
+import arc.configuration.check.CheckConfigurationBuilder;
 import arc.permissions.Permissions;
 import arc.violation.result.ViolationResult;
+import bridge.Version;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
-
-import java.util.List;
 
 /**
  * Represents a check.
  */
-public abstract class Check {
+public abstract class Check implements Reloadable {
 
     /**
      * The check type
@@ -26,14 +25,19 @@ public abstract class Check {
     private final CheckType checkType;
 
     /**
+     * The check timings
+     */
+    private CheckTiming timing;
+
+    /**
+     * The configuration builder;
+     */
+    protected final CheckConfigurationBuilder builder;
+
+    /**
      * The check configuration
      */
     protected CheckConfiguration configuration;
-
-    /**
-     * The configuration writer.
-     */
-    protected final CheckConfigurationWriter writer = new CheckConfigurationWriter();
 
     /**
      * The scheduled task.
@@ -52,7 +56,16 @@ public abstract class Check {
      */
     protected Check(CheckType checkType) {
         this.checkType = checkType;
-        writer.name(checkType.getName().toLowerCase());
+        this.builder = new CheckConfigurationBuilder(checkType);
+    }
+
+    /**
+     * If timings should be used.
+     */
+    protected void useTimings() {
+        if (timing == null) {
+            this.timing = new CheckTiming(checkType);
+        }
     }
 
     /**
@@ -62,7 +75,7 @@ public abstract class Check {
      * @return this
      */
     public Check enabled(boolean enabled) {
-        writer.enabled(enabled);
+        builder.enabled(enabled);
         return this;
     }
 
@@ -73,7 +86,7 @@ public abstract class Check {
      * @return this
      */
     public Check cancel(boolean cancel) {
-        writer.cancel(cancel);
+        builder.cancel(cancel);
         return this;
     }
 
@@ -84,7 +97,7 @@ public abstract class Check {
      * @return this
      */
     public Check cancelLevel(int level) {
-        writer.cancelLevel(level);
+        builder.cancelLevel(level);
         return this;
     }
 
@@ -95,7 +108,7 @@ public abstract class Check {
      * @return this
      */
     public Check notify(boolean notify) {
-        writer.notify(notify);
+        builder.notify(notify);
         return this;
     }
 
@@ -106,7 +119,7 @@ public abstract class Check {
      * @return this
      */
     public Check notifyEvery(int level) {
-        writer.notifyEvery(level);
+        builder.notifyEvery(level);
         return this;
     }
 
@@ -117,8 +130,8 @@ public abstract class Check {
      * @return this
      */
     public Check ban(boolean ban) {
-        writer.ban(ban);
-        if (!ban) writer.banLevel(0);
+        builder.ban(ban);
+        if (!ban) builder.banLevel(0);
         return this;
     }
 
@@ -129,7 +142,7 @@ public abstract class Check {
      * @return this
      */
     public Check banLevel(int level) {
-        writer.banLevel(level);
+        builder.banLevel(level);
         return this;
     }
 
@@ -140,8 +153,8 @@ public abstract class Check {
      * @return this
      */
     public Check kick(boolean kick) {
-        writer.kick(kick);
-        if (!kick) writer.kickLevel(0);
+        builder.kick(kick);
+        if (!kick) builder.kickLevel(0);
         return this;
     }
 
@@ -152,15 +165,24 @@ public abstract class Check {
      * @return this
      */
     public Check kickLevel(int level) {
-        writer.kickLevel(level);
+        builder.kickLevel(level);
         return this;
     }
 
     /**
-     * Write the config
+     * Build the configuration
      */
-    public void write() {
-        configuration = writer.finish();
+    public void build() {
+        configuration = builder.build();
+    }
+
+    /**
+     * Add a sub-type section.
+     *
+     * @param types the types to create
+     */
+    protected void createSubTypeSections(CheckSubType... types) {
+        for (CheckSubType type : types) configuration.createSubTypeSection(type);
     }
 
     /**
@@ -170,68 +192,18 @@ public abstract class Check {
      * @param value     the value
      */
     protected void addConfigurationValue(String valueName, Object value) {
-        if (containsValue(valueName)) return;
-        configuration.section().set(valueName, value);
+        configuration.addConfigurationValue(valueName, value);
     }
 
     /**
-     * Check if a value exists.
+     * Add a configuration value to a sub-type
      *
+     * @param type      the type
      * @param valueName the value name
-     * @return {@code true} if so.
+     * @param value     the value
      */
-    protected boolean containsValue(String valueName) {
-        return configuration.section().contains(valueName);
-    }
-
-    /**
-     * Get a value
-     *
-     * @param valueName the value name
-     * @return the value
-     */
-    protected int getValueInt(String valueName) {
-        return configuration.section().getInt(valueName);
-    }
-
-    /**
-     * Get a value
-     *
-     * @param valueName the value name
-     * @return the value
-     */
-    protected double getValueDouble(String valueName) {
-        return configuration.section().getDouble(valueName);
-    }
-
-    /**
-     * Get a value
-     *
-     * @param valueName the value name
-     * @return the value
-     */
-    protected boolean getValueBoolean(String valueName) {
-        return configuration.section().getBoolean(valueName);
-    }
-
-    /**
-     * Get a value
-     *
-     * @param valueName the value name
-     * @return the value
-     */
-    protected long getValueLong(String valueName) {
-        return configuration.section().getLong(valueName);
-    }
-
-    /**
-     * Get a string list
-     *
-     * @param valueName the value name
-     * @return the list
-     */
-    protected List<String> getList(String valueName) {
-        return configuration.section().getStringList(valueName);
+    protected void addConfigurationValue(CheckSubType type, String valueName, Object value) {
+        configuration.addConfigurationValue(type, valueName, value);
     }
 
     /**
@@ -239,19 +211,37 @@ public abstract class Check {
      *
      * @param result the result
      */
-    protected ViolationResult result(Player player, CheckResult result) {
+    protected ViolationResult checkViolation(Player player, CheckResult result) {
         if (result.failed()) return Arc.arc().violations().violation(player, this, result);
         return ViolationResult.EMPTY;
     }
 
     /**
-     * Process this result but ignore the output
-     *
-     * @param player the player
-     * @param result the result
+     * Start timing
      */
-    protected void resultIgnore(Player player, CheckResult result) {
-        if (result.failed()) Arc.arc().violations().violation(player, this, result);
+    protected void start(Player player) {
+        timing.start(player);
+    }
+
+    /**
+     * Stop timing
+     */
+    protected void stop(Player player) {
+        timing.stop(player);
+    }
+
+    /**
+     * @return the timing
+     */
+    public CheckTiming timing() {
+        return timing;
+    }
+
+    /**
+     * @return {@code true} if there are timings
+     */
+    public boolean hasAnyTimings() {
+        return timing != null && timing.hasAny();
     }
 
     /**
@@ -270,13 +260,13 @@ public abstract class Check {
     }
 
     /**
-     * Schedule this check
+     * Schedule
      *
      * @param runnable the runnable
      * @param every    timer
      * @param delay    initial delay
      */
-    protected void scheduledCheck(Runnable runnable, long delay, long every) {
+    protected void schedule(Runnable runnable, long delay, long every) {
         scheduled = Bukkit.getScheduler().runTaskTimer(Arc.plugin(), runnable, delay, every);
     }
 
@@ -291,51 +281,33 @@ public abstract class Check {
     }
 
     /**
-     * Check if the player is exempt from a sub-type
+     * Check if the player is exempt
      *
-     * @param player  player
-     * @param subtype the type
+     * @param player  the player
+     * @param subType the check sub-type
      * @return {@code true} if so
      */
-    protected boolean exemptSubType(Player player, String subtype) {
-        return player.hasPermission(Permissions.ARC_BYPASS + "." + checkType.category().name().toLowerCase() + "." + getName() + "." + subtype);
+    protected boolean exempt(Player player, CheckSubType subType) {
+        return Arc.arc().exemptions().isPlayerExempt(player, subType);
     }
 
     /**
-     * Disable this check if the current version is newer than {@code version}
+     * Disables this check if the {@link Version} is newer than {@code Version.VERSION_1_8}
      *
-     * @param version the other version
-     * @return {@code true} if the check is disabled.
+     * @return {@code true} if the check is disabled
      */
-    protected boolean disableIfNewerThan(Version version) {
-        if (Arc.version().isNewerThan(version)) {
+    protected boolean disableIfNewerThan18() {
+        if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
             permanentlyDisabled = true;
             return true;
         }
         return false;
     }
 
-    /**
-     * Disable this check if the current version is older than {@code version}
-     *
-     * @param version the version
-     * @return {@code true} if the check is disabled.
-     */
-    protected boolean disableIfOlderThan(Version version) {
-        if (Arc.version().isOlderThan(version)) {
-            permanentlyDisabled = true;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Reload the configuration.
-     */
-    public void reloadConfigInternal(FileConfiguration configuration) {
+    @Override
+    public void reloadConfiguration(ArcConfiguration configuration) {
         if (permanentlyDisabled) return;
-
-        this.configuration.reload(configuration.getConfigurationSection(getName().toLowerCase()));
+        this.configuration.reloadConfiguration(configuration);
         reloadConfig();
     }
 

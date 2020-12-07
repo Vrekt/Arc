@@ -1,22 +1,23 @@
 package arc;
 
 import arc.check.CheckManager;
-import arc.command.CommandArc;
+import arc.command.ArcCommand;
 import arc.configuration.ArcConfiguration;
 import arc.data.DataUtility;
 import arc.exemption.ExemptionManager;
+import arc.inventory.InventoryRegister;
 import arc.listener.Listeners;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
-import bridge1_15.Bridge1_15;
-import bridge1_16.Bridge1_16;
+import bridge1_15.Bridge115;
+import bridge1_16.Bridge116;
+import bridge1_8.Bridge18;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
-import bridge1_8.Bridge1_8;
 
 import java.util.Objects;
 
@@ -66,6 +67,11 @@ public final class Arc extends JavaPlugin {
     private final ExemptionManager exemptionManager = new ExemptionManager();
 
     /**
+     * Inventory UI register.
+     */
+    private final InventoryRegister inventoryRegister = new InventoryRegister();
+
+    /**
      * The protocol manager.
      */
     private ProtocolManager protocolManager;
@@ -95,9 +101,10 @@ public final class Arc extends JavaPlugin {
         violationManager.initialize(arcConfiguration);
 
         Listeners.register(this, protocolManager);
+        getServer().getPluginManager().registerEvents(inventoryRegister, this);
 
         getLogger().info("[INFO] Registering base command.");
-        Objects.requireNonNull(getCommand("arc")).setExecutor(new CommandArc());
+        Objects.requireNonNull(getCommand("arc")).setExecutor(new ArcCommand());
 
         getLogger().info("[INFO] Saving configuration");
         saveConfig();
@@ -105,9 +112,6 @@ public final class Arc extends JavaPlugin {
         getLogger().info("[SUCCESS] Ready!");
     }
 
-    /**
-     * TODO: Will throw exceptions when loading non-compatible versions
-     */
     @Override
     public void onDisable() {
         if (incompatible) return;
@@ -148,7 +152,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_8_8() {
         version = Version.VERSION_1_8;
-        bridge = new Bridge1_8();
+        bridge = new Bridge18();
     }
 
     /**
@@ -156,7 +160,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_15() {
         version = Version.VERSION_1_15;
-        bridge = new Bridge1_15();
+        bridge = new Bridge115();
     }
 
     /**
@@ -164,7 +168,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_16() {
         version = Version.VERSION_1_16;
-        bridge = new Bridge1_16();
+        bridge = new Bridge116();
     }
 
     /**
@@ -228,5 +232,12 @@ public final class Arc extends JavaPlugin {
      */
     public ProtocolManager protocol() {
         return protocolManager;
+    }
+
+    /**
+     * @return the inventory register
+     */
+    public InventoryRegister inventoryRegister() {
+        return inventoryRegister;
     }
 }

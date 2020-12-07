@@ -34,14 +34,14 @@ public final class Flight extends Check {
 
     public Flight() {
         super(CheckType.FLIGHT);
-        enabled(true).
-                cancel(true).
-                cancelLevel(0).
-                notify(true).
-                notifyEvery(1).
-                ban(false).
-                kick(false).
-                write();
+        enabled(true)
+                .cancel(true)
+                .cancelLevel(0)
+                .notify(true)
+                .notifyEvery(1)
+                .ban(false)
+                .kick(false)
+                .build();
 
         addConfigurationValue("boat-fly-min-descending-time", 5);
         addConfigurationValue("boat-fly-min-ascending-time", 5);
@@ -60,7 +60,11 @@ public final class Flight extends Check {
      */
     public void check(Player player, MovingData data, PlayerMoveEvent event) {
         final CheckResult result = new CheckResult();
+        start(player);
+
         if (Arc.version().isNewerThan(Version.VERSION_1_8)) checkBoatFly(player, data, result, event);
+
+        stop(player);
     }
 
     /**
@@ -93,7 +97,7 @@ public final class Flight extends Check {
         }
 
         // process the violation
-        final ViolationResult violation = result(player, result);
+        final ViolationResult violation = checkViolation(player, result);
         if (violation.cancel()) {
             // kick player from vehicle and set-back if possible.
             player.leaveVehicle();
@@ -114,10 +118,11 @@ public final class Flight extends Check {
 
     @Override
     public void load() {
-        boatFlyMinDiff = getValueDouble("boat-fly-min-diff");
-        boatFlyMinDescendingTime = getValueInt("boat-fly-min-descending-time");
-        boatFlyMinAscendingTime = getValueInt("boat-fly-min-ascending-time");
-        boatFlyMaxAscend = getValueDouble("boat-fly-max-ascend");
-        boatFlyMaxSetbackDistance = getValueInt("boat-fly-max-setback-distance");
+        useTimings();
+        boatFlyMinDiff = configuration.getDouble("boat-fly-min-diff");
+        boatFlyMinDescendingTime = configuration.getInt("boat-fly-min-descending-time");
+        boatFlyMinAscendingTime = configuration.getInt("boat-fly-min-ascending-time");
+        boatFlyMaxAscend = configuration.getDouble("boat-fly-max-ascend");
+        boatFlyMaxSetbackDistance = configuration.getInt("boat-fly-max-setback-distance");
     }
 }

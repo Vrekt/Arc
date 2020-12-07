@@ -59,7 +59,7 @@ public final class CheckManager implements Closeable, Reloadable {
 
     @Override
     public void reloadConfiguration(ArcConfiguration configuration) {
-        checks.forEach(check -> check.reloadConfigInternal(configuration.fileConfiguration()));
+        checks.forEach(check -> check.reloadConfiguration(configuration));
     }
 
     /**

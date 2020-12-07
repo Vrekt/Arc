@@ -1,9 +1,8 @@
 package arc.exemption;
 
-import arc.Arc;
+import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.permissions.Permissions;
-import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
@@ -75,6 +74,17 @@ public final class ExemptionManager implements Closeable {
     }
 
     /**
+     * Check if a player is exempt
+     *
+     * @param player  the player
+     * @param subType the sub-type
+     * @return {@code true} if so
+     */
+    public boolean isPlayerExempt(Player player, CheckSubType subType) {
+        return player.hasPermission(Permissions.ARC_BYPASS + "." + subType.from().category().name().toLowerCase() + "." + subType.from().getName() + "." + subType.getName());
+    }
+
+    /**
      * Check if a player is exempt from a check
      *
      * @param player the player
@@ -95,15 +105,6 @@ public final class ExemptionManager implements Closeable {
     public void addExemption(Player player, CheckType check, long duration) {
         final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.addExemption(check, System.currentTimeMillis() + duration);
-    }
-
-    /**
-     * Exempt all players from all checks
-     *
-     * @param duration the duration
-     */
-    public void exemptAllPlayersFromAllChecksFor(long duration) {
-        Arc.arc().checks().getAllChecks().forEach(check -> Bukkit.getOnlinePlayers().forEach(player -> addExemption(player, check.type(), duration)));
     }
 
     /**

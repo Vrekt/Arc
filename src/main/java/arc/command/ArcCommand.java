@@ -1,126 +1,140 @@
 package arc.command;
 
 import arc.Arc;
+import arc.check.Check;
+import arc.inventory.InventoryCreator;
+import arc.inventory.ItemBuilder;
 import arc.permissions.Permissions;
 import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Collections;
 
 /**
- * A basic arc command.
+ * The base command for /arc
  */
-public abstract class ArcCommand {
+public final class ArcCommand implements CommandExecutor {
 
-    /**
-     * The help messages with their respective permissions.
-     */
-    private final Map<String, String> helpLinesWithPermissions = new HashMap<>();
-
-    /**
-     * The sub commands
-     */
-    private final Map<String, ArcSubCommand> subCommands = new HashMap<>();
-
-    /**
-     * The permission required
-     */
-    private final List<String> permissions;
-
-    public ArcCommand(String... permissions) {
-        this.permissions = Arrays.asList(permissions);
-    }
-
-    /**
-     * Add a sub command
-     *
-     * @param command  the command
-     * @param executor the executor
-     */
-    protected void addSubCommand(String command, String permission, ArcSubCommand executor) {
-        executor.permission(permission);
-        subCommands.put(command, executor);
-    }
-
-    /**
-     * Check if the provided argument is a sub command
-     *
-     * @param argument the argument
-     * @return {@code true} if so
-     */
-    protected boolean isSubCommand(String argument) {
-        return subCommands.keySet().stream().anyMatch(argument::equalsIgnoreCase);
-    }
-
-    /**
-     * Execute a sub command
-     *
-     * @param argument the argument
-     * @param sender   the sender
-     * @param args     the arguments
-     * @return {@code true}
-     */
-    protected boolean executeSubCommand(String argument, CommandSender sender, String[] args) {
-        final ArcSubCommand subCommand = subCommands.get(argument);
-        if (!sender.hasPermission(subCommand.permission()) || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
-            ChatUtil.sendMessage(sender, ChatColor.RED + "You do not have permission to execute this sub-command.");
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        // check sender permissions.
+        if (!sender.hasPermission(Permissions.ARC_COMMANDS_BASE)
+                || !sender.hasPermission(Permissions.ARC_COMMANDS_ALL)) {
+            sender.sendMessage(Arc.arc().configuration().noPermissionMessage());
             return true;
         }
-        subCommands.get(argument).execute(sender, args);
+
+        // check sender is a player.
+        // TODO: For now.
+        if (!(sender instanceof Player)) {
+            ChatUtil.sendMessage(sender, ChatColor.RED + "You must be a player to do this.");
+            return true;
+        }
+
+        // cast our player and start building the inventory
+        final Player player = (Player) sender;
+
+        // create an empty item to fill slots with.
+        final ItemStack emptySlotItem = new ItemBuilder("STAINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE", 15)
+                .displayName("")
+                .build();
+
+        // create toggle violations item
+        final boolean violations = Arc.arc().violations().isViolationViewer(player);
+        final ItemStack toggleViolationsItem = new ItemBuilder("NETHER_STAR")
+                .displayName(ChatColor.RED + "Toggle violations")
+                .lore(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))
+                .build();
+
+        // create reload config item.
+        final ItemStack reloadConfigItem = new ItemBuilder("REDSTONE")
+                .displayName(ChatColor.RED + "Reload configuration")
+                .lore(ChatColor.GRAY + "All players will be exempt for a few seconds afterwards.")
+                .build();
+
+        // create the timings item
+        final ItemStack timingsItem = new ItemBuilder("COMPASS")
+                .displayName(ChatColor.RED + "Performance")
+                .lore(ChatColor.GRAY + "Insight into check timings and TPS.")
+                .build();
+
+        // finally, create the inventory and show it.
+        final InventoryCreator creator = new InventoryCreator(ChatColor.RED + "Arc " + ChatColor.GREEN + Arc.VERSION_STRING, 45);
+        creator.initialIndex(20)
+                .item(toggleViolationsItem, 2, item -> toggleViolations(item, player, creator))
+                .item(reloadConfigItem, 2, item -> reloadConfig(player))
+                .item(timingsItem, 2, item -> viewTimings(player))
+                .fillEmptySlots(emptySlotItem)
+                .show(player);
         return true;
     }
 
     /**
-     * Check if the sender has the permission required
+     * Toggle violations
      *
-     * @param sender the sender
-     * @return {@code true} if so
+     * @param item    the item
+     * @param player  the player
+     * @param creator the creator
      */
-    protected boolean hasPermission(CommandSender sender) {
-        return permissions.stream().anyMatch(sender::hasPermission);
+    private void toggleViolations(ItemStack item, Player player, InventoryCreator creator) {
+        if (!Permissions.canExecuteAction(player, Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS)) {
+            ChatUtil.sendMessage(player, ChatColor.RED + "You do not have permission to do this.");
+            player.closeInventory();
+            return;
+        }
+
+        final ItemStack modified = item.clone();
+        final boolean violations = Arc.arc().violations().toggleViolationsViewer(player);
+
+        final ItemMeta meta = modified.getItemMeta();
+        if (meta != null) {
+            meta.setLore(Collections.singletonList(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off.")));
+        }
+        modified.setItemMeta(meta);
+        creator.replace(item, modified);
     }
 
     /**
-     * Print no permission message
+     * Reload the config
      *
-     * @param sender the sender
-     * @return true.
+     * @param player the player
      */
-    protected boolean printNoPermission(CommandSender sender) {
-        sender.sendMessage(Arc.arc().configuration().noPermissionMessage());
-        return true;
+    private void reloadConfig(Player player) {
+        if (!Permissions.canExecuteAction(player, Permissions.ARC_COMMANDS_RELOAD_CONFIG)) {
+            ChatUtil.sendMessage(player, ChatColor.RED + "You do not have permission to do this.");
+            player.closeInventory();
+            return;
+        }
+
+        ChatUtil.sendMessage(player, ChatColor.RED + "Reloading....");
+        try {
+            Arc.arc().configuration().reloadConfiguration();
+            ChatUtil.sendMessage(player, ChatColor.GREEN + "Configuration reloaded.");
+        } catch (Exception any) {
+            any.printStackTrace();
+            ChatUtil.sendMessage(player, ChatColor.RED + "Any internal error occurred, it has been printed to console.");
+        }
     }
 
     /**
-     * Add a help line
+     * View timings.
+     * TODO very basic for right now.
      *
-     * @param line       the line
-     * @param permission the permission
+     * @param player the player
      */
-    protected void addHelpLine(String line, String permission) {
-        helpLinesWithPermissions.put(line, permission);
-    }
-
-    /**
-     * Print the help message
-     *
-     * @param sender the sender
-     * @return {@code true}
-     */
-    protected boolean printHelpMessage(CommandSender sender) {
-        final StringBuilder builder = new StringBuilder();
-        helpLinesWithPermissions.forEach((line, permission) -> {
-            if (sender.hasPermission(permission)) {
-                builder.append(Arc.arc().configuration().prefix()).append(line).append("\n");
-            }
-        });
-
-        sender.sendMessage(builder.toString());
-        return true;
+    private void viewTimings(Player player) {
+        Arc.arc().checks().getAllChecks()
+                .stream()
+                .filter(Check::hasAnyTimings)
+                .forEach(check -> ChatUtil.sendMessage(player, ChatColor.RED + "Check " + ChatColor.BLUE + check.getName() +
+                        ChatColor.RED + " had an average time of " + ChatColor.GREEN + check.timing().average() + "ms."));
+        player.closeInventory();
     }
 
 }

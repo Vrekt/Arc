@@ -1,6 +1,8 @@
 package bridge.materials;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Materials bridge.
@@ -62,6 +64,31 @@ public interface MaterialsBridge {
      * @return {@code true} if so
      */
     boolean isTrapdoor(Block block);
+
+    /**
+     * Get a material
+     *
+     * @param name the name
+     * @return the name
+     */
+    Material getMaterial(String name);
+
+    /**
+     * Create an item
+     *
+     * @param material the material name
+     * @return the item
+     */
+    ItemStack createItem(String material);
+
+    /**
+     * Create an item
+     *
+     * @param material the material
+     * @param data     the data
+     * @return the item
+     */
+    ItemStack createItem(String material, short data);
 
     /**
      * Check if a block is solid

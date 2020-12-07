@@ -11,32 +11,19 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Checks if the player is walking on water.
- * TODO: Improve this overtime.
- * if do-diff-checking=true will make check possibly detect other types of Jesus but could cause false positives
- * not tested (!)
+ * TODO: Needs more work.
  */
 public final class Jesus extends Check {
 
-    /**
-     * If differences should be monitored.
-     */
-    private boolean doDiffChecking;
 
     /**
      * Max similar vertical allowed
      * Max setback distance allowed
      */
-    private int minInWaterTime, maxInWaterTime, maxSetbackDistance;
+    private int maxSetbackDistance;
 
-    /**
-     * Min avg value
-     */
-    private double inWaterDiffMinAvg;
 
     public Jesus() {
         super(CheckType.JESUS);
@@ -47,12 +34,8 @@ public final class Jesus extends Check {
                 notifyEvery(1).
                 ban(false).
                 kick(false).
-                write();
+                build();
 
-        addConfigurationValue("do-diff-checking", false);
-        addConfigurationValue("min-in-water-time", 5);
-        addConfigurationValue("max-in-water-time", 100);
-        addConfigurationValue("in-water-diff-min-avg", 0.01);
         addConfigurationValue("max-setback-distance", 4);
         if (enabled()) load();
     }
@@ -67,24 +50,19 @@ public final class Jesus extends Check {
     public void check(Player player, MovingData data, PlayerMoveEvent event) {
         if (exempt(player) || !enabled()) return;
 
+        start(player);
         boolean inWater = MovingUtil.isInOrOnLiquid(data.to());
         // reset data if not in water.
         if (!inWater) {
             data.inWaterTime(0);
             data.averageInWaterDifferences(null);
+            stop(player);
         }
 
         if (!data.onGround() && inWater && !player.isInsideVehicle()) {
             final boolean blockFaceDown = data.to().getBlock().getRelative(BlockFace.DOWN).isLiquid();
             final boolean blockFaceDown2 = data.to().getBlock().getRelative(0, -2, 0).isLiquid();
             final CheckResult result = new CheckResult();
-            final int inWaterTime = data.inWaterTime() + 1;
-
-            List<Double> averages = data.averageInWaterDifferences();
-            if (doDiffChecking) {
-                // get averages, purge if entries are > 50
-                if (averages == null || averages.size() > 50) averages = new ArrayList<>();
-            }
 
             // we are on ground while on a liquid, check
             if (data.clientOnGround()) {
@@ -98,26 +76,6 @@ public final class Jesus extends Check {
                     result.setFailed("Client on ground while on layers of water.");
                 }
             } else {
-/*                // the client isn't on ground, check further
-                if (doDiffChecking && data.descending()) {
-                    // calculate difference and add it to a list of averages.
-                    final double vertical = data.vertical();
-                    final double last = data.lastVerticalDistance();
-                    final double diff = vertical - last;
-                    averages.add(diff);
-
-                    // make sure we have a decent sample size.
-                    if (averages.size() > 5 && inWaterTime > minInWaterTime && inWaterTime < maxInWaterTime) {
-                        // grab the avg
-                        final double average = averages.stream().mapToDouble(a -> a).average().orElse(-1);
-                        if (average != 1 && average < inWaterDiffMinAvg) {
-                            result.setFailed("inWaterDiffMinAvg too small, v=" + average + " min=" + inWaterDiffMinAvg);
-                        }
-                    }
-
-                    data.averageInWaterDifferences(averages);
-                    data.inWaterTime(inWaterTime);
-                }*/
 
                 final boolean blockFaceDown2Modifier = data.to().clone().add(0, -1.5, 0).getBlock().isLiquid();
                 if (data.vertical() == 0.0
@@ -127,7 +85,8 @@ public final class Jesus extends Check {
                 }
             }
 
-            final ViolationResult violation = result(player, result);
+            stop(player);
+            final ViolationResult violation = checkViolation(player, result);
             if (violation.cancel()) {
                 // set the player back in the event.
                 if (data.hasGround() && MathUtil.distance(data.ground(), data.to())
@@ -147,10 +106,7 @@ public final class Jesus extends Check {
 
     @Override
     public void load() {
-        doDiffChecking = getValueBoolean("do-diff-checking");
-        minInWaterTime = getValueInt("min-in-water-time");
-        maxInWaterTime = getValueInt("max-in-water-time");
-        inWaterDiffMinAvg = getValueDouble("in-water-diff-min-avg");
-        maxSetbackDistance = getValueInt("max-setback-distance");
+        useTimings();
+        maxSetbackDistance = configuration.getInt("max-setback-distance");
     }
 }

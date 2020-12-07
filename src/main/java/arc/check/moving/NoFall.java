@@ -11,8 +11,6 @@ import org.bukkit.entity.Player;
 
 /**
  * Checks if the player is taking no fall damage.
- * <p>
- * TODO: Expected distance checking regardless of client ground state?
  */
 public final class NoFall extends Check {
 
@@ -23,14 +21,14 @@ public final class NoFall extends Check {
 
     public NoFall() {
         super(CheckType.NOFALL);
-        enabled(true).
-                cancel(true).
-                cancelLevel(0).
-                notify(true).
-                notifyEvery(1).
-                ban(false).
-                kick(false).
-                write();
+        enabled(true)
+                .cancel(true)
+                .cancelLevel(0)
+                .notify(true)
+                .notifyEvery(1)
+                .ban(false)
+                .kick(false)
+                .build();
 
         addConfigurationValue("tolerance", 0.1);
         load();
@@ -42,9 +40,10 @@ public final class NoFall extends Check {
      * @param player the player
      * @param data   the data
      */
-    public void    check(Player player, MovingData data) {
+    public void check(Player player, MovingData data) {
         if (exempt(player) || !enabled()) return;
 
+        start(player);
         final CheckResult result = new CheckResult();
         final NoFallData nf = data.nf();
         cancelIf(player, nf, data);
@@ -105,7 +104,9 @@ public final class NoFall extends Check {
                 }
             }
         }
-        resultIgnore(player, result);
+
+        stop(player);
+        checkViolation(player, result);
     }
 
     /**
@@ -139,6 +140,7 @@ public final class NoFall extends Check {
 
     @Override
     public void load() {
-        tolerance = getValueDouble("tolerance");
+        useTimings();
+        tolerance = configuration.getDouble("tolerance");
     }
 }

@@ -27,16 +27,16 @@ public final class SwingFrequency extends PacketCheck {
 
     public SwingFrequency() {
         super(CheckType.SWING_FREQUENCY);
-        enabled(true).
-                cancel(true).
-                cancelLevel(0).
-                notify(true).
-                notifyEvery(1).
-                ban(true).
-                banLevel(10).
-                kick(true).
-                kickLevel(5).
-                write();
+        enabled(true)
+                .cancel(true)
+                .cancelLevel(0)
+                .notify(true)
+                .notifyEvery(1)
+                .ban(true)
+                .banLevel(10)
+                .kick(true)
+                .kickLevel(5)
+                .build();
 
         addConfigurationValue("max-packets", 50);
         addConfigurationValue("max-packets-kick", 100);
@@ -62,7 +62,7 @@ public final class SwingFrequency extends PacketCheck {
 
         data.swingPacketCount(0);
 
-        final ViolationResult violation = result(player, result);
+        final ViolationResult violation = checkViolation(player, result);
         if (violation.cancel()) {
             data.cancelSwingPackets(true);
         }
@@ -77,12 +77,12 @@ public final class SwingFrequency extends PacketCheck {
 
     @Override
     public void load() {
-        maxPackets = getValueInt("max-packets");
-        maxPacketsKick = getValueInt("max-packets-kick");
+        maxPackets = configuration.getInt("max-packets");
+        maxPacketsKick = configuration.getInt("max-packets-kick");
         kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
                 " %player% was kicked for sending too many swing packets.";
 
-        scheduledCheck(() -> {
+        schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!exempt(player)) check(player, PacketData.get(player));
             }

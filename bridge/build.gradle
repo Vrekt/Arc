@@ -11,4 +11,5 @@ repositories {
 
 dependencies {
     compile files('paper.jar')
+    compile project('Arc')
 }

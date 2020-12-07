@@ -1,7 +1,6 @@
 package arc.check.network;
 
 import arc.Arc;
-import bridge.Version;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -50,18 +49,18 @@ public final class PayloadFrequency extends PacketCheck {
      */
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
-        if (disableIfNewerThan(Version.VERSION_1_8)) return;
+        if (disableIfNewerThan18()) return;
 
-        enabled(true).
-                cancel(true).
-                cancelLevel(0).
-                notify(true).
-                notifyEvery(1).
-                ban(true).
-                banLevel(5).
-                kick(true).
-                kickLevel(2).
-                write();
+        enabled(true)
+                .cancel(true)
+                .cancelLevel(0)
+                .notify(true)
+                .notifyEvery(1)
+                .ban(true)
+                .banLevel(5)
+                .kick(true)
+                .kickLevel(2)
+                .build();
 
         addConfigurationValue("max-packet-size-books", 4096);
         addConfigurationValue("max-packet-size-others", 32767);
@@ -91,7 +90,7 @@ public final class PayloadFrequency extends PacketCheck {
             }
         }
 
-        final ViolationResult violation = result(player, result);
+        final ViolationResult violation = checkViolation(player, result);
         data.cancelPayloadPackets(violation.cancel());
         data.payloadPacketCount(0);
     }
@@ -133,7 +132,7 @@ public final class PayloadFrequency extends PacketCheck {
             data.incrementPayloadPacketCount();
         }
 
-        final ViolationResult violation = result(player, result);
+        final ViolationResult violation = checkViolation(player, result);
         data.cancelPayloadPackets(violation.cancel());
     }
 
@@ -156,20 +155,20 @@ public final class PayloadFrequency extends PacketCheck {
 
     @Override
     public void load() {
-        maxPacketSizeBooks = getValueInt("max-packet-size-books");
-        maxPacketSizeOthers = getValueInt("max-packet-size-others");
-        maxPacketsPerInterval = getValueInt("max-packets-per-interval");
-        maxPacketSizeKick = getValueBoolean("max-packet-size-kick");
-        maxPacketsPerIntervalKick = getValueBoolean("max-packets-per-interval-kick");
-        channels = getList("channels");
+        maxPacketSizeBooks = configuration.getInt("max-packet-size-books");
+        maxPacketSizeOthers = configuration.getInt("max-packet-size-others");
+        maxPacketsPerInterval = configuration.getInt("max-packets-per-interval");
+        maxPacketSizeKick = configuration.getBoolean("max-packet-size-kick");
+        maxPacketsPerIntervalKick = configuration.getBoolean("max-packets-per-interval-kick");
+        channels = configuration.getList("channels");
         kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
                 " %player% was kicked for sending too many swing packets.";
 
-        final int checkInterval = getValueInt("check-interval-milliseconds");
+        final int checkInterval = configuration.getInt("check-interval-milliseconds");
         final int interval = (checkInterval / 1000) * 20;
 
         registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
-        scheduledCheck(() -> {
+        schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 check(player, PacketData.get(player));
             }

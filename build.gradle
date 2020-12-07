@@ -23,7 +23,4 @@ dependencies {
     compile project(':bridge1_16')
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
     compile "org.apache.commons:commons-lang3:3.11"
-    compile group: 'io.netty', name: 'netty-buffer', version: '4.1.54.Final'
-    compile "org.inventivetalent:reflectionhelper:1.15.2-SNAPSHOT"
-    compile "org.inventivetalent:vectors:1.0.1-SNAPSHOT"
 }

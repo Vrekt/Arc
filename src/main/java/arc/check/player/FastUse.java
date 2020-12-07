@@ -1,6 +1,7 @@
 package arc.check.player;
 
 import arc.bridge.packets.BridgePlayClientBlockPlace;
+import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
@@ -9,6 +10,7 @@ import arc.violation.result.ViolationResult;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 /**
@@ -36,11 +38,12 @@ public final class FastUse extends PacketCheck {
                 .notifyEvery(1)
                 .ban(false)
                 .kick(false)
-                .write();
+                .build();
 
-        addConfigurationValue("use-delta-min", 100);
-        addConfigurationValue("delta-shot-min", 200);
-        addConfigurationValue("consume-time-ms", 1400);
+        createSubTypeSections(CheckSubType.FAST_USE_FAST_BOW, CheckSubType.FAST_USE_FAST_CONSUME);
+        addConfigurationValue(CheckSubType.FAST_USE_FAST_BOW, "use-delta-min", 100);
+        addConfigurationValue(CheckSubType.FAST_USE_FAST_BOW, "delta-shot-min", 200);
+        addConfigurationValue(CheckSubType.FAST_USE_FAST_CONSUME, "consume-time-ms", 1400);
 
         if (enabled()) load();
     }
@@ -56,10 +59,10 @@ public final class FastUse extends PacketCheck {
 
         final Material item = packet.getHeldItem(player).getType();
         if (item == Material.BOW) {
-            if (exemptSubType(player, "fastbow")) return;
+            if (exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return;
             PlayerData.get(player).lastBowUse(System.currentTimeMillis());
         } else if (item.isEdible() || item == Material.POTION) {
-            if (exemptSubType(player, "fastconsume")) return;
+            if (exempt(player, CheckSubType.FAST_USE_FAST_CONSUME)) return;
             PlayerData.get(player).consumeStartTime(System.currentTimeMillis());
         }
     }
@@ -72,7 +75,8 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public ViolationResult checkFastBow(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exemptSubType(player, "fastbow")) return ViolationResult.EMPTY;
+        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW))
+            return ViolationResult.EMPTY;
 
         final long lastUse = data.lastBowUse();
         final long lastShot = data.lastBowShoot();
@@ -84,7 +88,7 @@ public final class FastUse extends PacketCheck {
         if (deltaUseToShot < deltaShotMinimum && useDelta < useDeltaMinimum) {
             final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Used a bow too fast, deltaShot=" + deltaUseToShot + " min=" + deltaShotMinimum + " + useDelta=" + useDelta + " min=" + useDeltaMinimum, "(FastBow)");
-            return result(player, result);
+            return checkViolation(player, result);
         }
 
         return ViolationResult.EMPTY;
@@ -98,14 +102,15 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public ViolationResult checkFastConsume(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exemptSubType(player, "fastconsume")) return ViolationResult.EMPTY;
+        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_CONSUME))
+            return ViolationResult.EMPTY;
 
         // the time it took to consume the item
         final long delta = System.currentTimeMillis() - data.consumeStartTime();
         if (delta < consumeTime) {
             final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
             result.information("Consumed an item too fast, delta=" + delta + ", min=" + consumeTime, "(FastConsume)");
-            return result(player, result);
+            return checkViolation(player, result);
         }
 
         return ViolationResult.EMPTY;
@@ -120,9 +125,11 @@ public final class FastUse extends PacketCheck {
 
     @Override
     public void load() {
-        useDeltaMinimum = getValueLong("use-delta-min");
-        deltaShotMinimum = getValueLong("delta-shot-min");
-        consumeTime = getValueLong("consume-time-ms");
+        final ConfigurationSection fastBowSection = configuration.subTypeSection(CheckSubType.FAST_USE_FAST_BOW);
+        useDeltaMinimum = fastBowSection.getLong("use-delta-min");
+        deltaShotMinimum = fastBowSection.getLong("delta-shot-min");
+        final ConfigurationSection fastConsumeSection = configuration.subTypeSection(CheckSubType.FAST_USE_FAST_CONSUME);
+        consumeTime = fastConsumeSection.getLong("consume-time-ms");
         registerPacketListener(PacketType.Play.Client.BLOCK_PLACE, this::onBlockPlace);
     }
 

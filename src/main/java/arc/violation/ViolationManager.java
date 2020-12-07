@@ -216,6 +216,22 @@ public final class ViolationManager implements Closeable, Reloadable {
     }
 
     /**
+     * Toggle violations viewer
+     *
+     * @param player the player
+     * @return {@code true} if the player is now a viewer.
+     */
+    public boolean toggleViolationsViewer(Player player) {
+        if (isViolationViewer(player)) {
+            violationViewers.remove(player);
+            return false;
+        } else {
+            violationViewers.add(player);
+            return true;
+        }
+    }
+
+    /**
      * Get the violation level
      *
      * @param player the player
