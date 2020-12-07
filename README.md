@@ -2,13 +2,11 @@
 An anticheat built for PaperSpigot.
 
 # Supported Versions
-- 1.8.8 
-- 1.15.2*
-- 1.16.4*
+- 1.8.8 *
+- 1.15.2
+- 1.16.4
 
-*1.15.2 support is currently experimental and not everything is implemented.*
-
-*1.16.4 support is currently experimental and not everything is implemented.*
+*1.8.8 is the main supported version of Arc. All checks will be developed FIRST for 1.8.8
 
 # Whats Required
 - ProtocolLib
@@ -31,25 +29,37 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 
 # Current Checks
 ### Combat
+- KillAura
+  - Direction
+  - TODO.
 - Criticals
 - Reach
 ### Moving
 - MorePackets
 - NoFall
-- Jesus (Water Walk/LiquidWalk)
+- Jesus
 ### Network
 - Swing Frequency (Server Crashing)
 - Payload Frequency (Server Crashing)
 ### Player
 - Regeneration
-- FastUse (FastConsume) (FastBow)
+- FastUse
+  - Fast Consume
+  - Fast Bow
 
-# TODO LIST
+# Focus
+- [ ] Sub-type configurations
+- [ ] Patch more crashing exploits
+- [ ] Lag Checking #3 - After 6 more checks
+- [ ] Timings
+- [ ] Lag/TPS watch
+- [ ] Inventory UI
+- [ ] Player summaries
 
+# Finished
 - [x] CONVERT CODE BACK TO JAVA 8 FROM 11.
 - [x] Permissions for each check to bypass
 - [x] ~Improve MorePackets~
-- [ ] Patch more crashing exploits
 - [x] ~Workaround /effect for BadEffects check~
 - [x] ~Fix BadEffects potion duration~
 - [x] ~Better information system with violations~
@@ -62,10 +72,5 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
 - [x] Improve NoFall 
 - [x] Lag Checking/Refactoring before continuing
 - [x] Lag Checking #2 - After 3 more checks
-- [ ] Lag Checking #3 - After 6 more checks
-- [ ] Timings
-- [ ] Lag/TPS watch
-- [ ] Inventory UI
-- [ ] Player summaries
 - [x] One listener for all combat checks
 - [x] Improve/Fix reach (add velocity? ) IDK
