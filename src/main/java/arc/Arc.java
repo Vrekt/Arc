@@ -29,7 +29,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "1.0.9";
+    public static final String VERSION_STRING = "2.0.0";
 
     /**
      * The file configuration

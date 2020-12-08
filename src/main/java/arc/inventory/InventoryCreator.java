@@ -62,11 +62,25 @@ public final class InventoryCreator {
      *
      * @param item          the item
      * @param indexModifier the index modifier
+     * @param onClick       the consumer
      * @return this
      */
     public InventoryCreator item(ItemStack item, int indexModifier, Consumer<ItemStack> onClick) {
         inventory.setItem(lastIndex, item);
         itemConsumers.put(item.getType(), onClick);
+        lastIndex += indexModifier;
+        return this;
+    }
+
+    /**
+     * Set an item
+     *
+     * @param item          the item
+     * @param indexModifier the index modifier
+     * @return this
+     */
+    public InventoryCreator item(ItemStack item, int indexModifier) {
+        inventory.setItem(lastIndex, item);
         lastIndex += indexModifier;
         return this;
     }

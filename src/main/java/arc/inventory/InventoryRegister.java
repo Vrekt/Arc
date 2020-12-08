@@ -51,7 +51,7 @@ public final class InventoryRegister implements Listener {
                     event.setCancelled(true);
 
                     final ItemStack item = event.getCurrentItem();
-                    if (!creator.isEmptySlotItem(item)) {
+                    if (item != null && !creator.isEmptySlotItem(item)) {
                         creator.invokeConsumer(item);
                     }
                 } else {

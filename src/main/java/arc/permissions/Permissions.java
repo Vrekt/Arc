@@ -55,6 +55,11 @@ public final class Permissions {
     public static final String ARC_COMMANDS_SUMMARY = "arc.commands.summary";
 
     /**
+     * The permission to view timings
+     */
+    public static final String ARC_COMMANDS_TIMINGS = "arc.commands.timings";
+
+    /**
      * Check if the player can view violations
      *
      * @param player the player

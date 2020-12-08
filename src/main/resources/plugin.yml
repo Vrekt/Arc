@@ -1,7 +1,7 @@
 main: arc.Arc
 name: Arc
-version: 1.0.9
-description: Arc is an anticheat built PaperSpigot 1.8.8.
+version: 2.0.0
+description: An anticheat for 1.8.8, 1.15.2 and 1.16.4
 author: Vrekt
 depend:
   - ProtocolLib
@@ -19,6 +19,8 @@ permissions:
     description: Allows the player to use all Arc commands.
   arc.commands.summary:
     description: Allows the player to access player summary information.
+  arc.commands.timings:
+    description: Allows the player to view timings information.
   arc.bypass:
     default: false
     description: Allows the player to bypass all Arc checks.
