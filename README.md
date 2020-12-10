@@ -48,13 +48,14 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
   - Fast Bow
 
 # Focus
-- [ ] Sub-type configurations
+- [x] Sub-type configurations
 - [ ] Patch more crashing exploits
 - [ ] Lag Checking #3 - After 6 more checks
-- [ ] Timings
+- [x] Timings
 - [ ] Lag/TPS watch
-- [ ] Inventory UI
+- [x] Inventory UI
 - [ ] Player summaries
+- [ ] Speed check
 
 # Finished
 - [x] CONVERT CODE BACK TO JAVA 8 FROM 11.
