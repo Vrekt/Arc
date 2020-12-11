@@ -1,4 +1,6 @@
-<img src="arcb.png" width="200" height="200" />
+<p align="center">
+  <img src="arcbr.png" width="200" height="200" />
+</p>
 
 # Arc
 An anticheat built for PaperSpigot.
