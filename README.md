@@ -47,31 +47,6 @@ You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
   - Fast Consume
   - Fast Bow
 
-# Focus
-- [x] Sub-type configurations
-- [ ] Patch more crashing exploits
-- [ ] Lag Checking #3 - After 6 more checks
-- [x] Timings
-- [ ] Lag/TPS watch
-- [x] Inventory UI
-- [ ] Player summaries
-- [ ] Speed check
+# Development
 
-# Finished
-- [x] CONVERT CODE BACK TO JAVA 8 FROM 11.
-- [x] Permissions for each check to bypass
-- [x] ~Improve MorePackets~
-- [x] ~Workaround /effect for BadEffects check~
-- [x] ~Fix BadEffects potion duration~
-- [x] ~Better information system with violations~
-- [x] Debug system
-- [x] Debug/Information commands to toggle
-- [x] Commands in general
-- [x] Exemptions 
-- [x] More checks, obviously
-- [x] Better permissions
-- [x] Improve NoFall 
-- [x] Lag Checking/Refactoring before continuing
-- [x] Lag Checking #2 - After 3 more checks
-- [x] One listener for all combat checks
-- [x] Improve/Fix reach (add velocity? ) IDK
+View the trello [here](https://trello.com/b/Ytgv320C/arc)
