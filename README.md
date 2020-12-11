@@ -1,4 +1,4 @@
-![alt text](https://github.com/Vrekt/Arc/blob/main/arcb.png?raw=true)
+<img src="arcb.png" width="200" height="200" />
 
 # Arc
 An anticheat built for PaperSpigot.
