@@ -1,6 +1,8 @@
 # Arc
 An anticheat built for PaperSpigot.
 
+The main purpose of Arc is to support old PvP versions like 1.8 while still supporting newer versions with newer game features.
+
 # Supported Versions
 - 1.8.8 *
 - 1.15.2
