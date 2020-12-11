@@ -1,3 +1,5 @@
+![alt text](https://github.com/Vrekt/Arc/blob/main/arcb.png?raw=true)
+
 # Arc
 An anticheat built for PaperSpigot.
 
