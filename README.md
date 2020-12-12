@@ -6,21 +6,19 @@
 Arc is an anticheat built to support older PvP versions and newer game versions.
 
 * Supports 1.8.8, 1.15.2 and 1.16.4
-* Customizable check configurations.
-* Extensive permissions.
-* Extensive config
-* API included
+* Customizable check configurations
+* Extensive configuration
+* Extensive permissions
+* Performant
+* API
 
-An anticheat built for PaperSpigot.
+<p align="center">
+  <img src="https://i.imgur.com/fnUS7Ms.png" alt="Violations">
+</p>
 
-The main purpose of Arc is to support old PvP versions like 1.8 while still supporting newer versions with newer game features.
-
-# Supported Versions
-- 1.8.8 *
-- 1.15.2
-- 1.16.4
-
-*1.8.8 is the main supported version of Arc. All checks will be developed FIRST for 1.8.8
+<p align="center">
+  <img src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
+</p>
 
 # Whats Required
 - ProtocolLib
