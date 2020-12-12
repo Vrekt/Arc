@@ -58,3 +58,9 @@ An optional command system to use from the command-line.
 * FastUse
   * Fast Consume
   * Fast Bow
+
+# Development
+
+View the trello [here!](https://trello.com/b/Ytgv320C/arc)
+
+You can view in-progress items and things still TODO.
