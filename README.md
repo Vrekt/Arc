@@ -36,33 +36,25 @@ An optional command system to use from the command-line.
 * Arc requires Java 8.
 * Spigot or PaperSpigot.
 
-# Documentation
-You can find general configuration info [here](https://github.com/Vrekt/Arc/wiki/Configuration)
+## Current Checks
 
-You can find check configuration info [here](https://github.com/Vrekt/Arc/wiki/Check-configuration)
-
-You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
-
-# Current Checks
 ### Combat
-- KillAura
-  - Direction
-  - TODO.
-- Criticals
-- Reach
+* KillAura
+  * Direction
+* Criticals
+* Reach
+
 ### Moving
-- MorePackets
-- NoFall
-- Jesus
+* MorePackets
+* NoFall
+* Jesus
+
 ### Network
-- Swing Frequency (Server Crashing)
-- Payload Frequency (Server Crashing)
+* Swing Frequency
+* Payload Frequency
+
 ### Player
-- Regeneration
-- FastUse
-  - Fast Consume
-  - Fast Bow
-
-# Development
-
-View the trello [here](https://trello.com/b/Ytgv320C/arc)
+* Regeneration
+* FastUse
+  * Fast Consume
+  * Fast Bow
