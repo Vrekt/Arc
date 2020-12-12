@@ -16,21 +16,25 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
   <img src="https://i.imgur.com/fnUS7Ms.png" alt="Violations">
 </p>
 
+Customizable violation messages
+
 <p align="center">
   <img src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
 </p>
 
-# Whats Required
-- ProtocolLib
-- Java 8
+A basic but still WIP inventory UI for managing Arc.
 
-# Current Features
-- Customizable checks and check parameters.
-- Permissions for each type of check and category.
-- Configurable punishment
-- Configurable messages
-- Basic API
-- More to come...
+<p align="center">
+  <img src="https://i.imgur.com/QRFwGT8.png" alt="Commands">
+</p>
+
+An optional command system to use from the command-line.
+
+## Installing Arc
+
+* ProtocolLib is **required**.
+* Arc requires Java 8.
+* Spigot or PaperSpigot.
 
 # Documentation
 You can find general configuration info [here](https://github.com/Vrekt/Arc/wiki/Configuration)
