@@ -1,8 +1,16 @@
-<p align="center">
-  <img src="arcbr.png" width="200" height="200" />
-</p>
-
 # Arc
+
+<img src="arcbr.png" align="right"
+     alt="Arc logo" width="120" height="178">
+
+Arc is an anticheat built to support older PvP versions and newer game versions.
+
+* Supports 1.8.8, 1.15.2 and 1.16.4
+* Customizable check configurations.
+* Extensive permissions.
+* Extensive config
+* API included
+
 An anticheat built for PaperSpigot.
 
 The main purpose of Arc is to support old PvP versions like 1.8 while still supporting newer versions with newer game features.
