@@ -1,58 +1,66 @@
+# Arc
+
+<img src="arcbr.png" align="right"
+     alt="Arc logo" width="120" height="178">
+
+Arc is an anticheat built to support older PvP versions and newer game versions.
+
+* Supports 1.8.8, 1.15.2 and 1.16.4
+* Customizable check configurations
+* Extensive configuration
+* Extensive permissions
+* Performant
+* API
+
 <p align="center">
-  <img src="arcbr.png" width="200" height="200" />
+  <img src="https://i.imgur.com/RkzjGoW.png" alt="Violations">
 </p>
 
-# Arc
-An anticheat built for PaperSpigot.
+Customizable violation messages
 
-The main purpose of Arc is to support old PvP versions like 1.8 while still supporting newer versions with newer game features.
+<p align="center">
+  <img src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
+</p>
 
-# Supported Versions
-- 1.8.8 *
-- 1.15.2
-- 1.16.4
+A basic but still WIP inventory UI for managing Arc.
 
-*1.8.8 is the main supported version of Arc. All checks will be developed FIRST for 1.8.8
+<p align="center">
+  <img src="https://i.imgur.com/QRFwGT8.png" alt="Commands">
+</p>
 
-# Whats Required
-- ProtocolLib
-- Java 8
+An optional command system to use from the command-line.
 
-# Current Features
-- Customizable checks and check parameters.
-- Permissions for each type of check and category.
-- Configurable punishment
-- Configurable messages
-- Basic API
-- More to come...
+## Installing Arc
 
-# Documentation
-You can find general configuration info [here](https://github.com/Vrekt/Arc/wiki/Configuration)
+* ProtocolLib is **required**.
+* Arc requires Java 8.
+* Spigot or PaperSpigot.
 
-You can find check configuration info [here](https://github.com/Vrekt/Arc/wiki/Check-configuration)
+## Current Checks
 
-You can find API documentation [here](https://github.com/Vrekt/Arc/wiki/API)
-
-# Current Checks
 ### Combat
-- KillAura
-  - Direction
-  - TODO.
-- Criticals
-- Reach
+* KillAura
+  * Direction
+* Criticals
+* Reach
+
 ### Moving
-- MorePackets
-- NoFall
-- Jesus
+* MorePackets
+* NoFall
+* Jesus
+
 ### Network
-- Swing Frequency (Server Crashing)
-- Payload Frequency (Server Crashing)
+* Swing Frequency
+* Payload Frequency
+
 ### Player
-- Regeneration
-- FastUse
-  - Fast Consume
-  - Fast Bow
+* Regeneration
+* FastUse
+  * Fast Consume
+  * Fast Bow
 
 # Development
 
-View the trello [here](https://trello.com/b/Ytgv320C/arc)
+View the trello [here!](https://trello.com/b/Ytgv320C/arc)
+
+You can view in-progress items and things still TODO.
