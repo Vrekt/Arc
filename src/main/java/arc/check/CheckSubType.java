@@ -15,17 +15,22 @@ public enum CheckSubType {
     /**
      * Kill aura direction
      */
-    KILL_AURA_DIRECTION(CheckType.KILL_AURA, "direction"),
+    KILL_AURA_DIRECTION(CheckType.KILL_AURA, "direction", "Direction"),
 
     /**
      * FastUse fastbow
      */
-    FAST_USE_FAST_BOW(CheckType.FAST_USE, "fastbow"),
+    FAST_USE_FAST_BOW(CheckType.FAST_USE, "fastbow", "FastBow"),
 
     /**
      * FastUse FastConsume
      */
-    FAST_USE_FAST_CONSUME(CheckType.FAST_USE, "fastconsume");
+    FAST_USE_FAST_CONSUME(CheckType.FAST_USE, "fastconsume", "FastConsume"),
+
+    /**
+     * Flight BoatFly
+     */
+    FLIGHT_BOATFLY(CheckType.FLIGHT, "boatfly", "BoatFly");
 
     /**
      * Values
@@ -39,8 +44,9 @@ public enum CheckSubType {
 
     /**
      * The name
+     * The fancy name
      */
-    private final String name;
+    private final String name, fancyName;
 
     /**
      * Initialize the sub-type
@@ -48,9 +54,10 @@ public enum CheckSubType {
      * @param from the super type
      * @param name the name of the sub-type.
      */
-    CheckSubType(CheckType from, String name) {
+    CheckSubType(CheckType from, String name, String fancyName) {
         this.from = from;
         this.name = name;
+        this.fancyName = fancyName;
     }
 
     /**
@@ -65,6 +72,13 @@ public enum CheckSubType {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the fancy name
+     */
+    public String fancyName() {
+        return fancyName;
     }
 
     /**

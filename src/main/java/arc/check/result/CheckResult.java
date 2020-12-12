@@ -1,5 +1,13 @@
 package arc.check.result;
 
+import arc.check.CheckSubType;
+import org.bukkit.ChatColor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Represents a check result.
  */
@@ -23,29 +31,34 @@ public final class CheckResult {
     private Result result = Result.PASSED;
 
     /**
-     * The check information
-     * The name to append;
+     * The check sub-type
      */
-    private String information, appendName;
+    private CheckSubType subType;
 
     /**
-     * Initialize this check result with a result and information
-     *
-     * @param result      the result
-     * @param information the info
+     * Information builder.
      */
-    public CheckResult(Result result, String information) {
-        this.result = result;
-        this.information = information;
-    }
+    private StringBuilder informationBuilder;
 
     /**
-     * Initialize this check result with a result
+     * Initialize this check result
      *
      * @param result the result
      */
     public CheckResult(Result result) {
         this.result = result;
+        setFailed();
+    }
+
+    /**
+     * Initialize this check result.
+     *
+     * @param result the result
+     * @param type   the type
+     */
+    public CheckResult(Result result, CheckSubType type) {
+        this.result = result;
+        setFailed(type);
     }
 
     /**
@@ -73,17 +86,66 @@ public final class CheckResult {
 
     /**
      * Set failed
+     *
+     * @param type the sub-type
      */
-    public void setFailed() {
-        this.result = Result.FAILED;
+    public CheckResult setFailed(CheckSubType type) {
+        setFailed();
+        this.subType = type;
+        return this;
     }
 
     /**
-     * Set failed + information
+     * Set failed
+     *
+     * @param type        the sub-type
+     * @param information the information
      */
-    public void setFailed(String information) {
+    public CheckResult setFailed(CheckSubType type, String information) {
+        setFailed(type);
+        info(information);
+        return this;
+    }
+
+    /**
+     * Set failed
+     *
+     * @param information the initial information
+     */
+    public CheckResult setFailed(String information) {
+        setFailed();
+        info(information);
+        return this;
+    }
+
+    /**
+     * Set failed
+     */
+    public CheckResult setFailed() {
         this.result = Result.FAILED;
-        information(information);
+        this.informationBuilder = new StringBuilder();
+        return this;
+    }
+
+    /**
+     * Add an information line
+     *
+     * @param information the information
+     */
+    public void info(String information) {
+        informationBuilder.append(ChatColor.RED).append(information);
+        informationBuilder.append("\n");
+    }
+
+    /**
+     * Add a parameter
+     *
+     * @param parameter the parameter
+     * @param value     the value
+     */
+    public void parameter(String parameter, Object value) {
+        informationBuilder.append("\n").append(ChatColor.GRAY);
+        informationBuilder.append(parameter).append("=").append(value.toString());
     }
 
     /**
@@ -94,52 +156,24 @@ public final class CheckResult {
     }
 
     /**
-     * Set passed
-     */
-    public void setPassed() {
-        this.result = Result.PASSED;
-    }
-
-    /**
-     * @return the information
+     * @return retrieve the information
      */
     public String information() {
-        return information;
+        return informationBuilder.toString();
     }
 
     /**
-     * @return the name to append
+     * @return the sub-type
      */
-    public String appendName() {
-        return appendName;
+    public CheckSubType subType() {
+        return subType;
     }
 
     /**
-     * Set the appended name
-     *
-     * @param appendName the name
+     * @return check if this result has a sub-type.
      */
-    public void appendName(String appendName) {
-        this.appendName = appendName;
-    }
-
-    /**
-     * Set the information
-     *
-     * @param information information
-     */
-    public void information(String information) {
-        this.information = information;
-    }
-
-    /**
-     * Set the information
-     *
-     * @param information information
-     */
-    public void information(String information, String appendName) {
-        this.information = information;
-        this.appendName = appendName;
+    public boolean hasSubType() {
+        return subType != null;
     }
 
 }

@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.data.moving.MovingData;
 import arc.data.moving.packets.MovingPacketData;
 import arc.listener.IPacketListener;
+import com.comphenix.packetwrapper.WrapperPlayClientEntityAction;
 import com.comphenix.packetwrapper.WrapperPlayClientFlying;
 import com.comphenix.packetwrapper.WrapperPlayClientPosition;
 import com.comphenix.packetwrapper.WrapperPlayClientPositionLook;
@@ -47,6 +48,13 @@ public final class MovingPacketListener implements IPacketListener {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 onPositionLook(event);
+            }
+        });
+
+        protocol.addPacketListener(new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, PacketType.Play.Client.ENTITY_ACTION) {
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                onEntityAction(event);
             }
         });
 
@@ -104,6 +112,31 @@ public final class MovingPacketListener implements IPacketListener {
 
         packets.positionPackets(packets.positionPackets() + 1);
         if (packets.cancelPositionPackets()) event.setCancelled(true);
+    }
+
+    /**
+     * Invoked when the client sends ENTITY_ACTION
+     *
+     * @param event the event
+     */
+    private void onEntityAction(PacketEvent event) {
+        final WrapperPlayClientEntityAction packet = new WrapperPlayClientEntityAction(event.getPacket());
+        final MovingData data = MovingData.get(event.getPlayer());
+
+        switch (packet.getAction()) {
+            case START_SNEAKING:
+                data.sneaking(true);
+                break;
+            case STOP_SNEAKING:
+                data.sneaking(false);
+                break;
+            case START_SPRINTING:
+                data.sprinting(true);
+                break;
+            case STOP_SPRINTING:
+                data.sprinting(false);
+                break;
+        }
     }
 
 }

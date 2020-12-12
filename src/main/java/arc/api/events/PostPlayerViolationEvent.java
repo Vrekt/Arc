@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerEvent;
 /**
  * Invoked after the violation has been processed.
  */
-public class PostPlayerViolationEvent extends PlayerEvent {
+public final class PostPlayerViolationEvent extends PlayerEvent {
 
     /**
      * Handler list

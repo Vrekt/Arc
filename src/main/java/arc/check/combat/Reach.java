@@ -17,21 +17,15 @@ import org.bukkit.util.Vector;
 
 /**
  * Checks if the player is attacking from too far away.
- * TODO: Account for lag
  */
 public final class Reach extends PacketCheck {
-
-    /**
-     * Creative reach distance.
-     */
-    private static final double CREATIVE_REACH_DISTANCE = 6D;
 
     /**
      * The max distance allowed.
      * The max velocity to subtract from the distance
      * The min velocity required to be subtracted
      */
-    private double maxDistance, maxVelocityLength, minVelocityLength, nonLivingEyeHeight;
+    private double maxDistance, maxVelocityLength, minVelocityLength, nonLivingEyeHeight, creativeReachDistance;
 
     /**
      * If the Y axis should be ignored.
@@ -60,6 +54,7 @@ public final class Reach extends PacketCheck {
         addConfigurationValue("subtract-eye", true);
         addConfigurationValue("non-living-eye-height", 1.75);
         addConfigurationValue("use-bounding-boxes", true);
+        addConfigurationValue("creative-reach-distance", 6);
         if (enabled()) load();
     }
 
@@ -75,7 +70,7 @@ public final class Reach extends PacketCheck {
             // we attacked, get the entity and distance check.
             final Entity entity = packet.getTarget(player.getWorld());
             if (!entity.isDead()) {
-                start(player);
+                final CheckResult result = new CheckResult();
 
                 // get our entities Y locations
                 final double py = ignoreYAxis ? 1.0 : player.getLocation().getY();
@@ -104,20 +99,19 @@ public final class Reach extends PacketCheck {
                 double distance = playerVec.subtract(entityVec).length();
                 if (subtractVelocity) distance -= velocity;
                 if (subtractEye) distance -= ey;
-                stop(player);
-                // check if we are in creative
-                // , if so check against Magic value
-                if (player.getGameMode() == GameMode.CREATIVE && distance > CREATIVE_REACH_DISTANCE) {
-                    final ViolationResult violation = checkViolation(player, new CheckResult(CheckResult.Result.FAILED, "Creative reach distance >6"));
-                    return violation.cancel();
-                } else {
+                // check if we are in creative + magic value
+                if (player.getGameMode() == GameMode.CREATIVE && distance > creativeReachDistance) {
+                    result.setFailed("Creative reach distance > max");
+                    result.parameter("max", creativeReachDistance);
+                } else if (player.getGameMode() != GameMode.CREATIVE) {
                     // otherwise check
                     if (distance > maxDistance) {
-                        // too far away, flag.
-                        final ViolationResult violation = checkViolation(player, new CheckResult(CheckResult.Result.FAILED, "Attacked from too far away, len=" + distance + " max=" + maxDistance));
-                        return violation.cancel();
+                        result.setFailed("Attacked from too far away.");
+                        result.parameter("distance", distance);
+                        result.parameter("max", maxDistance);
                     }
                 }
+                return checkViolation(player, result).cancel();
             }
         }
         return false;
@@ -130,7 +124,6 @@ public final class Reach extends PacketCheck {
 
     @Override
     public void load() {
-        useTimings();
         maxDistance = configuration.getDouble("max-distance");
         maxVelocityLength = configuration.getDouble("max-velocity-length");
         minVelocityLength = configuration.getDouble("min-velocity-length");
@@ -139,5 +132,6 @@ public final class Reach extends PacketCheck {
         subtractEye = configuration.getBoolean("subtract-eye");
         nonLivingEyeHeight = configuration.getDouble("non-living-eye-height");
         useBoundingBoxes = configuration.getBoolean("use-bounding-boxes");
+        creativeReachDistance = configuration.getDouble("creative-reach-distance");
     }
 }

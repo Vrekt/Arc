@@ -62,6 +62,11 @@ public final class Materials implements MaterialsBridge {
     }
 
     @Override
+    public boolean isIce(Block block) {
+        return block.getType() == Material.ICE || block.getType() == Material.PACKED_ICE;
+    }
+
+    @Override
     public Material getMaterial(String name) {
         return Material.getMaterial(name);
     }

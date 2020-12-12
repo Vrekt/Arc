@@ -61,9 +61,30 @@ public final class MovingUtil {
         if (BRIDGE.materials().isLiquid(location.getBlock())
                 || BRIDGE.materials().isLiquid(location.getBlock().getRelative(BlockFace.DOWN))) return true;
 
-        final List<Block> neighbors0 = neighbors(location, 0.1, -0.01, 0.1);
-        // final List<Block> neighbors1 = neighbors(location, 0.1, -0.5, 0.1);
-        return neighbors0.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
+        final List<Block> neighbors = neighbors(location, 0.1, -0.01, 0.1);
+        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
+    }
+
+    /**
+     * @param location the location
+     * @return {@code true} if the location is on ice
+     */
+    public static boolean isOnIce(Location location) {
+        if (BRIDGE.materials().isIce(location.getBlock())
+                || BRIDGE.materials().isIce(location.getBlock().getRelative(BlockFace.DOWN))) return true;
+        final List<Block> neighbors = neighbors(location, 0.1, -0.01, 0.1);
+        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isIce(block));
+    }
+
+    /**
+     * Check if we are on ice with trapdoors.
+     *
+     * @param location the location
+     * @return {@code true} if so
+     * TODO
+     */
+    public static boolean isOnIceTrapdoor(Location location) {
+        return true;
     }
 
     /**
@@ -140,9 +161,25 @@ public final class MovingUtil {
         if (onGround) {
             data.ground(to);
             data.onGroundTime(data.onGroundTime() + 1);
+
+            // calculate ice
+            // TODO: Trapdoors
+            final boolean onIce = isOnIce(to);
+            final int iceTime = onIce ? data.onIceTime() + 1 : 0;
+            data.onIceTime(iceTime);
+
         } else {
             data.onGroundTime(0);
         }
+
+        final boolean sprinting = data.sprinting();
+        final boolean sneaking = data.sneaking();
+
+        final int sprintTime = sprinting ? data.sprintTime() + 1 : 0;
+        final int sneakTime = sneaking ? data.sneakTime() + 1 : 0;
+
+        data.sprintTime(sprintTime);
+        data.sneakTime(sneakTime);
 
         // calculate vertical distance
         final double distance = MathUtil.vertical(from, to);

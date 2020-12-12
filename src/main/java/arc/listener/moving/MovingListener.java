@@ -5,6 +5,7 @@ import arc.check.CheckType;
 import arc.check.moving.Flight;
 import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
+import arc.check.moving.Speed;
 import arc.data.moving.MovingData;
 import arc.permissions.Permissions;
 import arc.utility.MovingUtil;
@@ -36,12 +37,18 @@ public final class MovingListener implements Listener {
     private final Flight flight;
 
     /**
+     * The speed check
+     */
+    private final Speed speed;
+
+    /**
      * Initialize and add all the checks we need.
      */
     public MovingListener() {
         noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
         jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
         flight = (Flight) Arc.arc().checks().getCheck(CheckType.FLIGHT);
+        speed = (Speed) Arc.arc().checks().getCheck(CheckType.SPEED);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -71,6 +78,9 @@ public final class MovingListener implements Listener {
         // retrieve data and calculate what we need
         final MovingData data = MovingData.get(player);
         MovingUtil.updateMovingPlayer(data, from, to);
+
+        // Check players for speed.
+        speed.check(player, data, event);
 
         // Check players for Flight.
         flight.check(player, data, event);

@@ -67,4 +67,5 @@ public final class Entities implements EntitiesBridge {
         final AxisAlignedBB nms = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new BoundingBox(nms.a, nms.b, nms.c, nms.d, nms.e, nms.f);
     }
+
 }

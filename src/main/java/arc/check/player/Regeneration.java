@@ -50,7 +50,9 @@ public final class Regeneration extends Check {
         // if its less than the minimum then flag.
         if (time < regenerationTime) {
             final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
-            result.information("Regaining health too fast, time=" + time + ", min=" + regenerationTime);
+            result.info("Regaining health too fast.");
+            result.parameter("time", time);
+            result.parameter("min", regenerationTime);
             final ViolationResult violation = checkViolation(player, result);
             callback.onResult(violation);
         }

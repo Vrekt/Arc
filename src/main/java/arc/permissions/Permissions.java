@@ -108,16 +108,4 @@ public final class Permissions {
         }
         return false;
     }
-
-    /**
-     * Check if a player can do something
-     *
-     * @param player  the player
-     * @param command the command permission
-     * @return {@code true} if so
-     */
-    public static boolean canExecuteAction(Player player, String command) {
-        return player.hasPermission(ARC_COMMANDS_ALL) || player.hasPermission(command);
-    }
-
 }

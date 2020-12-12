@@ -14,10 +14,12 @@ import arc.permissions.Permissions;
 import arc.utility.Punishment;
 import arc.utility.chat.PlaceholderStringReplacer;
 import arc.violation.result.ViolationResult;
+import bridge.Version;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -42,6 +44,11 @@ public final class ViolationManager implements Closeable, Reloadable {
      * A list of players who can view violations/debug information
      */
     private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
+
+    /**
+     * If sync events should be used.
+     */
+    private boolean useSyncEvents;
 
     /**
      * Keeps track of when to expire history
@@ -76,6 +83,8 @@ public final class ViolationManager implements Closeable, Reloadable {
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
                 .build();
+
+        useSyncEvents = Arc.version().isNewerThan(Version.VERSION_1_8);
     }
 
     /**
@@ -118,7 +127,7 @@ public final class ViolationManager implements Closeable, Reloadable {
 
         // call our violation event.
         if (configuration.enableEventApi()) {
-            final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result.information());
+            final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result);
             triggerSync(event);
             // if the event is cancelled, remove the violation level and return no result.
             if (event.isCancelled()) {
@@ -139,7 +148,7 @@ public final class ViolationManager implements Closeable, Reloadable {
             // replace the place holders within the message
             final String violationMessage = new PlaceholderStringReplacer(configuration.violationMessage())
                     .replacePlayer(player)
-                    .replaceCheck(check, result.appendName())
+                    .replaceCheck(check, result.hasSubType() ? "(" + result.subType().fancyName() + ")" : null)
                     .replaceLevel(level)
                     .replacePrefix(configuration.prefix())
                     .build();
@@ -184,7 +193,11 @@ public final class ViolationManager implements Closeable, Reloadable {
      * @param event the event
      */
     private void triggerSync(Event event) {
-        Bukkit.getScheduler().runTask(Arc.arc(), () -> Bukkit.getServer().getPluginManager().callEvent(event));
+        if (useSyncEvents) {
+            Bukkit.getScheduler().runTask(Arc.arc(), () -> Bukkit.getServer().getPluginManager().callEvent(event));
+        } else {
+            Bukkit.getServer().getPluginManager().callEvent(event);
+        }
     }
 
     /**
@@ -195,24 +208,6 @@ public final class ViolationManager implements Closeable, Reloadable {
      */
     public boolean isViolationViewer(Player player) {
         return violationViewers.contains(player);
-    }
-
-    /**
-     * Add a violation viewer
-     *
-     * @param player the player
-     */
-    public void addViolationViewer(Player player) {
-        violationViewers.add(player);
-    }
-
-    /**
-     * Remove a violation viewer
-     *
-     * @param player the player
-     */
-    public void removeViolationViewer(Player player) {
-        violationViewers.remove(player);
     }
 
     /**

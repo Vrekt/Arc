@@ -75,18 +75,33 @@ public final class MovingData {
     /**
      * Movement location
      * The last known ground location
+     * The speed setback location
      */
-    private Location from, to, ground;
+    private Location from, to, ground, speedSetback;
 
     /**
      * Last moving update.
+     * Last teleport
      */
-    private long lastMovingUpdate;
+    private long lastMovingUpdate, lastTeleport;
 
     /**
      * The vertical distances traveled.
      */
     private double lastVerticalDistance, verticalDistance;
+
+    /**
+     * If the player is sprinting
+     * If the player is sneaking
+     */
+    private boolean sprinting, sneaking;
+
+    /**
+     * Sneaking time and sprint time
+     * The time on ice
+     * The time off ice
+     */
+    private int sneakTime, sprintTime, onIceTime, offIceTime;
 
     /**
      * Average in water diffs
@@ -282,5 +297,69 @@ public final class MovingData {
 
     public void ascendingTime(int ascendingTime) {
         this.ascendingTime = ascendingTime;
+    }
+
+    public long lastTeleport() {
+        return lastTeleport;
+    }
+
+    public void lastTeleport(long lastTeleport) {
+        this.lastTeleport = lastTeleport;
+    }
+
+    public boolean sprinting() {
+        return sprinting;
+    }
+
+    public void sprinting(boolean sprinting) {
+        this.sprinting = sprinting;
+    }
+
+    public boolean sneaking() {
+        return sneaking;
+    }
+
+    public void sneaking(boolean sneaking) {
+        this.sneaking = sneaking;
+    }
+
+    public Location speedSetback() {
+        return speedSetback;
+    }
+
+    public void speedSetback(Location speedSetback) {
+        this.speedSetback = speedSetback;
+    }
+
+    public int sneakTime() {
+        return sneakTime;
+    }
+
+    public void sneakTime(int sneakTime) {
+        this.sneakTime = sneakTime;
+    }
+
+    public int sprintTime() {
+        return sprintTime;
+    }
+
+    public void sprintTime(int sprintTime) {
+        this.sprintTime = sprintTime;
+    }
+
+    public int onIceTime() {
+        return onIceTime;
+    }
+
+    public void onIceTime(int onIceTime) {
+        this.onIceTime = onIceTime;
+    }
+
+    public int offIceTime() {
+        return offIceTime;
+    }
+
+    public void offIceTime(int offIceTime) {
+        this.offIceTime = offIceTime;
     }
 }

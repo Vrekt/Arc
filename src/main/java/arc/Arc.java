@@ -3,7 +3,10 @@ package arc;
 import arc.check.CheckManager;
 import arc.command.ArcCommand;
 import arc.configuration.ArcConfiguration;
-import arc.data.DataUtility;
+import arc.data.combat.CombatData;
+import arc.data.moving.MovingData;
+import arc.data.packet.PacketData;
+import arc.data.player.PlayerData;
 import arc.exemption.ExemptionManager;
 import arc.inventory.InventoryRegister;
 import arc.listener.Listeners;
@@ -121,30 +124,32 @@ public final class Arc extends JavaPlugin {
         violationManager.close();
         checkManager.close();
 
-        Bukkit.getOnlinePlayers().forEach(DataUtility::removeAll);
+        Bukkit.getOnlinePlayers().forEach(player -> {
+            CombatData.remove(player);
+            MovingData.remove(player);
+            PacketData.remove(player);
+            PlayerData.remove(player);
+        });
     }
 
     /**
      * Load compatible versions
+     * TODO: Specific 1.15.2 and 1.16.4
      */
     private boolean loadCompatibleVersions() {
         if (Bukkit.getVersion().contains("1.8")) {
-            getLogger().info("Initializing Arc for: " + Bukkit.getVersion());
             loadFor1_8_8();
-            return true;
         } else if (Bukkit.getVersion().contains("1.16")) {
-            getLogger().info(ChatColor.RED + "Initializing Arc for: " + Bukkit.getVersion());
             loadFor1_16();
-            return true;
         } else if (Bukkit.getVersion().contains("1.15")) {
-            getLogger().info(ChatColor.RED + "Initializing Arc for: " + Bukkit.getVersion());
             loadFor1_15();
-            return true;
         } else {
             getLogger().info("[INCOMPATIBLE] Arc is not compatible with this version: " + Bukkit.getVersion());
             incompatible = true;
             return false;
         }
+        getLogger().info("[SUCCESS] Initialized Arc for: " + Bukkit.getVersion());
+        return true;
     }
 
     /**

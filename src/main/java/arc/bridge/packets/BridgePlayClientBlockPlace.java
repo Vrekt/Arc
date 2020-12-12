@@ -26,7 +26,7 @@ public final class BridgePlayClientBlockPlace extends AbstractPacket {
      * @return if the item is main hand.
      */
     public boolean isMainHand() {
-        return !version.isNewerThan(Version.VERSION_1_8) || handle.getHands().read(0) == EnumWrappers.Hand.MAIN_HAND;
+        return version.isNewerThan(Version.VERSION_1_8) && handle.getHands().read(0) == EnumWrappers.Hand.MAIN_HAND;
     }
 
     /**

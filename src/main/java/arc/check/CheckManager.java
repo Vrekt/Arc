@@ -4,10 +4,7 @@ import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
 import arc.check.combat.Reach;
-import arc.check.moving.Flight;
-import arc.check.moving.Jesus;
-import arc.check.moving.MorePackets;
-import arc.check.moving.NoFall;
+import arc.check.moving.*;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;
@@ -46,6 +43,7 @@ public final class CheckManager implements Closeable, Reloadable {
         add(new NoSwing());
         add(new KillAura());
         add(new Flight());
+        add(new Speed());
     }
 
     /**

@@ -72,7 +72,11 @@ public final class MorePackets extends Check {
                 kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
                 packets.kick(true);
             }
-            result.setFailed("Too many flying packets p=" + flyingPackets + " max=" + maxFlyingPackets);
+
+            result.setFailed("Too many flying packets");
+            result.parameter("packets", flyingPackets);
+            result.parameter("max", maxFlyingPackets);
+
             failedFlying = true;
         } else {
             packets.cancelFlyingPackets(false);
@@ -83,7 +87,11 @@ public final class MorePackets extends Check {
                 kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
                 packets.kick(true);
             }
-            result.setFailed("Too many position packets p=" + positionPackets + " max=" + maxPositionPackets);
+
+            result.setFailed("Too many position packets");
+            result.parameter("packets", positionPackets);
+            result.parameter("max", maxPositionPackets);
+
             failedPosition = true;
         } else {
             packets.cancelPositionPackets(false);

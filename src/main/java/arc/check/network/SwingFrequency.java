@@ -53,7 +53,9 @@ public final class SwingFrequency extends PacketCheck {
         final CheckResult result = new CheckResult();
 
         if (data.swingPacketCount() > maxPackets) {
-            result.setFailed("Too many swing packets per second, p=" + data.swingPacketCount() + " m=" + maxPackets);
+            result.setFailed("Too many swing packets per second.");
+            result.parameter("packets", data.swingPacketCount());
+            result.parameter("max", maxPackets);
         } else if (data.swingPacketCount() > maxPacketsKick) {
             kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
         } else {

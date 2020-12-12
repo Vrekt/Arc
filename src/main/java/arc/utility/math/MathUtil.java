@@ -34,6 +34,19 @@ public final class MathUtil {
     }
 
     /**
+     * Calculate horizontal distance
+     *
+     * @param from from
+     * @param to   to
+     * @return distance
+     */
+    public static double horizontal(Location from, Location to) {
+        final double dx = to.getX() - from.getX();
+        final double dz = to.getZ() - from.getZ();
+        return Math.sqrt(dx * dx + dz * dz);
+    }
+
+    /**
      * Clamp a value
      *
      * @param value value

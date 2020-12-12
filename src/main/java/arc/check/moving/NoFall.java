@@ -43,7 +43,6 @@ public final class NoFall extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player) || !enabled()) return;
 
-        start(player);
         final CheckResult result = new CheckResult();
         final NoFallData nf = data.nf();
         cancelIf(player, nf, data);
@@ -52,11 +51,15 @@ public final class NoFall extends Check {
         // TODO: Constantly flagged if cheat is left on.
         // TODO: Can probably be improved but will take some work and brain
         if (data.onGround() && data.onGroundTime() >= 5) {
+            final long lastCheckDelta = System.currentTimeMillis() - nf.lastCheck();
             // client still isn't on the ground, we still have a fall distance and we were descending
             if (!data.clientOnGround()
                     && player.getFallDistance() > 3.0 &&
-                    (System.currentTimeMillis() - nf.lastCheck()) <= 60000 && !nf.hasFailed()) {
-                result.setFailed("client faked onGround state, fDist=" + player.getFallDistance());
+                    lastCheckDelta <= 60000 && !nf.hasFailed()) {
+                result.setFailed("Client faked OnGround state.");
+                result.parameter("fDist", player.getFallDistance());
+                result.parameter("lastCheckDelta", lastCheckDelta);
+
                 nf.hasFailed(true);
 
                 nf.location(nf.lastCheckLocation());
@@ -86,10 +89,14 @@ public final class NoFall extends Check {
 
                 // Fixes regular NoFall and "Packet" types
                 if (clientHasGround && player.getFallDistance() == 0.0) {
-                    result.setFailed("client faked onGround state, fDist=" + player.getFallDistance());
+                    result.setFailed("Client faked OnGround state.");
+                    result.parameter("fDist", player.getFallDistance());
+
                     nf.hasFailed(true);
                 } else if (!clientHasGround && player.getFallDistance() == 0.0) {
-                    result.setFailed("client faked fall distance, fDist=" + player.getFallDistance());
+                    result.setFailed("Client faked fall distance");
+                    result.parameter("fDist", player.getFallDistance());
+
                     nf.hasFailed(true);
                 }
 
@@ -98,14 +105,17 @@ public final class NoFall extends Check {
                     final double difference = player.getFallDistance() - distance;
                     // we have too much off a difference between expected fall distance + player fall dist
                     if (difference > tolerance) {
-                        result.setFailed("fall distance not expected, fDist=" + player.getFallDistance() + ", e=" + distance + ", t=" + tolerance);
+                        result.setFailed("Fall distance not expected.");
+                        result.parameter("fDist", player.getFallDistance());
+                        result.parameter("expected", distance);
+                        result.parameter("tolerance", tolerance);
+
                         nf.hasFailed(true);
                     }
                 }
             }
         }
 
-        stop(player);
         checkViolation(player, result);
     }
 
@@ -140,7 +150,6 @@ public final class NoFall extends Check {
 
     @Override
     public void load() {
-        useTimings();
         tolerance = configuration.getDouble("tolerance");
     }
 }

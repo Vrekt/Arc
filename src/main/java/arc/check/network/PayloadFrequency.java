@@ -84,7 +84,10 @@ public final class PayloadFrequency extends PacketCheck {
         final CheckResult result = new CheckResult();
 
         if (count > maxPacketsPerInterval) {
-            result.setFailed("Too many payload packets per interval, count=" + count + " max=" + maxPacketsPerInterval);
+            result.setFailed("Too many payload packets per interval.");
+            result.parameter("count", count);
+            result.parameter("max", maxPacketsPerInterval);
+
             if (maxPacketsPerIntervalKick) {
                 kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
             }
@@ -123,7 +126,10 @@ public final class PayloadFrequency extends PacketCheck {
             final int max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
             // check if the length is bigger than the allowed size
             if (bytes.length > max) {
-                result.setFailed("Payload packet size too big, len=" + bytes.length + " max=" + max);
+                result.setFailed("Payload packet size too big.");
+                result.parameter("length", bytes.length);
+                result.parameter("max", max);
+
                 if (maxPacketSizeKick) {
                     kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
                 }

@@ -47,7 +47,10 @@ public final class NoSwing extends PacketCheck {
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             final long delta = (System.currentTimeMillis()) - CombatData.get(player).lastSwingTime();
             if (delta > swingTime) {
-                final CheckResult result = new CheckResult(CheckResult.Result.FAILED, "No swing animation, delta=" + delta + " min=" + swingTime);
+                final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
+                result.info("No swing animation within time");
+                result.parameter("delta", delta);
+                result.parameter("min", swingTime);
                 return checkViolation(player, result).cancel();
             }
         }

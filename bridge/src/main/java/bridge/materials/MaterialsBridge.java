@@ -66,6 +66,14 @@ public interface MaterialsBridge {
     boolean isTrapdoor(Block block);
 
     /**
+     * Check if the block is ice
+     *
+     * @param block the ice
+     * @return {@code true} if so
+     */
+    boolean isIce(Block block);
+
+    /**
      * Get a material
      *
      * @param name the name

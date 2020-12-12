@@ -59,8 +59,6 @@ public final class Criticals extends PacketCheck {
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (!enabled() || exempt(player)) return false;
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
-            start(player);
-
             final MovingData data = MovingData.get(player);
             // If it was a possible critical hit and we are on-ground lets check.
             if (isPossibleCriticalHit(player, data) && data.onGround()) {
@@ -79,21 +77,29 @@ public final class Criticals extends PacketCheck {
 
                 // First, check for similar vertical amounts.
                 if (similarVerticalAmount >= maxSimilarVerticalAllowed) {
-                    result.setFailed("Vertical not changed overtime, v=" + vertical + " amt=" + similarVerticalAmount + ", max=" + maxSimilarVerticalAllowed);
+                    result.setFailed("Vertical not changed overtime");
+                    result.parameter("vertical", vertical);
+                    result.parameter("amount", similarVerticalAmount);
+                    result.parameter("max", maxSimilarVerticalAllowed);
                 }
 
                 // Second, check the vertical distance
                 if (vertical == 0.0 && !result.failed()) {
                     noVerticalAmount++;
                     if (noVerticalAmount >= maxNoVerticalAllowed) {
-                        result.setFailed("Max no vertical distances reached, dist=0.0, max=" + maxNoVerticalAllowed + " amt=" + noVerticalAmount);
+                        result.setFailed("Max no vertical distance reached.");
+                        result.parameter("distance", 0.0);
+                        result.parameter("amount", noVerticalAmount);
+                        result.parameter("max", maxNoVerticalAllowed);
                     }
                 } else if (vertical > 0.0 && !result.failed()) {
                     noVerticalAmount = noVerticalAmount == 0 ? 0 : noVerticalAmount - 1;
 
                     // Finally, check distance against config.
                     if (vertical <= distance) {
-                        result.setFailed("vertical too small, dist=" + vertical + ", m=" + distance);
+                        result.setFailed("Vertical too small.");
+                        result.parameter("distance", vertical);
+                        result.parameter("min", distance);
                     }
                 }
 
@@ -102,10 +108,7 @@ public final class Criticals extends PacketCheck {
                 data.similarVerticalAmount(similarVerticalAmount);
 
                 // violation
-                stop(player);
                 return checkViolation(player, result).cancel();
-            } else {
-                stop(player);
             }
         }
         return false;
@@ -134,7 +137,6 @@ public final class Criticals extends PacketCheck {
 
     @Override
     public void load() {
-        useTimings();
         distance = configuration.getDouble("distance");
         difference = configuration.getDouble("difference");
         maxSimilarVerticalAllowed = configuration.getInt("max-similar-vertical-allowed");

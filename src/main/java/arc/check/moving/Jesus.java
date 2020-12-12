@@ -50,16 +50,15 @@ public final class Jesus extends Check {
     public void check(Player player, MovingData data, PlayerMoveEvent event) {
         if (exempt(player) || !enabled()) return;
 
-        start(player);
         boolean inWater = MovingUtil.isInOrOnLiquid(data.to());
         // reset data if not in water.
         if (!inWater) {
             data.inWaterTime(0);
             data.averageInWaterDifferences(null);
-            stop(player);
+            return;
         }
 
-        if (!data.onGround() && inWater && !player.isInsideVehicle()) {
+        if (!data.onGround() && !player.isInsideVehicle()) {
             final boolean blockFaceDown = data.to().getBlock().getRelative(BlockFace.DOWN).isLiquid();
             final boolean blockFaceDown2 = data.to().getBlock().getRelative(0, -2, 0).isLiquid();
             final CheckResult result = new CheckResult();
@@ -67,13 +66,16 @@ public final class Jesus extends Check {
             // we are on ground while on a liquid, check
             if (data.clientOnGround()) {
                 if (data.vertical() == 0.0) {
-                    // not possible, i don't think
-                    result.setFailed("Client on ground and vertical 0.0 while in or on liquid.");
+                    result.setFailed("Client on ground in liquid");
+                    result.parameter("vertical", 0.0);
+                    result.parameter("liquid", true);
                 }
 
                 // on ground and at-least a decent amount of liquid below us.
                 if (blockFaceDown || blockFaceDown2) {
                     result.setFailed("Client on ground while on layers of water.");
+                    result.parameter("layer1", blockFaceDown);
+                    result.parameter("layer2", blockFaceDown2);
                 }
             } else {
 
@@ -82,10 +84,13 @@ public final class Jesus extends Check {
                         && (blockFaceDown || blockFaceDown2Modifier)) {
                     // no vertical but on layers of water.
                     result.setFailed("Client has no vertical while on layers of water.");
+                    result.parameter("vertical", 0.0);
+                    result.parameter("layer1", blockFaceDown);
+                    result.parameter("layer2", blockFaceDown2Modifier);
+
                 }
             }
 
-            stop(player);
             final ViolationResult violation = checkViolation(player, result);
             if (violation.cancel()) {
                 // set the player back in the event.
@@ -106,7 +111,6 @@ public final class Jesus extends Check {
 
     @Override
     public void load() {
-        useTimings();
         maxSetbackDistance = configuration.getInt("max-setback-distance");
     }
 }

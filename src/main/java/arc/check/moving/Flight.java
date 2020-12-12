@@ -2,6 +2,7 @@ package arc.check.moving;
 
 import arc.Arc;
 import arc.check.Check;
+import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
@@ -10,9 +11,11 @@ import arc.utility.math.MathUtil;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
+import sun.security.krb5.Config;
 
 /**
  * Checks various vertical movement/flying stuff.
@@ -43,11 +46,13 @@ public final class Flight extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("boat-fly-min-descending-time", 5);
-        addConfigurationValue("boat-fly-min-ascending-time", 5);
-        addConfigurationValue("boat-fly-min-diff", 0.038);
-        addConfigurationValue("boat-fly-max-ascend", 0.0);
-        addConfigurationValue("boat-fly-max-setback-distance", 1);
+        createSubTypeSections(CheckSubType.FLIGHT_BOATFLY);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-min-descending-time", 5);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-min-ascending-time", 5);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-min-diff", 0.038);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-max-ascend", 0.0);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-max-setback-distance", 1);
+
         if (enabled()) load();
     }
 
@@ -59,12 +64,12 @@ public final class Flight extends Check {
      * @param event  the event
      */
     public void check(Player player, MovingData data, PlayerMoveEvent event) {
+        if (!enabled() || exempt(player)) return;
+
         final CheckResult result = new CheckResult();
-        start(player);
+        checkBoatFly(player, data, result, event);
 
-        if (Arc.version().isNewerThan(Version.VERSION_1_8)) checkBoatFly(player, data, result, event);
 
-        stop(player);
     }
 
     /**
@@ -75,6 +80,8 @@ public final class Flight extends Check {
      * @param result the result
      */
     private void checkBoatFly(Player player, MovingData data, CheckResult result, PlayerMoveEvent event) {
+        if (!Arc.version().isNewerThan(Version.VERSION_1_8)) return;
+
         if (player.isInsideVehicle() && player.getVehicle() instanceof Boat) {
             final Boat boat = (Boat) player.getVehicle();
             final boolean inOrOnLiquid = MovingUtil.isInOrOnLiquid(boat.getLocation());
@@ -84,14 +91,18 @@ public final class Flight extends Check {
                 final double diff = data.vertical() - data.lastVerticalDistance();
                 if (data.descendingTime() > boatFlyMinDescendingTime
                         && diff >= 0.0 && diff < boatFlyMinDiff) {
-                    result.information("BoatFly diff=" + diff + " min=" + boatFlyMinDiff + " while falling", "(BoatFly)");
-                    result.setFailed();
+                    result.setFailed(CheckSubType.FLIGHT_BOATFLY, "difference less than minimum.");
+                    result.parameter("difference", diff);
+                    result.parameter("minimum", boatFlyMinDiff);
+                    result.parameter("descendingTime", data.descendingTime());
+                    result.parameter("minDescendingTime", boatFlyMinDescendingTime);
                 }
 
                 if (data.ascendingTime() > boatFlyMinAscendingTime
                         && diff >= boatFlyMaxAscend) {
-                    result.information("BoatFly diff=" + diff + " max=" + boatFlyMaxAscend + " while ascending", "(BoatFly)");
-                    result.setFailed();
+                    result.setFailed(CheckSubType.FLIGHT_BOATFLY, "difference greater than max.");
+                    result.parameter("difference", diff);
+                    result.parameter("max", boatFlyMaxAscend);
                 }
             }
         }
@@ -118,11 +129,12 @@ public final class Flight extends Check {
 
     @Override
     public void load() {
-        useTimings();
-        boatFlyMinDiff = configuration.getDouble("boat-fly-min-diff");
-        boatFlyMinDescendingTime = configuration.getInt("boat-fly-min-descending-time");
-        boatFlyMinAscendingTime = configuration.getInt("boat-fly-min-ascending-time");
-        boatFlyMaxAscend = configuration.getDouble("boat-fly-max-ascend");
-        boatFlyMaxSetbackDistance = configuration.getInt("boat-fly-max-setback-distance");
+        final ConfigurationSection boatFlySection = configuration.subTypeSection(CheckSubType.FLIGHT_BOATFLY);
+
+        boatFlyMinDiff = boatFlySection.getDouble("boat-fly-min-diff");
+        boatFlyMinDescendingTime = boatFlySection.getInt("boat-fly-min-descending-time");
+        boatFlyMinAscendingTime = boatFlySection.getInt("boat-fly-min-ascending-time");
+        boatFlyMaxAscend = boatFlySection.getDouble("boat-fly-max-ascend");
+        boatFlyMaxSetbackDistance = boatFlySection.getInt("boat-fly-max-setback-distance");
     }
 }

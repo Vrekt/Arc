@@ -41,7 +41,6 @@ public final class CheckConfiguration implements Reloadable {
      */
     private int cancelLevel, notifyLevel, banLevel, kickLevel;
 
-
     /**
      * Initialize this check configuration
      *

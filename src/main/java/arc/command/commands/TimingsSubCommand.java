@@ -18,10 +18,6 @@ public final class TimingsSubCommand extends ArcSubCommand {
 
     @Override
     public void execute(CommandSender sender, String[] arguments) {
-        Arc.arc().checks().getAllChecks()
-                .stream()
-                .filter(Check::hasAnyTimings)
-                .forEach(check -> ChatUtil.sendMessage(sender, ChatColor.RED + "Check " + ChatColor.BLUE + check.getName() +
-                        ChatColor.RED + " had an average time of " + ChatColor.GREEN + check.timing().average() + "ms."));
+        // TODO:
     }
 }

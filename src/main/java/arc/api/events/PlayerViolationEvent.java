@@ -1,6 +1,7 @@
 package arc.api.events;
 
 import arc.check.CheckType;
+import arc.check.result.CheckResult;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -27,9 +28,9 @@ public final class PlayerViolationEvent extends PlayerEvent implements Cancellab
     private final int violationLevel;
 
     /**
-     * The violation information
+     * The check result.
      */
-    private final String information;
+    private final CheckResult result;
 
     /**
      * If this event is cancelled.
@@ -42,13 +43,13 @@ public final class PlayerViolationEvent extends PlayerEvent implements Cancellab
      * @param who            who failed
      * @param checkFailed    the check failed
      * @param violationLevel the violation level
-     * @param information    the violation information
+     * @param result         the check result
      */
-    public PlayerViolationEvent(Player who, CheckType checkFailed, int violationLevel, String information) {
+    public PlayerViolationEvent(Player who, CheckType checkFailed, int violationLevel, CheckResult result) {
         super(who);
         this.checkFailed = checkFailed;
         this.violationLevel = violationLevel;
-        this.information = information;
+        this.result = result;
     }
 
     /**
@@ -66,10 +67,10 @@ public final class PlayerViolationEvent extends PlayerEvent implements Cancellab
     }
 
     /**
-     * @return the information
+     * @return the result
      */
-    public String information() {
-        return information;
+    public CheckResult result() {
+        return result;
     }
 
     @Override

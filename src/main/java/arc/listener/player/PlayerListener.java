@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.check.CheckType;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
+import arc.data.moving.MovingData;
 import arc.data.player.PlayerData;
 import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Arrow;
@@ -14,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * Listens for player related events
@@ -76,6 +78,14 @@ public final class PlayerListener implements Listener {
         final PlayerData data = PlayerData.get(player);
         final ViolationResult result = fastUse.checkFastConsume(player, data);
         event.setCancelled(result.cancel());
+    }
+
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onTeleport(PlayerTeleportEvent event) {
+        final Player player = event.getPlayer();
+        final MovingData data = MovingData.get(player);
+
     }
 
 }

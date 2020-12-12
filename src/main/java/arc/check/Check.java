@@ -2,7 +2,6 @@ package arc.check;
 
 import arc.Arc;
 import arc.check.result.CheckResult;
-import arc.check.timings.CheckTiming;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Reloadable;
 import arc.configuration.check.CheckConfiguration;
@@ -23,11 +22,6 @@ public abstract class Check implements Reloadable {
      * The check type
      */
     private final CheckType checkType;
-
-    /**
-     * The check timings
-     */
-    private CheckTiming timing;
 
     /**
      * The configuration builder;
@@ -57,15 +51,6 @@ public abstract class Check implements Reloadable {
     protected Check(CheckType checkType) {
         this.checkType = checkType;
         this.builder = new CheckConfigurationBuilder(checkType);
-    }
-
-    /**
-     * If timings should be used.
-     */
-    protected void useTimings() {
-        if (timing == null) {
-            this.timing = new CheckTiming(checkType);
-        }
     }
 
     /**
@@ -214,34 +199,6 @@ public abstract class Check implements Reloadable {
     protected ViolationResult checkViolation(Player player, CheckResult result) {
         if (result.failed()) return Arc.arc().violations().violation(player, this, result);
         return ViolationResult.EMPTY;
-    }
-
-    /**
-     * Start timing
-     */
-    protected void start(Player player) {
-        timing.start(player);
-    }
-
-    /**
-     * Stop timing
-     */
-    protected void stop(Player player) {
-        timing.stop(player);
-    }
-
-    /**
-     * @return the timing
-     */
-    public CheckTiming timing() {
-        return timing;
-    }
-
-    /**
-     * @return {@code true} if there are timings
-     */
-    public boolean hasAnyTimings() {
-        return timing != null && timing.hasAny();
     }
 
     /**

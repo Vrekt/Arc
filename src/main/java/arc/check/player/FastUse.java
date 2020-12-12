@@ -86,8 +86,13 @@ public final class FastUse extends PacketCheck {
 
         // check the delta times against the configuration values.
         if (deltaUseToShot < deltaShotMinimum && useDelta < useDeltaMinimum) {
-            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
-            result.information("Used a bow too fast, deltaShot=" + deltaUseToShot + " min=" + deltaShotMinimum + " + useDelta=" + useDelta + " min=" + useDeltaMinimum, "(FastBow)");
+            final CheckResult result = new CheckResult(CheckResult.Result.FAILED, CheckSubType.FAST_USE_FAST_BOW);
+            result.info("Used a bow too fast.");
+            result.parameter("deltaShot", deltaUseToShot);
+            result.parameter("minDeltaShow", deltaShotMinimum);
+            result.parameter("useDelta", useDelta);
+            result.parameter("minUseDelta", useDeltaMinimum);
+
             return checkViolation(player, result);
         }
 
@@ -108,8 +113,10 @@ public final class FastUse extends PacketCheck {
         // the time it took to consume the item
         final long delta = System.currentTimeMillis() - data.consumeStartTime();
         if (delta < consumeTime) {
-            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
-            result.information("Consumed an item too fast, delta=" + delta + ", min=" + consumeTime, "(FastConsume)");
+            final CheckResult result = new CheckResult(CheckResult.Result.FAILED, CheckSubType.FAST_USE_FAST_CONSUME);
+            result.info("Consumed an item too fast.");
+            result.parameter("delta", delta);
+            result.parameter("min", consumeTime);
             return checkViolation(player, result);
         }
 

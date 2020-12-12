@@ -58,7 +58,6 @@ public final class KillAura extends PacketCheck {
      */
     public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
         if (!enabled() || exempt(player)) return false;
-        start(player);
 
         // grab a new result, our entity and player data.
         final CheckResult result = new CheckResult();
@@ -68,7 +67,6 @@ public final class KillAura extends PacketCheck {
         direction(player, entity, result);
 
         // return result.
-        stop(player);
         return checkViolation(player, result).cancel();
     }
 
@@ -85,8 +83,10 @@ public final class KillAura extends PacketCheck {
         // grab angle.
         final double angle = getAngle(directionUseBoundingBoxes, entity, player);
         if (angle > directionMaxAngleDifference) {
-            result.information("Angle difference over max, angle=" + angle + ", max=" + directionMaxAngleDifference, "(Direction)");
-            result.setFailed();
+            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Angle difference over max");
+            result.parameter("angle", angle);
+            result.parameter("max", directionMaxAngleDifference);
+            result.parameter("bb", directionUseBoundingBoxes);
         }
     }
 
@@ -121,7 +121,6 @@ public final class KillAura extends PacketCheck {
 
     @Override
     public void load() {
-        useTimings();
         final ConfigurationSection directionSection = configuration.subTypeSection(CheckSubType.KILL_AURA_DIRECTION);
         directionUseBoundingBoxes = directionSection.getBoolean("use-bounding-boxes");
         directionMaxAngleDifference = directionSection.getDouble("max-angle-difference");
