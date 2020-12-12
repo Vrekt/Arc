@@ -13,7 +13,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * API
 
 <p align="center">
-  <img src="https://i.imgur.com/fnUS7Ms.png" alt="Violations">
+  <img src="https://i.imgur.com/RkzjGoW.png" alt="Violations">
 </p>
 
 Customizable violation messages
