@@ -75,3 +75,13 @@ View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress it
   * Be sure to thoroughly test and make sure no other systems interfere.
   * Documentation should be included.
 
+# Documentation
+
+All the documentation is still work-in-progress and very incomplete.
+
+Although, most things within the code are very clear and documented.
+
+* Here are the various documentation links
+ * [API](https://github.com/Vrekt/Arc/wiki/API)
+ * [Configuration](https://github.com/Vrekt/Arc/wiki/Configuration)
+ * [Check Configuration](https://github.com/Vrekt/Arc/wiki/Check-configuration)
