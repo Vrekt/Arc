@@ -36,6 +36,42 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 # Installing
 * Arc *requires* Java 8.
-* Arc *required* ProtocolLib
+* Arc *requires* ProtocolLib
 * Compatible with Spigot and PaperSpigot!
+
+# Checks
+
+* `Combat` checks
+  * KillAura
+    * Direction
+    * WIP.
+  * Criticals
+  * Reach
+* `Moving` checks
+  * Flight
+    * BoatFly
+    * WIP
+  * Speed
+  * NoFall
+  * MorePackets
+  * Jesus
+* `Network` checks
+  * Swing packet checking
+  * Payload packet checking
+* `Player` checks
+  * Regeneration
+  * FastUse
+    * FastBow
+    * FastConsume
+
+*...All checks are still work in progress and subject to change*
+
+# Development
+
+View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress items and TODO.
+
+* You can submit pull requests at any time to implement a feature or change.
+  * Please ensure the code is quality and readable
+  * Be sure to thoroughly test and make sure no other systems interfere.
+  * Documentation should be included.
 
