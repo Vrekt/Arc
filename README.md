@@ -1,4 +1,4 @@
-<img align="center" src="test.png">
+<img align="right" src="test.png">
 
 # Arc
 Arc is an anticheat built to support older PvP versions and newer game versions.
