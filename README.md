@@ -31,3 +31,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * Toggle violations
 * Reload configuration
 * View timings
+
+... and more!
+
+# Installing
