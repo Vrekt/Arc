@@ -15,10 +15,17 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 * Customizable violation messages
 * Customizable violation parameters
+* Customizable violation actions
+* Customizable notify levels for each check
 * Hovering debug system
+* Violation data kept on logout
+* Notified on player kicks/bans
+* Ability to toggle on/off
+
+
 ##
 
-<img src="inventory.png">
+<img align="right" src="https://i.imgur.com/P4otxe9.png">
 
 * WIP Inventory management system
 * Toggle violations
