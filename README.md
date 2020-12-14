@@ -35,3 +35,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 ... and more!
 
 # Installing
+* Arc *requires* Java 8.
+* Arc *required* ProtocolLib
+* Compatible with Spigot and PaperSpigot!
+
