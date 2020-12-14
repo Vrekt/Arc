@@ -18,7 +18,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * Hovering debug system
 ##
 
-<img align="left" src="https://i.imgur.com/P4otxe9.png">
+<img src="inventory.png">
 
 * WIP Inventory management system
 * Toggle violations
