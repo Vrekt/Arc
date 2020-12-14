@@ -8,7 +8,6 @@ import arc.data.moving.MovingData;
 import arc.data.moving.packets.MovingPacketData;
 import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,11 +22,6 @@ public final class MorePackets extends Check {
      * Max packets allowed before kicking
      */
     private int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
-
-    /**
-     * The kick broadcast message.
-     */
-    private String kickBroadcastMessage;
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
@@ -68,9 +62,9 @@ public final class MorePackets extends Check {
         boolean failedFlying = false, failedPosition = false;
 
         if (flyingPackets >= maxFlyingPackets) {
-            if (flyingPackets >= maxPacketsToKick && !packets.kick()) {
-                kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
-                packets.kick(true);
+            if (flyingPackets >= maxPacketsToKick
+                    && !Arc.arc().punishment().hasPendingKick(player)) {
+                Arc.arc().punishment().kickPlayer(player, this);
             }
 
             result.setFailed("Too many flying packets");
@@ -83,8 +77,8 @@ public final class MorePackets extends Check {
         }
 
         if (positionPackets >= maxPositionPackets) {
-            if (positionPackets >= maxPacketsToKick && !packets.kick()) {
-                kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
+            if (positionPackets >= maxPacketsToKick && !Arc.arc().punishment().hasPendingKick(player)) {
+                Arc.arc().punishment().kickPlayer(player, this);
                 packets.kick(true);
             }
 
@@ -122,8 +116,6 @@ public final class MorePackets extends Check {
         maxFlyingPackets = configuration.getInt("max-flying-packets");
         maxPositionPackets = configuration.getInt("max-position-packets");
         maxPacketsToKick = configuration.getInt("max-packets-kick");
-        kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
-                " %player% was kicked for sending too many swing packets.";
 
         schedule(() -> {
             for (final Player player : Bukkit.getOnlinePlayers()) {

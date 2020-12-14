@@ -15,7 +15,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerMoveEvent;
-import sun.security.krb5.Config;
 
 /**
  * Checks various vertical movement/flying stuff.
@@ -80,7 +79,7 @@ public final class Flight extends Check {
      * @param result the result
      */
     private void checkBoatFly(Player player, MovingData data, CheckResult result, PlayerMoveEvent event) {
-        if (!Arc.version().isNewerThan(Version.VERSION_1_8)) return;
+        if (!Arc.version().isNewerThan(Version.VERSION_1_8) || exempt(player, CheckSubType.FLIGHT_BOATFLY)) return;
 
         if (player.isInsideVehicle() && player.getVehicle() instanceof Boat) {
             final Boat boat = (Boat) player.getVehicle();

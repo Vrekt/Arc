@@ -1,61 +1,68 @@
 package arc.configuration;
 
 import arc.Arc;
-import arc.configuration.punishment.ban.BanConfiguration;
-import arc.configuration.punishment.kick.KickConfiguration;
+import arc.configuration.ban.BanConfiguration;
+import arc.configuration.kick.KickConfiguration;
+import arc.configuration.types.ConfigurationString;
+import arc.configuration.values.ConfigurationValues;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
 /**
  * The arc configuration
  */
-public final class ArcConfiguration {
+public final class ArcConfiguration extends Configurable {
 
     /**
      * Handles ban configuration values
      */
-    private BanConfiguration banConfiguration;
+    private final BanConfiguration banConfiguration = new BanConfiguration();
     /**
      * Handles kick configuration values
      */
-    private KickConfiguration kickConfiguration;
+    private final KickConfiguration kickConfiguration = new KickConfiguration();
 
     /**
-     * If TPS should be watched
+     * If check timings should be enabled.
+     * If the TPS helper should be enabled.
      * If the event API should be enabled.
      */
-    private boolean watchTps, enableEventApi;
+    private boolean enableCheckTimings, enableTpsHelper, enableEventApi;
 
     /**
-     * The lower limit of when to optimize checks to up the TPS.
-     * The violation data timeout
+     * TPS helper limit
+     * The time after leaving violation data times out
      */
-    private int tpsLowerLimit, violationDataTimeout;
+    private int tpsHelperLimit, violationDataTimeout;
 
     /**
-     * The violation message
-     * The no permissions message
-     * The prefix
+     * Violation notify message
      */
-    private String violationMessage, noPermissionMessage, prefix;
+    private ConfigurationString violationNotifyMessage;
 
     /**
-     * Read
-     * TODO: Invalid configuration
-     *
-     * @param configuration the configuration
+     * Command no permission message
      */
+    private String commandNoPermissionMessage;
+
+    /**
+     * Prefix
+     */
+    private String prefix;
+
+    @Override
     public void read(FileConfiguration configuration) {
-        banConfiguration = new BanConfiguration(configuration);
-        kickConfiguration = new KickConfiguration(configuration);
+        kickConfiguration.read(configuration);
+        banConfiguration.read(configuration);
 
-        watchTps = configuration.getBoolean("tps-helper");
-        tpsLowerLimit = configuration.getInt("tps-lower-limit");
-        enableEventApi = configuration.getBoolean("enable-event-api");
-        violationDataTimeout = configuration.getInt("violation-data-timeout");
-        violationMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("violation-notify-message"));
-        noPermissionMessage = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-command-no-permission-message"));
-        prefix = ChatColor.translateAlternateColorCodes('&', configuration.getString("arc-prefix"));
+        enableCheckTimings = bool(configuration, ConfigurationValues.ENABLE_CHECK_TIMINGS);
+        enableTpsHelper = bool(configuration, ConfigurationValues.ENABLE_TPS_HELPER);
+        tpsHelperLimit = integer(configuration, ConfigurationValues.TPS_HELPER_LIMIT);
+        violationNotifyMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
+        commandNoPermissionMessage = ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
+        prefix = ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.ARC_PREFIX));
+        violationDataTimeout = integer(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
+        enableEventApi = bool(configuration, ConfigurationValues.ENABLE_EVENT_API);
     }
 
     /**
@@ -73,45 +80,52 @@ public final class ArcConfiguration {
     }
 
     /**
-     * @return if TPS should be watched
+     * @return if check timings are enabled
      */
-    public boolean watchTps() {
-        return watchTps;
+    public boolean enableCheckTimings() {
+        return enableCheckTimings;
     }
 
     /**
-     * @return if the event API should be enabled.
+     * @return if TPS helper is enabled.
+     */
+    public boolean enableTpsHelper() {
+        return enableTpsHelper;
+    }
+
+    /**
+     * @return if event API is enabled.
      */
     public boolean enableEventApi() {
         return enableEventApi;
     }
 
     /**
-     * @return the tps lower limit
+     * @return TPS helper limit
      */
-    public int tpsLowerLimit() {
-        return tpsLowerLimit;
+    public int tpsHelperLimit() {
+        return tpsHelperLimit;
     }
 
     /**
-     * @return the violation data timeout
+     * @return violation data timeout
      */
     public int violationDataTimeout() {
         return violationDataTimeout;
     }
 
     /**
-     * @return the violation message.
+     * @return violation notify message
      */
-    public String violationMessage() {
-        return violationMessage;
+    public ConfigurationString violationNotifyMessage() {
+        return new ConfigurationString(violationNotifyMessage);
     }
 
     /**
-     * @return the no permission message for the /arc command
+     * @return command no permission message
      */
-    public String noPermissionMessage() {
-        return noPermissionMessage;
+    public String commandNoPermissionMessage() {
+        return commandNoPermissionMessage;
     }
 
     /**
@@ -132,12 +146,13 @@ public final class ArcConfiguration {
      * Reload the configuration
      */
     public void reloadConfiguration() {
-        Arc.arc().reloadConfig();
-        final FileConfiguration config = Arc.arc().getConfig();
+        Arc.plugin().reloadConfig();
 
-        read(config);
-        Arc.arc().checks().reloadConfiguration(this);
-        Arc.arc().violations().reloadConfiguration(this);
+        final FileConfiguration configuration = Arc.plugin().getConfig();
+        read(configuration);
+
+        Arc.arc().checks().reload(this);
+        Arc.arc().violations().reload(this);
     }
 
 }

@@ -46,7 +46,7 @@ public enum CheckSubType {
      * The name
      * The fancy name
      */
-    private final String name, fancyName;
+    private final String name, prettyName;
 
     /**
      * Initialize the sub-type
@@ -54,10 +54,10 @@ public enum CheckSubType {
      * @param from the super type
      * @param name the name of the sub-type.
      */
-    CheckSubType(CheckType from, String name, String fancyName) {
+    CheckSubType(CheckType from, String name, String prettyName) {
         this.from = from;
         this.name = name;
-        this.fancyName = fancyName;
+        this.prettyName = prettyName;
     }
 
     /**
@@ -77,8 +77,8 @@ public enum CheckSubType {
     /**
      * @return the fancy name
      */
-    public String fancyName() {
-        return fancyName;
+    public String prettyName() {
+        return prettyName;
     }
 
     /**

@@ -1,6 +1,8 @@
 package arc.utility.chat;
 
+import arc.Arc;
 import arc.check.Check;
+import arc.configuration.types.Placeholders;
 import org.apache.commons.lang3.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -60,11 +62,21 @@ public final class PlaceholderStringReplacer {
     /**
      * Replace prefix
      *
-     * @param prefix the prefix
      * @return this
      */
-    public PlaceholderStringReplacer replacePrefix(String prefix) {
-        text = StringUtils.replace(text, Placeholders.PREFIX.placeholder(), prefix);
+    public PlaceholderStringReplacer replacePrefix() {
+        text = StringUtils.replace(text, Placeholders.PREFIX.placeholder(), Arc.arc().configuration().prefix());
+        return this;
+    }
+
+    /**
+     * Replace time
+     *
+     * @param time the time
+     * @return this
+     */
+    public PlaceholderStringReplacer replaceTime(String time) {
+        text = StringUtils.replace(text, Placeholders.PREFIX.placeholder(), time);
         return this;
     }
 

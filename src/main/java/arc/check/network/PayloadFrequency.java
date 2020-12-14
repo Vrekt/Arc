@@ -11,7 +11,6 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.collect.Lists;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.List;
@@ -38,11 +37,6 @@ public final class PayloadFrequency extends PacketCheck {
      * If the player should be kicked for exceeding the max packets per interval
      */
     private boolean maxPacketSizeKick, maxPacketsPerIntervalKick;
-
-    /**
-     * The kick broadcast message
-     */
-    private String kickBroadcastMessage;
 
     /**
      * Check only enables if the version is legacy.
@@ -88,8 +82,8 @@ public final class PayloadFrequency extends PacketCheck {
             result.parameter("count", count);
             result.parameter("max", maxPacketsPerInterval);
 
-            if (maxPacketsPerIntervalKick) {
-                kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
+            if (maxPacketsPerIntervalKick && !Arc.arc().punishment().hasPendingKick(player)) {
+                Arc.arc().punishment().kickPlayer(player, this);
             }
         }
 
@@ -130,8 +124,8 @@ public final class PayloadFrequency extends PacketCheck {
                 result.parameter("length", bytes.length);
                 result.parameter("max", max);
 
-                if (maxPacketSizeKick) {
-                    kick(player, kickBroadcastMessage.replace("%player%", player.getName()));
+                if (maxPacketSizeKick && !Arc.arc().punishment().hasPendingKick(player)) {
+                    Arc.arc().punishment().kickPlayer(player, this);
                 }
             }
 
@@ -167,8 +161,6 @@ public final class PayloadFrequency extends PacketCheck {
         maxPacketSizeKick = configuration.getBoolean("max-packet-size-kick");
         maxPacketsPerIntervalKick = configuration.getBoolean("max-packets-per-interval-kick");
         channels = configuration.getList("channels");
-        kickBroadcastMessage = Arc.arc().configuration().prefix() + ChatColor.RED +
-                " %player% was kicked for sending too many swing packets.";
 
         final int checkInterval = configuration.getInt("check-interval-milliseconds");
         final int interval = (checkInterval / 1000) * 20;

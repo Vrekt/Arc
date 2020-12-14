@@ -3,10 +3,9 @@ package arc.check;
 import arc.Arc;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
-import arc.configuration.Reloadable;
+import arc.configuration.Configurable;
 import arc.configuration.check.CheckConfiguration;
 import arc.configuration.check.CheckConfigurationBuilder;
-import arc.permissions.Permissions;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import org.bukkit.Bukkit;
@@ -16,7 +15,7 @@ import org.bukkit.scheduler.BukkitTask;
 /**
  * Represents a check.
  */
-public abstract class Check implements Reloadable {
+public abstract class Check extends Configurable {
 
     /**
      * The check type
@@ -202,21 +201,6 @@ public abstract class Check implements Reloadable {
     }
 
     /**
-     * Kick the player
-     *
-     * @param player  the player
-     * @param message the message to broadcast
-     */
-    protected void kick(Player player, String message) {
-        final ArcConfiguration config = Arc.arc().configuration();
-        Bukkit.getScheduler().runTaskLater(Arc.plugin(), ()
-                -> {
-            player.kickPlayer(config.kickConfiguration().kickMessage().replace("%check%", getName()));
-            Bukkit.broadcast(message, Permissions.ARC_VIOLATIONS);
-        }, config.kickConfiguration().kickDelay());
-    }
-
-    /**
      * Schedule
      *
      * @param runnable the runnable
@@ -262,9 +246,10 @@ public abstract class Check implements Reloadable {
     }
 
     @Override
-    public void reloadConfiguration(ArcConfiguration configuration) {
+    public void reload(ArcConfiguration configuration) {
         if (permanentlyDisabled) return;
-        this.configuration.reloadConfiguration(configuration);
+
+        this.configuration.reload(configuration);
         reloadConfig();
     }
 

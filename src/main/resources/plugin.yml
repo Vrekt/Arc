@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 2.0.0
+version: 2.0.1
 description: An anticheat for 1.8.8, 1.15.2 and 1.16.4
 author: Vrekt
 depend:
@@ -38,7 +38,10 @@ permissions:
           arc.bypass.moving.speed:
             description: Allows the player to bypass the Speed check.
           arc.bypass.moving.flight:
-            description: Allows the player to bypas the Flight check.
+            description: Allows the player to bypass the Flight check.
+            children:
+              arc.bypass.moving.flight.boatfly:
+                description: Allows the player to bypass the Flight BoatFly check.
       arc.bypass.player:
         default: false
         description: Allows the player to bypass all Player checks.

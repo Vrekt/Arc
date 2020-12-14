@@ -7,19 +7,15 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
-import arc.configuration.Reloadable;
-import arc.configuration.punishment.ban.BanConfiguration;
-import arc.configuration.punishment.kick.KickConfiguration;
+import arc.configuration.Configurable;
 import arc.permissions.Permissions;
-import arc.utility.Punishment;
-import arc.utility.chat.PlaceholderStringReplacer;
+import arc.utility.PunishmentManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -33,7 +29,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Manages violations
  */
-public final class ViolationManager implements Closeable, Reloadable {
+public final class ViolationManager extends Configurable implements Closeable {
 
     /**
      * Violation history
@@ -61,14 +57,9 @@ public final class ViolationManager implements Closeable, Reloadable {
     private ArcConfiguration configuration;
 
     /**
-     * The ban configuration.
+     * The punishment manager
      */
-    private BanConfiguration banConfiguration;
-
-    /**
-     * The kick configuration.
-     */
-    private KickConfiguration kickConfiguration;
+    private PunishmentManager punishmentManager;
 
     /**
      * Initialize
@@ -77,8 +68,7 @@ public final class ViolationManager implements Closeable, Reloadable {
      */
     public void initialize(ArcConfiguration configuration) {
         this.configuration = configuration;
-        this.banConfiguration = configuration.banConfiguration();
-        this.kickConfiguration = configuration.kickConfiguration();
+        this.punishmentManager = Arc.arc().punishment();
 
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
@@ -128,7 +118,7 @@ public final class ViolationManager implements Closeable, Reloadable {
         // call our violation event.
         if (configuration.enableEventApi()) {
             final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result);
-            triggerSync(event);
+            triggerEvent(event);
             // if the event is cancelled, remove the violation level and return no result.
             if (event.isCancelled()) {
                 // reverse.
@@ -141,17 +131,17 @@ public final class ViolationManager implements Closeable, Reloadable {
         final ViolationResult violationResult = new ViolationResult();
 
         // handle violation
-        if (check.configuration().notifyViolation()
-                && check.configuration().shouldNotify(level)) {
+        if (check.configuration().shouldNotify(level)) {
             // add that we are going to notify.
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             // replace the place holders within the message
-            final String violationMessage = new PlaceholderStringReplacer(configuration.violationMessage())
-                    .replacePlayer(player)
-                    .replaceCheck(check, result.hasSubType() ? "(" + result.subType().fancyName() + ")" : null)
-                    .replaceLevel(level)
-                    .replacePrefix(configuration.prefix())
-                    .build();
+
+            final String violationMessage = configuration.violationNotifyMessage()
+                    .player(player)
+                    .check(check, result.hasSubType() ? "(" + result.subType().prettyName() + ")" : null)
+                    .level(level)
+                    .prefix()
+                    .value();
 
             // build the text component and then send to all viewers.
             final TextComponent component = new TextComponent(violationMessage);
@@ -163,23 +153,21 @@ public final class ViolationManager implements Closeable, Reloadable {
         if (check.configuration().shouldCancel(level)) violationResult.addResult(ViolationResult.Result.CANCEL);
 
         // ban the player if this check should ban
-        if (check.configuration().shouldBan(level)
-                && !Punishment.hasPendingBan(player)) {
+        if (check.configuration().shouldBan(level) && !punishmentManager.hasPendingBan(player)) {
             violationResult.addResult(ViolationResult.Result.BAN);
-            Punishment.banPlayer(player, check, banConfiguration);
+            punishmentManager.banPlayer(player, check);
         }
 
         // kick the player if this check should kick.
-        if (check.configuration().shouldKick(level)
-                && !Punishment.hasPendingKick(player)) {
+        if (check.configuration().shouldKick(level) && !punishmentManager.hasPendingKick(player)) {
             violationResult.addResult(ViolationResult.Result.KICK);
-            Punishment.kickPlayer(player, check, kickConfiguration);
+            punishmentManager.kickPlayer(player, check);
         }
 
         // fire the post event
         if (configuration.enableEventApi()) {
             final PostPlayerViolationEvent postEvent = new PostPlayerViolationEvent(player, violationResult, check.type(), level, result.information());
-            triggerSync(postEvent);
+            triggerEvent(postEvent);
         }
 
         return violationResult;
@@ -192,7 +180,7 @@ public final class ViolationManager implements Closeable, Reloadable {
      *
      * @param event the event
      */
-    private void triggerSync(Event event) {
+    private void triggerEvent(Event event) {
         if (useSyncEvents) {
             Bukkit.getScheduler().runTask(Arc.arc(), () -> Bukkit.getServer().getPluginManager().callEvent(event));
         } else {
@@ -238,10 +226,8 @@ public final class ViolationManager implements Closeable, Reloadable {
     }
 
     @Override
-    public void reloadConfiguration(ArcConfiguration configuration) {
+    public void reload(ArcConfiguration configuration) {
         this.configuration = configuration;
-        this.kickConfiguration = configuration.kickConfiguration();
-        this.banConfiguration = configuration.banConfiguration();
 
         historyCache.invalidateAll();
         historyCache = CacheBuilder.newBuilder()

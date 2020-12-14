@@ -4,6 +4,12 @@ import arc.Arc;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -27,6 +33,11 @@ public final class InventoryCreator {
     private final Map<Material, Consumer<ItemStack>> itemConsumers = new HashMap<>();
 
     /**
+     * The event listener for this inventory
+     */
+    private final TemporaryInventoryListener listener = new TemporaryInventoryListener();
+
+    /**
      * Last index
      */
     private int lastIndex = 0;
@@ -35,6 +46,11 @@ public final class InventoryCreator {
      * The empty slot item
      */
     private ItemStack emptySlotItem;
+
+    /**
+     * The player who this inventory is for.
+     */
+    private Player player;
 
     /**
      * Initialize this builder
@@ -124,8 +140,9 @@ public final class InventoryCreator {
      * @param player the player
      */
     public void show(Player player) {
-        Arc.arc().inventoryRegister().register(player, this);
+        this.player = player;
         player.openInventory(inventory);
+        Arc.plugin().getServer().getPluginManager().registerEvents(listener, Arc.plugin());
     }
 
     /**
@@ -158,4 +175,58 @@ public final class InventoryCreator {
             itemConsumers.get(item.getType()).accept(item);
         }
     }
+
+    /**
+     * A temporary inventory listener.
+     */
+    private final class TemporaryInventoryListener implements Listener {
+        @EventHandler
+        private void onInventoryClose(InventoryCloseEvent event) {
+            final Player player = (Player) event.getPlayer();
+            if (InventoryCreator.this.player.getUniqueId().equals(player.getUniqueId())) {
+                // we have the same player, cleanup.
+                cleanup();
+            }
+        }
+
+        @EventHandler
+        private void onInventoryClick(InventoryClickEvent event) {
+            if (event.getWhoClicked() instanceof Player) {
+                final Player player = (Player) event.getWhoClicked();
+                if (InventoryCreator.this.player.getUniqueId().equals(player.getUniqueId())) {
+                    final Inventory inventory = event.getClickedInventory();
+                    if (isThisInventory(inventory)) {
+                        // if we have the same player and inventory!
+                        event.setCancelled(true);
+
+                        final ItemStack item = event.getCurrentItem();
+                        if (item != null && !isEmptySlotItem(item)) invokeConsumer(item);
+                    } else {
+                        cleanup();
+                    }
+                }
+            }
+        }
+
+        @EventHandler
+        private void onQuit(PlayerQuitEvent event) {
+            // handle quitting just in-case i suppose
+            final Player player = event.getPlayer();
+            if (InventoryCreator.this.player.getUniqueId().equals(player.getUniqueId())) {
+                cleanup();
+            }
+        }
+
+        /**
+         * Cleanup.
+         */
+        private void cleanup() {
+            HandlerList.unregisterAll(this);
+            itemConsumers.clear();
+            InventoryCreator.this.player = null;
+            InventoryCreator.this.emptySlotItem = null;
+        }
+
+    }
+
 }

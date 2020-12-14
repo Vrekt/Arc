@@ -1,4 +1,4 @@
-package arc.utility.chat;
+package arc.configuration.types;
 
 /**
  * Placeholders
@@ -21,7 +21,17 @@ public enum Placeholders {
     /**
      * Prefix
      */
-    PREFIX("%prefix%");
+    PREFIX("%prefix%"),
+
+    /**
+     * Time
+     */
+    TIME("%time%"),
+
+    /**
+     * Ban type
+     */
+    TYPE("%type%");
 
     /**
      * The placeholder

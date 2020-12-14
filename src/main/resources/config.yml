@@ -1,35 +1,89 @@
-# What message should the player receive if kicked?
-kick-message: "&cYou have been kicked."
-# How long to wait before kicking a player in seconds.
-kick-delay: 0
-# What message should the player receive if banned?
-ban-message: "&cYou have been banned for %check%"
-# How long to wait before banning a player in seconds.
-ban-delay: 0
-# How should a player banned? By NAME or IP
-ban-type: NAME
-# The ban length type when banning a player.
-# Accepts: 'DAYS', 'YEARS', 'PERM' for permanent bans
-ban-length-type: DAYS
-# How long should a player be banned for?
-ban-length: 30
-# Should bans be broadcasted?
-broadcast-ban: false
-# If so, what should the message be?
-broadcast-ban-message: "&c%player% was banned for %check%"
-# The ban message to display to players with the permissions arc.violations
-ban-message-to-violations: "%prefix% &9%player%&f will be banned for &c%check%&f in &c%time%&f seconds."
-# If arc should monitor TPS and adjust check performance if TPS drops
-tps-helper: true
-# When TPS to this or below TPS helper will engage.
-tps-lower-limit: 17
+# The global kick message. Players will see this message when kicked.
+# Valid parameters:
+# - %check%
+global-kick-message: "&cYou have been kicked for %check%"
+
+# The global kick delay in seconds.
+global-kick-delay: 0
+
+# The message to send to players with the permission `arc.violations`
+# Valid parameters:
+# - %prefix% - the prefix
+# - %player% - The player name
+# - %check% - The check name
+# - %time% - The time banned for
+global-violations-kick-message: "%prefix% &9%player%&f will be kicked for &c%check%&f in &c%time%&f seconds."
+
+# The global ban message. Players will see this message when banned.
+# Valid parameters
+# - %check%
+global-ban-message: "&cYou have been banned for %check%"
+
+# The global ban delay in seconds.
+global-ban-delay: 0
+
+# The global ban type.
+# Valid parameters:
+# - NAME
+# - IP
+global-ban-type: NAME
+
+# The global ban length type.
+# Valid parameters:
+# - DAYS - Days
+# - YEARS - Years
+# - PERM - Permanent
+global-ban-length-type: DAYS
+
+# How long a player should be banned for.
+global-ban-length: 30
+
+# If the ban should be broadcasted.
+global-broadcast-ban: false
+
+# The message to broadcast if `global-broadcast-ban` is `true`
+# Valid parameters:
+# - %prefix% - The prefix
+# - %player% - The player name
+# - %check% - The check name
+# - %time% - The time banned for
+# - %type% - Days, Years, Permanent
+# Example: Skiddin(%player% was banned for Speed(%check%) for 30(%time%) days(%type%)
+global-broadcast-ban-message: "%prefix% &c%player% was banned for %check% for %time% %type%"
+
+# The message to send to players with the permission `arc.violations`
+# Valid parameters:
+# - %prefix% - the prefix
+# - %player% - The player name
+# - %check% - The check name
+# - %time% - The time banned for
+global-violations-ban-message: "%prefix% &9%player%&f will be banned for &c%check%&f in &c%time%&f seconds."
+
+# If check timings should be enabled.
+enable-check-timings: true
+
+# If the TPS helper should be enabled.
+enabled-tps-helper: true
+
+# If the TPS drops below this amount TPS helper will engage.
+tps-helper-limit: 17
+
 # The message to display when a violation occurs
+# Valid parameters:
+# - %prefix% - the prefix
+# - %player% - The player name
+# - %check% - The check name
+# - %level% - the violation level
 violation-notify-message: "%prefix% &9%player%&f has violated check &c%check%&8(&c%level%&8)&7"
+
 # The message to display when the sender has no permission for the /arc command.
 arc-command-no-permission-message: "Unknown command. Type /help for help."
+
 # The prefix to show in chat.
 arc-prefix: "&8[&cArc&8]"
+
 # The amount of time after a player leaves their violation data will be removed, in minutes.
 violation-data-timeout: 30
+
 # If the event API should be enabled.
 enable-event-api: true

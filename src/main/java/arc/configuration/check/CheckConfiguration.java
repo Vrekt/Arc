@@ -4,8 +4,9 @@ import arc.Arc;
 import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.configuration.ArcConfiguration;
-import arc.configuration.Reloadable;
+import arc.configuration.Configurable;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +15,7 @@ import java.util.Map;
 /**
  * A check configuration format.
  */
-public final class CheckConfiguration implements Reloadable {
+public final class CheckConfiguration extends Configurable {
 
     /**
      * The check for this configuration.
@@ -50,19 +51,11 @@ public final class CheckConfiguration implements Reloadable {
     public CheckConfiguration(CheckType check, ConfigurationSection section) {
         this.check = check;
         this.section = section;
-        load();
+        read(null);
     }
 
     @Override
-    public void reloadConfiguration(ArcConfiguration configuration) {
-        this.section = configuration.fileConfiguration().getConfigurationSection(check.getName());
-        load();
-    }
-
-    /**
-     * Load the configuration
-     */
-    private void load() {
+    public void read(FileConfiguration configuration) {
         // retrieve booleans
         enabled = section.getBoolean("enabled");
         cancel = section.getBoolean("cancel");
@@ -85,6 +78,12 @@ public final class CheckConfiguration implements Reloadable {
                 subTypeSections.put(subType, subTypeSection);
             }
         });
+    }
+
+    @Override
+    public void reload(ArcConfiguration configuration) {
+        this.section = configuration.fileConfiguration().getConfigurationSection(check.getName());
+        read(null);
     }
 
     /**
@@ -245,7 +244,7 @@ public final class CheckConfiguration implements Reloadable {
      * @return {@code true} if so
      */
     public boolean shouldNotify(int violationLevel) {
-        return notifyLevel == 1 || violationLevel % notifyLevel == 0;
+        return notifyViolation() && (notifyLevel == 1 || violationLevel % notifyLevel == 0);
     }
 
     /**

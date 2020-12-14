@@ -10,7 +10,7 @@ import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
 import arc.configuration.ArcConfiguration;
-import arc.configuration.Reloadable;
+import arc.configuration.Configurable;
 
 import java.io.Closeable;
 import java.util.HashSet;
@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * A check manager
  */
-public final class CheckManager implements Closeable, Reloadable {
+public final class CheckManager extends Configurable implements Closeable {
 
     /**
      * All the checks
@@ -56,8 +56,8 @@ public final class CheckManager implements Closeable, Reloadable {
     }
 
     @Override
-    public void reloadConfiguration(ArcConfiguration configuration) {
-        checks.forEach(check -> check.reloadConfiguration(configuration));
+    public void reload(ArcConfiguration configuration) {
+        checks.forEach(check -> check.reload(configuration));
     }
 
     /**

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Allows building of items
+ * Easy building of items
  */
 public final class ItemBuilder {
 

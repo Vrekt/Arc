@@ -8,8 +8,8 @@ import arc.data.moving.MovingData;
 import arc.data.packet.PacketData;
 import arc.data.player.PlayerData;
 import arc.exemption.ExemptionManager;
-import arc.inventory.InventoryRegister;
 import arc.listener.Listeners;
+import arc.utility.PunishmentManager;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
@@ -19,7 +19,6 @@ import bridge1_8.Bridge18;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
@@ -32,7 +31,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.0.0";
+    public static final String VERSION_STRING = "2.0.1";
 
     /**
      * The file configuration
@@ -70,9 +69,9 @@ public final class Arc extends JavaPlugin {
     private final ExemptionManager exemptionManager = new ExemptionManager();
 
     /**
-     * Inventory UI register.
+     * Punishment manager.
      */
-    private final InventoryRegister inventoryRegister = new InventoryRegister();
+    private PunishmentManager punishmentManager;
 
     /**
      * The protocol manager.
@@ -98,13 +97,13 @@ public final class Arc extends JavaPlugin {
         saveDefaultConfig();
         arcConfiguration.read(getConfig());
         protocolManager = ProtocolLibrary.getProtocolManager();
+        punishmentManager = new PunishmentManager(arcConfiguration.banConfiguration(), arcConfiguration.kickConfiguration());
 
         getLogger().info("[INFO] Registering checks and listeners");
         checkManager.initialize();
         violationManager.initialize(arcConfiguration);
 
         Listeners.register(this, protocolManager);
-        getServer().getPluginManager().registerEvents(inventoryRegister, this);
 
         getLogger().info("[INFO] Registering base command.");
         Objects.requireNonNull(getCommand("arc")).setExecutor(new ArcCommand());
@@ -134,14 +133,13 @@ public final class Arc extends JavaPlugin {
 
     /**
      * Load compatible versions
-     * TODO: Specific 1.15.2 and 1.16.4
      */
     private boolean loadCompatibleVersions() {
-        if (Bukkit.getVersion().contains("1.8")) {
-            loadFor1_8_8();
-        } else if (Bukkit.getVersion().contains("1.16")) {
+        if (Bukkit.getVersion().contains("1.8.8")) {
+            loadFor1_8();
+        } else if (Bukkit.getVersion().contains("1.16.4")) {
             loadFor1_16();
-        } else if (Bukkit.getVersion().contains("1.15")) {
+        } else if (Bukkit.getVersion().contains("1.15.2")) {
             loadFor1_15();
         } else {
             getLogger().info("[INCOMPATIBLE] Arc is not compatible with this version: " + Bukkit.getVersion());
@@ -155,7 +153,7 @@ public final class Arc extends JavaPlugin {
     /**
      * Load arc for 1.8.8
      */
-    private void loadFor1_8_8() {
+    private void loadFor1_8() {
         version = Version.VERSION_1_8;
         bridge = new Bridge18();
     }
@@ -233,16 +231,17 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
+     * @return the punishment manager
+     */
+    public PunishmentManager punishment() {
+        return punishmentManager;
+    }
+
+    /**
      * @return the protocol manager
      */
     public ProtocolManager protocol() {
         return protocolManager;
     }
 
-    /**
-     * @return the inventory register
-     */
-    public InventoryRegister inventoryRegister() {
-        return inventoryRegister;
-    }
 }
