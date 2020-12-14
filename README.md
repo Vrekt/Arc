@@ -1,8 +1,6 @@
+<img align="center" src="arcbrresized">
+
 # Arc
-
-<img src="arcbr.png" align="right"
-     alt="Arc logo" width="120" height="178">
-
 Arc is an anticheat built to support older PvP versions and newer game versions.
 
 * Supports 1.8.8, 1.15.2 and 1.16.4
