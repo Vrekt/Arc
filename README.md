@@ -17,9 +17,8 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 Customizable violation messages
 
-<p align="center">
-  <img  src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
-</p>
+##
+<img align="left"  src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
 
 A basic but still WIP inventory UI for managing Arc.
 
