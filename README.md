@@ -13,18 +13,9 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 ## 
 <img align="right" src="violations.png" alt="Violations">
 
-Customizable violation messages
-
-##
-<img align="left"  src="https://i.imgur.com/JpyeQoF.png" alt="Inventory UI">
-
-A basic but still WIP inventory UI for managing Arc.
-
-<p align="center">
-  <img src="https://i.imgur.com/QRFwGT8.png" alt="Commands">
-</p>
-
-An optional command system to use from the command-line.
+* Customizable violation messages
+* Custom parameters
+* Debug information
 
 ## Installing Arc
 
