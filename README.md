@@ -12,7 +12,10 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 ##
 
 <img align="left" src="https://i.imgur.com/M85fUpO.png" alt="Violations">
-Arc includes customizable violation messages and parameters. 
-There is also debug information attached to each violation.
+Arc includes customizable violation messages and parameters along with
+debug information attached to each violation.
 
-Ability to toggle violation messages.
+##
+
+<img align="right" src="https://i.imgur.com/JbFQfub.png" alt="UI">
+Arc includes a basic but still WIP inventory UI for management.
