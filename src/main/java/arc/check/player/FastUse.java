@@ -6,7 +6,6 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
-import arc.violation.result.ViolationResult;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import org.bukkit.Material;
@@ -18,7 +17,6 @@ import org.bukkit.entity.Player;
  * use-delta-min: If higher, check is more relaxed.
  * delta-shot-min: If higher, check is more relaxed.
  * consume-time-ms: If less, check is more strict. (avg time with 0 ping is 1500ms)
- * TODO: Disable with versions > 1.8?
  */
 public final class FastUse extends PacketCheck {
 
@@ -74,9 +72,8 @@ public final class FastUse extends PacketCheck {
      * @param data   the data
      * @return the result
      */
-    public ViolationResult checkFastBow(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW))
-            return ViolationResult.EMPTY;
+    public boolean checkFastBow(Player player, PlayerData data) {
+        if (exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return false;
 
         final long lastUse = data.lastBowUse();
         final long lastShot = data.lastBowShoot();
@@ -86,17 +83,16 @@ public final class FastUse extends PacketCheck {
 
         // check the delta times against the configuration values.
         if (deltaUseToShot < deltaShotMinimum && useDelta < useDeltaMinimum) {
-            final CheckResult result = new CheckResult(CheckResult.Result.FAILED, CheckSubType.FAST_USE_FAST_BOW);
-            result.info("Used a bow too fast.");
+            final CheckResult result = new CheckResult();
+            result.setFailed(CheckSubType.FAST_USE_FAST_BOW, "Used a bow too fast.");
             result.parameter("deltaShot", deltaUseToShot);
             result.parameter("minDeltaShow", deltaShotMinimum);
             result.parameter("useDelta", useDelta);
             result.parameter("minUseDelta", useDeltaMinimum);
-
-            return checkViolation(player, result);
+            return checkViolation(player, result).cancel();
         }
 
-        return ViolationResult.EMPTY;
+        return false;
     }
 
     /**
@@ -106,28 +102,25 @@ public final class FastUse extends PacketCheck {
      * @param data   the data
      * @return the result
      */
-    public ViolationResult checkFastConsume(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_CONSUME))
-            return ViolationResult.EMPTY;
+    public boolean checkFastConsume(Player player, PlayerData data) {
+        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_CONSUME)) return false;
 
         // the time it took to consume the item
         final long delta = System.currentTimeMillis() - data.consumeStartTime();
         if (delta < consumeTime) {
-            final CheckResult result = new CheckResult(CheckResult.Result.FAILED, CheckSubType.FAST_USE_FAST_CONSUME);
-            result.info("Consumed an item too fast.");
+            final CheckResult result = new CheckResult();
+            result.setFailed(CheckSubType.FAST_USE_FAST_CONSUME, "Consumed an item too fast.");
             result.parameter("delta", delta);
             result.parameter("min", consumeTime);
-            return checkViolation(player, result);
+            return checkViolation(player, result).cancel();
         }
 
-        return ViolationResult.EMPTY;
+        return false;
     }
 
     @Override
     public void reloadConfig() {
-        unload();
-
-        if (enabled()) load();
+        load();
     }
 
     @Override

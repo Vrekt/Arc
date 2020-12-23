@@ -1,6 +1,6 @@
 package arc.data.combat;
 
-import org.bukkit.entity.Entity;
+import arc.data.Data;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Combat data1
  */
-public final class CombatData {
+public final class CombatData implements Data {
 
     /**
      * The register
@@ -38,24 +38,8 @@ public final class CombatData {
 
     /**
      * Last time the player swung their arm
-     * The last attack time
      */
-    private long lastSwingTime, lastAttackTime;
-
-    /**
-     * last attacked entity
-     */
-    private Entity lastAttackedEntity;
-
-    /**
-     * When we last attacked this entity
-     */
-    private long lastAttackedEntityTime;
-
-    /**
-     * The last angle.
-     */
-    private double lastAngle;
+    private long lastSwingTime;
 
     public long lastSwingTime() {
         return lastSwingTime;
@@ -65,35 +49,4 @@ public final class CombatData {
         this.lastSwingTime = lastSwingTime;
     }
 
-    public long lastAttackTime() {
-        return lastAttackTime;
-    }
-
-    public void lastAttackTime(long lastAttackTime) {
-        this.lastAttackTime = lastAttackTime;
-    }
-
-    public double lastAngle() {
-        return lastAngle;
-    }
-
-    public void lastAngle(double lastAngle) {
-        this.lastAngle = lastAngle;
-    }
-
-    public Entity lastAttackedEntity() {
-        return lastAttackedEntity;
-    }
-
-    public void lastAttackedEntity(Entity lastAttackedEntity) {
-        this.lastAttackedEntity = lastAttackedEntity;
-    }
-
-    public long lastAttackedEntityTime() {
-        return lastAttackedEntityTime;
-    }
-
-    public void lastAttackedEntityTime(long lastAttackedEntityTime) {
-        this.lastAttackedEntityTime = lastAttackedEntityTime;
-    }
 }

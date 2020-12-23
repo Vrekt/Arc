@@ -27,7 +27,6 @@ public enum ConfigurationValues {
     VIOLATION_DATA_TIMEOUT(new ConfigurationValue<>("violation-data-timeout", 30)),
     ENABLE_EVENT_API(new ConfigurationValue<>("enable-event-api", true));
 
-
     /**
      * The value
      */

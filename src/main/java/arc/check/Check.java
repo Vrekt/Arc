@@ -6,6 +6,9 @@ import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.configuration.check.CheckConfiguration;
 import arc.configuration.check.CheckConfigurationBuilder;
+import arc.exemption.ExemptionManager;
+import arc.exemption.type.ExemptionType;
+import arc.violation.ViolationManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import org.bukkit.Bukkit;
@@ -16,6 +19,16 @@ import org.bukkit.scheduler.BukkitTask;
  * Represents a check.
  */
 public abstract class Check extends Configurable {
+
+    /**
+     * Exemptions
+     */
+    private static final ExemptionManager EXEMPTION_MANAGER = Arc.arc().exemptions();
+
+    /**
+     * Violations
+     */
+    private static final ViolationManager VIOLATION_MANAGER = Arc.arc().violations();
 
     /**
      * The check type
@@ -196,7 +209,7 @@ public abstract class Check extends Configurable {
      * @param result the result
      */
     protected ViolationResult checkViolation(Player player, CheckResult result) {
-        if (result.failed()) return Arc.arc().violations().violation(player, this, result);
+        if (result.failed()) return VIOLATION_MANAGER.violation(player, this, result);
         return ViolationResult.EMPTY;
     }
 
@@ -218,7 +231,7 @@ public abstract class Check extends Configurable {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player) {
-        return Arc.arc().exemptions().isPlayerExempt(player, checkType);
+        return EXEMPTION_MANAGER.isPlayerExempt(player, checkType);
     }
 
     /**
@@ -229,7 +242,18 @@ public abstract class Check extends Configurable {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player, CheckSubType subType) {
-        return Arc.arc().exemptions().isPlayerExempt(player, subType);
+        return EXEMPTION_MANAGER.isPlayerExempt(player, subType);
+    }
+
+    /**
+     * Check if a player is exempt
+     *
+     * @param player the player
+     * @param type   the type
+     * @return {@code true} if so
+     */
+    protected boolean exempt(Player player, ExemptionType type) {
+        return EXEMPTION_MANAGER.isPlayerExempt(player, type);
     }
 
     /**
@@ -248,9 +272,12 @@ public abstract class Check extends Configurable {
     @Override
     public void reload(ArcConfiguration configuration) {
         if (permanentlyDisabled) return;
+        unload();
 
         this.configuration.reload(configuration);
-        reloadConfig();
+        if (this.configuration.enabled()) {
+            reloadConfig();
+        }
     }
 
     /**

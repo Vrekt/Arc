@@ -5,23 +5,25 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.data.moving.packets.MovingPacketData;
-import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 /**
- * Ensures too many packets aren't being sent at once.
- * TODO: Needs work!
+ * Ensures too many packets aren't being sent every second
  */
 public final class MorePackets extends Check {
 
     /**
-     * Max flying packets allowed
-     * Max position packets allowed
-     * Max packets allowed before kicking
+     * The max flying packets allowed per second.
+     * The max position packets allowed per second
+     * The max look packets allowed per second
+     * The max threshold allowed before kicking
      */
-    private int maxFlyingPackets, maxPositionPackets, maxPacketsToKick;
+    private int maxFlyingPacketsPerSecond, maxPositionPacketsPerSecond, maxLookPacketsPerSecond, packetKickThreshold;
+    /**
+     * If this check should kick for reaching the threshold
+     */
+    private boolean kickIfThresholdReached;
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
@@ -35,9 +37,11 @@ public final class MorePackets extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("max-flying-packets", 30);
-        addConfigurationValue("max-position-packets", 30);
-        addConfigurationValue("max-packets-kick", 50);
+        addConfigurationValue("max-flying-packets-per-second", 25);
+        addConfigurationValue("max-position-packets-per-second", 25);
+        addConfigurationValue("max-look-packets-per-second", 25);
+        addConfigurationValue("kick-if-threshold-reached", true);
+        addConfigurationValue("packet-kick-threshold", 50);
 
         if (enabled()) load();
     }
@@ -46,86 +50,124 @@ public final class MorePackets extends Check {
      * Check this player
      *
      * @param player the player
-     * @param data   the data
+     * @param data   their data
      */
     private void check(Player player, MovingData data) {
+        if (exempt(player)) return;
+
+        // position+look are combined, look packets
+        final int flyingCount = data.flyingPackets();
+        final int positionCount = data.positionPackets();
+        final int positionLookCount = data.positionLookPackets();
+        final int lookCount = data.lookPackets();
         final CheckResult result = new CheckResult();
-        final MovingPacketData packets = data.packets();
-        // we were exempt for awhile or some type of lag occurred so reset.
-        if (System.currentTimeMillis() - packets.lastCheck() >= 2000) {
-            packets.flyingPackets(0);
-            packets.positionPackets(0);
-        }
 
-        final int flyingPackets = packets.flyingPackets();
-        final int positionPackets = packets.positionPackets();
-        boolean failedFlying = false, failedPosition = false;
+        // check flying counts
+        if (flyingCount > maxFlyingPacketsPerSecond) {
+            populateResult(result, "Too many flying packets per second", flyingCount, maxFlyingPacketsPerSecond);
+            checkViolation(player, result);
+            data.cancelFlying(true);
 
-        if (flyingPackets >= maxFlyingPackets) {
-            if (flyingPackets >= maxPacketsToKick
-                    && !Arc.arc().punishment().hasPendingKick(player)) {
-                Arc.arc().punishment().kickPlayer(player, this);
-            }
-
-            result.setFailed("Too many flying packets");
-            result.parameter("packets", flyingPackets);
-            result.parameter("max", maxFlyingPackets);
-
-            failedFlying = true;
+            kickPlayerIfThresholdReached(player, flyingCount);
         } else {
-            packets.cancelFlyingPackets(false);
+            data.cancelFlying(false);
         }
 
-        if (positionPackets >= maxPositionPackets) {
-            if (positionPackets >= maxPacketsToKick && !Arc.arc().punishment().hasPendingKick(player)) {
-                Arc.arc().punishment().kickPlayer(player, this);
-                packets.kick(true);
-            }
+        // check position and position_look counts
+        if (positionCount > maxPositionPacketsPerSecond) {
+            populateResult(result, "Too many position packets per second", positionCount, maxPositionPacketsPerSecond);
+            checkViolation(player, result);
+            data.cancelPosition(true);
 
-            result.setFailed("Too many position packets");
-            result.parameter("packets", positionPackets);
-            result.parameter("max", maxPositionPackets);
+            kickPlayerIfThresholdReached(player, positionCount);
+        } else if (positionLookCount > maxPositionPacketsPerSecond) {
+            populateResult(result, "Too many position look packets per second", positionLookCount, maxPositionPacketsPerSecond);
+            checkViolation(player, result);
+            data.cancelPosition(true);
 
-            failedPosition = true;
+            kickPlayerIfThresholdReached(player, positionLookCount);
         } else {
-            packets.cancelPositionPackets(false);
+            data.cancelPosition(false);
         }
 
-        final ViolationResult violation = checkViolation(player, result);
-        if (violation.cancel()) {
-            packets.cancelFlyingPackets(failedFlying);
-            packets.cancelPositionPackets(failedPosition);
+        // check look counts
+        if (lookCount > maxLookPacketsPerSecond) {
+            populateResult(result, "Too many look packets per second", lookCount, maxLookPacketsPerSecond);
+            checkViolation(player, result);
+            data.cancelLook(true);
+
+            kickPlayerIfThresholdReached(player, lookCount);
+        } else {
+            data.cancelLook(false);
         }
 
-        packets.flyingPackets(0);
-        packets.positionPackets(0);
-        packets.lastCheck(System.currentTimeMillis());
+        data.flyingPackets(0);
+        data.positionPackets(0);
+        data.positionLookPackets(0);
+        data.lookPackets(0);
+    }
+
+    /**
+     * Populate the check result with information
+     *
+     * @param result      the result
+     * @param information the information
+     * @param count       the count
+     * @param max         the max
+     */
+    private void populateResult(CheckResult result, String information, int count, int max) {
+        result.setFailed(information);
+        result.parameter("count", count);
+        result.parameter("max", max);
+    }
+
+    /**
+     * Kick the player if the threshold is reached
+     *
+     * @param player the player
+     * @param count  the count
+     */
+    private void kickPlayerIfThresholdReached(Player player, int count) {
+        if (kickIfThresholdReached && count >= packetKickThreshold && !Arc.arc().punishment().hasPendingKick(player)) {
+            Arc.arc().punishment().kickPlayer(player, this);
+        }
+    }
+
+    /**
+     * Check if the sent packet should be cancelled.
+     *
+     * @param data       their data
+     * @param isFlying   if the packet is flying
+     * @param isPosition if the packet is position
+     * @param isLook     if the packet is look
+     * @return {@code true} if the packet should be cancelled.
+     */
+    public boolean cancelPacket(MovingData data, boolean isFlying, boolean isPosition, boolean isLook) {
+        return isFlying ? data.cancelFlying() : isPosition ? data.cancelPosition() : isLook && data.cancelLook();
     }
 
     @Override
     public void reloadConfig() {
-        unload();
-
-        if (enabled()) {
-            load();
-        }
-    }
-
-    @Override
-    public void load() {
-        maxFlyingPackets = configuration.getInt("max-flying-packets");
-        maxPositionPackets = configuration.getInt("max-position-packets");
-        maxPacketsToKick = configuration.getInt("max-packets-kick");
-
-        schedule(() -> {
-            for (final Player player : Bukkit.getOnlinePlayers()) {
-                if (!exempt(player)) check(player, MovingData.get(player));
-            }
-        }, 20, 20);
+        load();
     }
 
     @Override
     public void unload() {
         cancelScheduled();
+    }
+
+    @Override
+    public void load() {
+        maxFlyingPacketsPerSecond = configuration.getInt("max-flying-packets-per-second");
+        maxPositionPacketsPerSecond = configuration.getInt("max-position-packets-per-second");
+        maxLookPacketsPerSecond = configuration.getInt("max-look-packets-per-second");
+        kickIfThresholdReached = configuration.getBoolean("kick-if-threshold-reached");
+        packetKickThreshold = configuration.getInt("packet-kick-threshold");
+
+        schedule(() -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                check(player, MovingData.get(player));
+            }
+        }, 0, 20);
     }
 }

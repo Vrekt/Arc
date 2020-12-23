@@ -1,36 +1,28 @@
 package arc.check.combat;
 
-import arc.Arc;
 import arc.check.CheckSubType;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
 import arc.utility.entity.Entities;
-import bridge.BoundingBox;
-import bridge.Version;
-import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
+import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 /**
  * Checks multiple fight related things
- * direction-use-bounding-boxes=true slightly more accurate
- * direction-max-angle-difference<=1.25 strict
+ * <p>
+ * Current configuration is relaxed.
  */
 public final class KillAura extends PacketCheck {
 
     /**
-     * If bounding boxes should be used
+     * Max yaw and pitch difference allowed.
      */
-    private boolean directionUseBoundingBoxes;
+    private float maxYawDifference, maxPitchDifference;
 
-    /**
-     * Max angle difference for direction checking
-     */
-    private double directionMaxAngleDifference;
 
     public KillAura() {
         super(CheckType.KILL_AURA);
@@ -44,8 +36,8 @@ public final class KillAura extends PacketCheck {
                 .build();
 
         createSubTypeSections(CheckSubType.KILL_AURA_DIRECTION);
-        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "use-bounding-boxes", true);
-        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "max-angle-difference", 1.2);
+        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "max-yaw-difference", 75);
+        addConfigurationValue(CheckSubType.KILL_AURA_DIRECTION, "max-pitch-difference", 75);
 
         if (enabled()) load();
     }
@@ -54,15 +46,15 @@ public final class KillAura extends PacketCheck {
      * Invoked when the player attacks
      *
      * @param player the player
-     * @param packet the packet
+     * @param entity the entity
      */
-    public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
-        if (!enabled() || exempt(player)) return false;
+    public boolean check(Player player, Entity entity) {
+        if (exempt(player)) return false;
 
         // grab a new result, our entity and player data.
         final CheckResult result = new CheckResult();
-        final Entity entity = packet.getTarget(player.getWorld());
         final CombatData data = CombatData.get(player);
+
         // check direction
         direction(player, entity, result);
 
@@ -80,49 +72,34 @@ public final class KillAura extends PacketCheck {
     private void direction(Player player, Entity entity, CheckResult result) {
         if (exempt(player, CheckSubType.KILL_AURA_DIRECTION)) return;
 
-        // grab angle.
-        final double angle = getAngle(directionUseBoundingBoxes, entity, player);
-        if (angle > directionMaxAngleDifference) {
-            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Angle difference over max");
-            result.parameter("angle", angle);
-            result.parameter("max", directionMaxAngleDifference);
-            result.parameter("bb", directionUseBoundingBoxes);
-        }
-    }
+        final Location playerLocation = player.getLocation();
+        final Location entityLocation = entity.getLocation();
 
-    /**
-     * Get an angle
-     *
-     * @param useBoundingBoxes if bounding boxes should be used
-     * @param entity           the entity
-     * @param player           the player
-     * @return the angle
-     */
-    private double getAngle(boolean useBoundingBoxes, Entity entity, Player player) {
-        final boolean compatibility = Arc.version().isOlderThan(Version.VERSION_1_16);
-        final Vector eye = player.getEyeLocation().clone().toVector();
-        final BoundingBox bb = directionUseBoundingBoxes ? Entities.getBoundingBox(entity) : null;
-        final Vector entityVec = entity.getLocation().clone().toVector();
+        final float yawToEntity = Entities.getYawToEntity(playerLocation, playerLocation.getYaw(), entityLocation);
+        final float pitchToEntity = Entities.getPitchToEntity(playerLocation, playerLocation.getPitch(), entityLocation, player, entity);
 
-        if (useBoundingBoxes && compatibility && bb != null) {
-            final double midpointX = (bb.minX() + bb.maxX()) / 2;
-            final double midpointY = (bb.minY() + bb.maxY()) / 2;
-            final double midpointZ = (bb.minZ() + bb.maxZ()) / 2;
-            entityVec.setX(midpointX).setY(midpointY).setZ(midpointZ);
+        if (yawToEntity >= maxYawDifference) {
+            result.setFailed("Yaw difference greater than allowed.");
+            result.parameter("yawToEntity", yawToEntity);
+            result.parameter("maxYawDiff", maxYawDifference);
         }
 
-        return entityVec.subtract(eye).angle(player.getLocation().getDirection());
+        if (pitchToEntity >= maxPitchDifference) {
+            result.setFailed("Pitch difference greater than allowed.");
+            result.parameter("pitchToEntity", pitchToEntity);
+            result.parameter("maxPitchDiff", maxPitchDifference);
+        }
     }
 
     @Override
     public void reloadConfig() {
-        if (enabled()) load();
+        load();
     }
 
     @Override
     public void load() {
         final ConfigurationSection directionSection = configuration.subTypeSection(CheckSubType.KILL_AURA_DIRECTION);
-        directionUseBoundingBoxes = directionSection.getBoolean("use-bounding-boxes");
-        directionMaxAngleDifference = directionSection.getDouble("max-angle-difference");
+        maxYawDifference = (float) directionSection.getDouble("max-yaw-difference");
+        maxPitchDifference = (float) directionSection.getDouble("max-pitch-difference");
     }
 }

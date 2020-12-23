@@ -9,9 +9,10 @@ import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.permissions.Permissions;
-import arc.utility.PunishmentManager;
+import arc.punishment.PunishmentManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
+import bridge.chat.ChatBridge;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -40,6 +41,11 @@ public final class ViolationManager extends Configurable implements Closeable {
      * A list of players who can view violations/debug information
      */
     private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Chat bridge
+     */
+    private ChatBridge chatBridge;
 
     /**
      * If sync events should be used.
@@ -75,6 +81,7 @@ public final class ViolationManager extends Configurable implements Closeable {
                 .build();
 
         useSyncEvents = Arc.version().isNewerThan(Version.VERSION_1_8);
+        chatBridge = Arc.bridge().chat();
     }
 
     /**
@@ -113,7 +120,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      */
     public ViolationResult violation(Player player, Check check, CheckResult result) {
         final Violations violations = history.get(player.getUniqueId());
-        final int level = violations.incrementViolationLevel(check.getName());
+        final int level = violations.incrementViolationLevel(check.type());
 
         // call our violation event.
         if (configuration.enableEventApi()) {
@@ -122,7 +129,7 @@ public final class ViolationManager extends Configurable implements Closeable {
             // if the event is cancelled, remove the violation level and return no result.
             if (event.isCancelled()) {
                 // reverse.
-                violations.decreaseViolationLevel(check.getName());
+                violations.decreaseViolationLevel(check.type());
                 return ViolationResult.EMPTY;
             }
         }
@@ -145,7 +152,7 @@ public final class ViolationManager extends Configurable implements Closeable {
 
             // build the text component and then send to all viewers.
             final TextComponent component = new TextComponent(violationMessage);
-            Arc.bridge().chat().addHoverEvent(component, result.information());
+            chatBridge.addHoverEvent(component, result.information());
             violationViewers.forEach(viewer -> viewer.spigot().sendMessage(component));
         }
 
@@ -222,7 +229,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @return the level
      */
     public int getViolationLevel(Player player, CheckType check) {
-        return history.get(player.getUniqueId()).getViolationLevel(check.getName());
+        return history.get(player.getUniqueId()).getViolationLevel(check);
     }
 
     @Override

@@ -87,13 +87,6 @@ public final class CheckConfiguration extends Configurable {
     }
 
     /**
-     * @return the section
-     */
-    public ConfigurationSection section() {
-        return section;
-    }
-
-    /**
      * Get the sub-type section
      *
      * @param subType the sub-type

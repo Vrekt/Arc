@@ -1,5 +1,6 @@
 package arc.data.player;
 
+import arc.data.Data;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Stores player related check data
  */
-public final class PlayerData {
+public final class PlayerData implements Data {
 
     /**
      * The register

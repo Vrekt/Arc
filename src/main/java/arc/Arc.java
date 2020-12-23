@@ -3,13 +3,13 @@ package arc;
 import arc.check.CheckManager;
 import arc.command.ArcCommand;
 import arc.configuration.ArcConfiguration;
-import arc.data.combat.CombatData;
-import arc.data.moving.MovingData;
-import arc.data.packet.PacketData;
-import arc.data.player.PlayerData;
+import arc.data.Data;
 import arc.exemption.ExemptionManager;
-import arc.listener.Listeners;
-import arc.utility.PunishmentManager;
+import arc.listener.combat.CombatPacketListener;
+import arc.listener.connection.PlayerConnectionListener;
+import arc.listener.moving.MovingPacketListener;
+import arc.listener.player.PlayerListener;
+import arc.punishment.PunishmentManager;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
@@ -19,9 +19,10 @@ import bridge1_8.Bridge18;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Objects;
+import java.util.logging.Level;
 
 /**
  * The main entry point for Arc.
@@ -71,7 +72,7 @@ public final class Arc extends JavaPlugin {
     /**
      * Punishment manager.
      */
-    private PunishmentManager punishmentManager;
+    private final PunishmentManager punishmentManager = new PunishmentManager();
 
     /**
      * The protocol manager.
@@ -81,54 +82,87 @@ public final class Arc extends JavaPlugin {
     /**
      * If the version is incompatible
      */
-    private boolean incompatible = false;
+    private boolean incompatible;
 
     @Override
     public void onEnable() {
         arc = this;
-        getLogger().info("[INFO] Arc version " + VERSION_STRING);
+        getLogger().info("Checking server version...");
         if (!loadCompatibleVersions()) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
 
-        getLogger().info("[INFO] Loading configuration");
-
+        getLogger().info("Reading configuration...");
         saveDefaultConfig();
         arcConfiguration.read(getConfig());
-        protocolManager = ProtocolLibrary.getProtocolManager();
-        punishmentManager = new PunishmentManager(arcConfiguration.banConfiguration(), arcConfiguration.kickConfiguration());
 
-        getLogger().info("[INFO] Registering checks and listeners");
+        getLogger().info("Registering checks and listeners...");
+        loadExternalPlugins();
         checkManager.initialize();
         violationManager.initialize(arcConfiguration);
+        punishmentManager.initialize(arcConfiguration);
+        registerListeners();
 
-        Listeners.register(this, protocolManager);
+        getLogger().info("Registering base command...");
+        verifyCommand();
 
-        getLogger().info("[INFO] Registering base command.");
-        Objects.requireNonNull(getCommand("arc")).setExecutor(new ArcCommand());
-
-        getLogger().info("[INFO] Saving configuration");
+        getLogger().info("Saving configuration...");
         saveConfig();
 
-        getLogger().info("[SUCCESS] Ready!");
+        getLogger().info("Ready!");
     }
 
     @Override
     public void onDisable() {
         if (incompatible) return;
-        Listeners.unregister(protocolManager);
 
         exemptionManager.close();
         violationManager.close();
         checkManager.close();
+        punishmentManager.close();
+        unregisterListeners();
 
-        Bukkit.getOnlinePlayers().forEach(player -> {
-            CombatData.remove(player);
-            MovingData.remove(player);
-            PacketData.remove(player);
-            PlayerData.remove(player);
-        });
+        Bukkit.getOnlinePlayers().forEach(Data::removeAll);
+        arc = null;
+    }
+
+    /**
+     * Register all listeners
+     */
+    private void registerListeners() {
+        getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+
+        new MovingPacketListener().register(protocolManager);
+        new CombatPacketListener().register(protocolManager);
+    }
+
+    /**
+     * Unregister listeners
+     */
+    private void unregisterListeners() {
+        protocolManager.removePacketListeners(this);
+    }
+
+    /**
+     * Load external plugins.
+     * TODO: Other plugin support like bans, etc.
+     */
+    private void loadExternalPlugins() {
+        protocolManager = ProtocolLibrary.getProtocolManager();
+    }
+
+    /**
+     * Verify the command /arc exists.
+     */
+    private void verifyCommand() {
+        final PluginCommand command = getCommand("arc");
+        if (command == null) {
+            getLogger().log(Level.SEVERE, "/arc command not found! You will not be able to use this command.");
+        } else {
+            command.setExecutor(new ArcCommand());
+        }
     }
 
     /**
@@ -142,11 +176,11 @@ public final class Arc extends JavaPlugin {
         } else if (Bukkit.getVersion().contains("1.15.2")) {
             loadFor1_15();
         } else {
-            getLogger().info("[INCOMPATIBLE] Arc is not compatible with this version: " + Bukkit.getVersion());
+            getLogger().log(Level.SEVERE, "Arc is not compatible with this version: " + Bukkit.getVersion());
             incompatible = true;
             return false;
         }
-        getLogger().info("[SUCCESS] Initialized Arc for: " + Bukkit.getVersion());
+        getLogger().info("Initialized Arc for: " + Bukkit.getVersion());
         return true;
     }
 
@@ -173,6 +207,7 @@ public final class Arc extends JavaPlugin {
         version = Version.VERSION_1_16;
         bridge = new Bridge116();
     }
+
 
     /**
      * @return the internal plugin

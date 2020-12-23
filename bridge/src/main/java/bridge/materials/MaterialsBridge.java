@@ -74,6 +74,14 @@ public interface MaterialsBridge {
     boolean isIce(Block block);
 
     /**
+     * Check if the block is a wall block
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isWall(Block block);
+
+    /**
      * Get a material
      *
      * @param name the name
@@ -99,12 +107,17 @@ public interface MaterialsBridge {
     ItemStack createItem(String material, short data);
 
     /**
+     * WARNING: Will not detect walls as solid blocks, use {@code isWall} instead.
      * Check if a block is solid
+     * Prevent from flagging walls.
+     * Walls should already be detected earlier than this, with BlockRelative.DOWN
+     * TODO: Workaround
      *
      * @param block the block
      * @return {@code true} if so
      */
     default boolean isSolid(Block block) {
+        if (isWall(block)) return false;
         return block.getType().isSolid() || isSlab(block) || isStair(block) || isFence(block) || isFenceGate(block) || isTrapdoor(block);
     }
 

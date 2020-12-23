@@ -4,32 +4,24 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.utility.MovingUtil;
-import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
 /**
  * Checks if the player is using criticals while impossible to do so.
- * distance>=0.10: Stricter
- * difference=>0.1: Strict
- * max-similar-vertical-allowed=<5: Strict
- * max-no-vertical-allowed>=5: Relaxed
  */
 public final class Criticals extends PacketCheck {
 
     /**
-     * The min distance allowed when checking for a critical hit.
-     * The min distance allowed when checking between the current vertical and last.
+     * The minimum distance allowed.
+     * The similar movement threshold/distance to count
      */
-    private double distance, difference;
+    private double minimumDistanceAllowed, minSimilarMovementDifference;
 
     /**
-     * The max time allowed before flagging when the vertical doesn't change.
-     * The max amount of times the vertical can be 0
+     * The maximum amount of no movement allowed.
      */
-    private int maxSimilarVerticalAllowed, maxNoVerticalAllowed;
+    private int maxNoMovementAllowed, maxSimilarMovementAllowed;
 
     public Criticals() {
         super(CheckType.CRITICALS);
@@ -42,104 +34,101 @@ public final class Criticals extends PacketCheck {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("distance", 0.09);
-        addConfigurationValue("difference", 0.05);
-        addConfigurationValue("max-similar-vertical-allowed", 5);
-        addConfigurationValue("max-no-vertical-allowed", 3);
+        addConfigurationValue("minimum-distance-allowed", 0.099);
+        addConfigurationValue("max-no-movement-allowed", 3);
+        addConfigurationValue("max-similar-movement-allowed", 3);
+        addConfigurationValue("min-similar-movement-difference", 0.05);
 
         if (enabled()) load();
     }
 
     /**
-     * Invoked when we interact with an entity.
+     * Check the player
      *
      * @param player the player
-     * @param packet the packet
+     * @return if the check should cancel.
      */
-    public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
-        if (!enabled() || exempt(player)) return false;
-        if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
-            final MovingData data = MovingData.get(player);
-            // If it was a possible critical hit and we are on-ground lets check.
-            if (isPossibleCriticalHit(player, data) && data.onGround()) {
-                final CheckResult result = new CheckResult();
-                final double vertical = Math.floor(data.vertical() * 100) / 100;
-                final double last = Math.floor(data.lastVerticalDistance() * 100) / 100;
-                int similarVerticalAmount = data.similarVerticalAmount();
-                int noVerticalAmount = data.noVerticalAmount();
-                // Check if the difference between the last vertical and now is less than expected.
-                // If so, increment the amount.
-                if (Math.abs((vertical - last)) < difference) {
-                    similarVerticalAmount++;
-                } else {
-                    similarVerticalAmount = similarVerticalAmount <= maxSimilarVerticalAllowed ? 0 : similarVerticalAmount - maxSimilarVerticalAllowed;
+    public boolean check(Player player) {
+        if (exempt(player)) return false;
+        final MovingData data = MovingData.get(player);
+        final CheckResult result = new CheckResult();
+
+        // first, check if we maybe have a hit.
+        // won't always be accurate of-course.
+        final boolean isPossibleCritical = isPossibleCritical(player, data);
+
+        // check
+        if (isPossibleCritical) {
+            // floor our vertical values to cap them
+            final double vertical = Math.floor(data.vertical() * 100) / 100;
+            final double last = Math.floor(data.lastVertical() * 100) / 100;
+            final double difference = Math.floor(Math.abs(vertical - last) * 100) / 100;
+
+            // check if no movement
+            if (difference == 0.0 || vertical == 0.0) {
+                final int amount = data.noMovementAmount() + 1;
+                data.noMovementAmount(amount);
+
+                if (amount >= maxNoMovementAllowed) {
+                    result.setFailed("max no movements reached");
+                    result.parameter("amount", amount);
+                    result.parameter("max", maxNoMovementAllowed);
                 }
+            } else {
+                data.noMovementAmount(data.noMovementAmount() - 1);
+            }
 
-                // First, check for similar vertical amounts.
-                if (similarVerticalAmount >= maxSimilarVerticalAllowed) {
-                    result.setFailed("Vertical not changed overtime");
-                    result.parameter("vertical", vertical);
-                    result.parameter("amount", similarVerticalAmount);
-                    result.parameter("max", maxSimilarVerticalAllowed);
+            // check basic distance
+            if (!result.failed() && (vertical == last) && vertical <= minimumDistanceAllowed) {
+                result.setFailed("Vertical less than allowed");
+                result.parameter("vertical", vertical);
+                result.parameter("min", minimumDistanceAllowed);
+            }
+
+            // check similar movements based on difference.
+            if (!result.failed() && difference >= 0.0 && difference <= minSimilarMovementDifference) {
+                final int amount = data.similarMovementAmount() + 1;
+                data.similarMovementAmount(amount);
+
+                if (amount >= maxSimilarMovementAllowed) {
+                    result.setFailed("max similar movement amount reached");
+                    result.parameter("amount", amount);
+                    result.parameter("max", maxSimilarMovementAllowed);
+                    result.parameter("diff", difference);
                 }
-
-                // Second, check the vertical distance
-                if (vertical == 0.0 && !result.failed()) {
-                    noVerticalAmount++;
-                    if (noVerticalAmount >= maxNoVerticalAllowed) {
-                        result.setFailed("Max no vertical distance reached.");
-                        result.parameter("distance", 0.0);
-                        result.parameter("amount", noVerticalAmount);
-                        result.parameter("max", maxNoVerticalAllowed);
-                    }
-                } else if (vertical > 0.0 && !result.failed()) {
-                    noVerticalAmount = noVerticalAmount == 0 ? 0 : noVerticalAmount - 1;
-
-                    // Finally, check distance against config.
-                    if (vertical <= distance) {
-                        result.setFailed("Vertical too small.");
-                        result.parameter("distance", vertical);
-                        result.parameter("min", distance);
-                    }
-                }
-
-                // update data
-                data.noVerticalAmount(noVerticalAmount);
-                data.similarVerticalAmount(similarVerticalAmount);
-
-                // violation
-                return checkViolation(player, result).cancel();
+            } else {
+                data.similarMovementAmount(data.similarMovementAmount() - 1);
             }
         }
-        return false;
+
+        return checkViolation(player, result).cancel();
     }
 
     /**
-     * Check if the hit could be a critical one.
-     * TODO: Cooldown checking somehow.
+     * Check if the hit could be a critical.
      *
      * @param player the player
-     * @param data   data
+     * @param data   their data
      * @return {@code true} if so
      */
-    private boolean isPossibleCriticalHit(Player player, MovingData data) {
-        return !data.clientOnGround()
+    private boolean isPossibleCritical(Player player, MovingData data) {
+        return !data.clientPositionOnGround()
                 && !player.isInsideVehicle()
                 && !player.hasPotionEffect(PotionEffectType.BLINDNESS)
-                && !MovingUtil.hasClimbable(player.getLocation())
-                && !MovingUtil.isInOrOnLiquid(player.getLocation());
+                && !data.inLiquid()
+                && !(data.climbing() || data.hasClimbable());
     }
 
     @Override
     public void reloadConfig() {
-        if (enabled()) load();
+        load();
     }
 
     @Override
     public void load() {
-        distance = configuration.getDouble("distance");
-        difference = configuration.getDouble("difference");
-        maxSimilarVerticalAllowed = configuration.getInt("max-similar-vertical-allowed");
-        maxNoVerticalAllowed = configuration.getInt("max-no-vertical-allowed");
+        minimumDistanceAllowed = configuration.getDouble("minimum-distance-allowed");
+        maxNoMovementAllowed = configuration.getInt("max-no-movement-allowed");
+        maxSimilarMovementAllowed = configuration.getInt("max-similar-movement-allowed");
+        minSimilarMovementDifference = configuration.getDouble("min-similar-movement-difference");
     }
 }

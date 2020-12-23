@@ -2,10 +2,8 @@ package arc.check.player;
 
 import arc.check.Check;
 import arc.check.CheckType;
-import arc.check.result.CheckCallback;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
-import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Player;
 
 /**
@@ -32,35 +30,35 @@ public final class Regeneration extends Check {
                 .build();
 
         addConfigurationValue("regeneration-time-ms", 3400);
-        load();
+        if (enabled()) load();
     }
 
     /**
      * Check for regeneration
      *
-     * @param player   the player
-     * @param data     their data
-     * @param callback the action callback
+     * @param player the player
+     * @param data   their data
+     * @return {@code true} if cancel.
      */
-    public void check(Player player, PlayerData data, CheckCallback callback) {
-        if (exempt(player)) return;
+    public boolean check(Player player, PlayerData data) {
+        if (exempt(player)) return false;
 
         // the time from now to the last regain event.
         final long time = System.currentTimeMillis() - data.lastHealthRegain();
         // if its less than the minimum then flag.
         if (time < regenerationTime) {
-            final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
-            result.info("Regaining health too fast.");
+            final CheckResult result = new CheckResult();
+            result.setFailed("Regaining health too fast.");
             result.parameter("time", time);
             result.parameter("min", regenerationTime);
-            final ViolationResult violation = checkViolation(player, result);
-            callback.onResult(violation);
+            return checkViolation(player, result).cancel();
         }
+        return false;
     }
 
     @Override
     public void reloadConfig() {
-        if (enabled()) load();
+        load();
     }
 
     @Override

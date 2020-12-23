@@ -53,6 +53,11 @@ public final class Materials implements MaterialsBridge {
     }
 
     @Override
+    public boolean isWall(Block block) {
+        return isFence(block);
+    }
+
+    @Override
     public Material getMaterial(String name) {
         return Material.getMaterial(name);
     }

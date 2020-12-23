@@ -1,48 +1,48 @@
 package arc.violation;
 
+import arc.check.CheckType;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Keeps track of player violations
- * TODO: Why is this a string and not {@link arc.check.CheckType}
  */
 public final class Violations {
 
     /**
-     * Keeps track of violations by check name.
-     * TODO: Needs to be concurrent?
+     * Keeps track of violations by check type.
      */
-    private final Map<String, Integer> violations = new HashMap<>();
+    private final Map<CheckType, Integer> violations = new HashMap<>();
 
     /**
      * Get the violation level for a check
      *
-     * @param checkName the check name
+     * @param check the check
      * @return the level
      */
-    public int getViolationLevel(String checkName) {
-        return violations.getOrDefault(checkName, 0);
+    public int getViolationLevel(CheckType check) {
+        return violations.getOrDefault(check, 0);
     }
 
     /**
      * Increment the violation level
      *
-     * @param checkName the check name
+     * @param check the check
      */
-    public int incrementViolationLevel(String checkName) {
-        final int level = getViolationLevel(checkName) + 1;
-        violations.put(checkName, level);
+    public int incrementViolationLevel(CheckType check) {
+        final int level = getViolationLevel(check) + 1;
+        violations.put(check, level);
         return level;
     }
 
     /**
      * Decrease the violation level by 1.
      *
-     * @param checkName the check name
+     * @param check the check
      */
-    public void decreaseViolationLevel(String checkName) {
-        violations.put(checkName, getViolationLevel(checkName) - 1);
+    public void decreaseViolationLevel(CheckType check) {
+        violations.put(check, getViolationLevel(check) - 1);
     }
 
 }

@@ -46,16 +46,21 @@ public final class MathUtil {
         return Math.sqrt(dx * dx + dz * dz);
     }
 
-    /**
-     * Clamp a value
-     *
-     * @param value value
-     * @param min   min
-     * @param max   max
-     * @return the clamped value
-     */
-    public static double clamp(double value, double min, double max) {
+    public static int clampInt(int value, int min, int max) {
         return Math.max(min, Math.min(max, value));
+    }
+
+    /**
+     * Wrap the angle
+     *
+     * @param angle the angle
+     * @return the modified angle
+     */
+    public static float wrapAngle(float angle) {
+        angle = angle % 360.0F;
+        if (angle >= 180.0F) angle -= 360.0F;
+        if (angle < -180.0F) angle += 360.0F;
+        return angle;
     }
 
 }

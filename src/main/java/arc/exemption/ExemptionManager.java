@@ -2,6 +2,7 @@ package arc.exemption;
 
 import arc.check.CheckSubType;
 import arc.check.CheckType;
+import arc.exemption.type.ExemptionType;
 import arc.permissions.Permissions;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -27,12 +28,8 @@ public final class ExemptionManager implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        final boolean canBypassAll = Permissions.canBypassAllChecks(player);
-        if (!canBypassAll) {
-            // if we cannot bypass all checks add our exemptions map.
-            exemptions.put(player.getUniqueId(), new Exemptions());
-            doJoinExemptions(player);
-        }
+        exemptions.put(player.getUniqueId(), new Exemptions());
+        doJoinExemptions(player);
     }
 
     /**
@@ -43,6 +40,7 @@ public final class ExemptionManager implements Closeable {
      */
     private void doJoinExemptions(Player player) {
         addExemption(player, CheckType.MORE_PACKETS, 500);
+        addExemption(player, CheckType.NOFALL, 500);
     }
 
     /**
@@ -52,8 +50,8 @@ public final class ExemptionManager implements Closeable {
      */
     public void onPlayerLeave(Player player) {
         final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
-        exemptions.close();
         this.exemptions.remove(player.getUniqueId());
+        exemptions.clear();
     }
 
     /**
@@ -70,6 +68,8 @@ public final class ExemptionManager implements Closeable {
         if (isFlying(player) && isExemptWhenFlying(check)) return true;
         // check other added exemptions
         final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        if (exemptions == null) return false;
+
         return exemptions.isExempt(check);
     }
 
@@ -96,6 +96,17 @@ public final class ExemptionManager implements Closeable {
     }
 
     /**
+     * Check if a player is exempt from a certain type
+     *
+     * @param player the player
+     * @param type   the check
+     * @return {@code true} if so
+     */
+    public boolean isPlayerExempt(Player player, ExemptionType type) {
+        return exemptions.get(player.getUniqueId()).isExempt(type);
+    }
+
+    /**
      * Add an exemption
      *
      * @param player   the player
@@ -105,6 +116,26 @@ public final class ExemptionManager implements Closeable {
     public void addExemption(Player player, CheckType check, long duration) {
         final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.addExemption(check, System.currentTimeMillis() + duration);
+    }
+
+    /**
+     * Add an exemption type
+     *
+     * @param player the player
+     * @param type   the type
+     */
+    public void addExemption(Player player, ExemptionType type) {
+        exemptions.get(player.getUniqueId()).addExemption(type);
+    }
+
+    /**
+     * Remove an exemption type
+     *
+     * @param player the player
+     * @param type   the type
+     */
+    public void removeExemption(Player player, ExemptionType type) {
+        exemptions.get(player.getUniqueId()).removeExemption(type);
     }
 
     /**
@@ -124,12 +155,15 @@ public final class ExemptionManager implements Closeable {
      * @return {@code true} if so
      */
     private boolean isExemptWhenFlying(CheckType check) {
-        return check == CheckType.NOFALL || check == CheckType.FLIGHT || check == CheckType.SPEED || check == CheckType.JESUS;
+        return check == CheckType.NOFALL
+                || check == CheckType.FLIGHT
+                || check == CheckType.SPEED
+                || check == CheckType.JESUS;
     }
 
     @Override
     public void close() {
-        exemptions.values().forEach(Exemptions::close);
+        exemptions.values().forEach(Exemptions::clear);
         exemptions.clear();
     }
 }

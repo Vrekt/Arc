@@ -1,8 +1,10 @@
-package arc.utility;
+package arc.punishment;
 
 import arc.Arc;
 import arc.api.events.PlayerBanEvent;
 import arc.check.Check;
+import arc.configuration.ArcConfiguration;
+import arc.configuration.Configurable;
 import arc.configuration.ban.BanConfiguration;
 import arc.configuration.kick.KickConfiguration;
 import arc.configuration.types.BanLengthType;
@@ -16,6 +18,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
+import java.io.Closeable;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * TODO: Popular ban plugin support
  * TODO: Offline support
  */
-public final class PunishmentManager {
+public final class PunishmentManager extends Configurable implements Closeable {
 
     /**
      * A set of players who have pending bans.
@@ -40,26 +43,44 @@ public final class PunishmentManager {
     /**
      * The ban configuration
      */
-    private final BanConfiguration banConfiguration;
+    private BanConfiguration banConfiguration;
 
     /**
      * The kick configuration
      */
-    private final KickConfiguration kickConfiguration;
+    private KickConfiguration kickConfiguration;
 
     /**
      * Event related
      */
-    private final boolean useSyncEvents, enableEventApi;
+    private boolean useSyncEvents, enableEventApi;
 
-    public PunishmentManager(BanConfiguration banConfiguration, KickConfiguration kickConfiguration) {
-        this.banConfiguration = banConfiguration;
-        this.kickConfiguration = kickConfiguration;
+    /**
+     * Initialize
+     *
+     * @param configuration the arc config
+     */
+    public void initialize(ArcConfiguration configuration) {
+        read(configuration);
+    }
+
+    @Override
+    public void reload(ArcConfiguration configuration) {
+        read(configuration);
+    }
+
+    /**
+     * Read
+     *
+     * @param configuration the arc config
+     */
+    private void read(ArcConfiguration configuration) {
+        this.banConfiguration = configuration.banConfiguration();
+        this.kickConfiguration = configuration.kickConfiguration();
 
         useSyncEvents = Arc.version().isNewerThan(Version.VERSION_1_8);
         enableEventApi = Arc.arc().configuration().enableEventApi();
     }
-
 
     /**
      * Check if the player has a pending ban
@@ -163,6 +184,12 @@ public final class PunishmentManager {
     private void ban(Player player, Check check, Date date, int time) {
         if (!hasPendingBan(player.getName())) return;
         final BanList.Type type = banConfiguration.globalBanType();
+        if (type == BanList.Type.IP && player.getAddress() == null) {
+            Arc.arc().getLogger().warning("Failed to ban player " + player.getName());
+            pendingPlayerBans.remove(player);
+            return;
+        }
+
         final String playerBan = type == BanList.Type.IP ? player.getAddress().getHostName() : player.getName();
         final String message = banConfiguration.globalBanMessage()
                 .check(check, null)
@@ -203,7 +230,15 @@ public final class PunishmentManager {
      */
     public void kickPlayer(Player player, Check check) {
         pendingPlayerKicks.add(player);
+        final String violationsMessage = kickConfiguration.globalViolationsKickMessage()
+                .check(check, null)
+                .player(player)
+                .prefix()
+                .time(kickConfiguration.globalKickDelay())
+                .value();
+        Bukkit.broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> {
+
             final String message = kickConfiguration.globalKickMessage()
                     .check(check, null)
                     .value();
@@ -224,6 +259,12 @@ public final class PunishmentManager {
         } else {
             Bukkit.getServer().getPluginManager().callEvent(event);
         }
+    }
+
+    @Override
+    public void close() {
+        pendingPlayerBans.clear();
+        pendingPlayerKicks.clear();
     }
 
 }

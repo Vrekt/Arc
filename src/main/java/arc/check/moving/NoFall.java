@@ -4,9 +4,10 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.data.moving.nf.NoFallData;
-import arc.utility.MovingUtil;
+import arc.exemption.type.ExemptionType;
+import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 /**
@@ -15,9 +16,17 @@ import org.bukkit.entity.Player;
 public final class NoFall extends Check {
 
     /**
-     * The tolerance amount to allow when fall distance is greater than calculated vertical distance
+     * The inaccuracy/tolerance amount to allow when calculating fall distance.
+     * If (e-fallDist < 1.0) = safe
+     * If (e-fallDist > 1.0) = flag
      */
-    private double tolerance;
+    private double expectedFallDistanceTolerance;
+
+    /**
+     * The times allowed where we can be on ground but the client can't be.
+     * 50 is a little generous.
+     */
+    private int invalidGroundMovesAllowed;
 
     public NoFall() {
         super(CheckType.NOFALL);
@@ -30,8 +39,9 @@ public final class NoFall extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("tolerance", 0.1);
-        load();
+        addConfigurationValue("expected-fall-distance-tolerance", 1.0);
+        addConfigurationValue("invalid-ground-moves-allowed", 50);
+        if (enabled()) load();
     }
 
     /**
@@ -41,115 +51,103 @@ public final class NoFall extends Check {
      * @param data   the data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player) || !enabled()) return;
-
-        final CheckResult result = new CheckResult();
-        final NoFallData nf = data.nf();
-        cancelIf(player, nf, data);
-
-        // Checks if the client is saying we are not on the ground
-        // TODO: Constantly flagged if cheat is left on.
-        // TODO: Can probably be improved but will take some work and brain
-        if (data.onGround() && data.onGroundTime() >= 5) {
-            final long lastCheckDelta = System.currentTimeMillis() - nf.lastCheck();
-            // client still isn't on the ground, we still have a fall distance and we were descending
-            if (!data.clientOnGround()
-                    && player.getFallDistance() > 3.0 &&
-                    lastCheckDelta <= 60000 && !nf.hasFailed()) {
-                result.setFailed("Client faked OnGround state.");
-                result.parameter("fDist", player.getFallDistance());
-                result.parameter("lastCheckDelta", lastCheckDelta);
-
-                nf.hasFailed(true);
-
-                nf.location(nf.lastCheckLocation());
-                nf.lastCheckLocation(null);
-                nf.lastCheck(System.currentTimeMillis());
-            } else {
-                // reset
-                nf.lastCheck(System.currentTimeMillis());
-                nf.lastCheckLocation(null);
-                nf.location(null);
-            }
+        if (exempt(player) || exempt(player, ExemptionType.DEATH)) return;
+        if (data.onGround()) checkGround(player, data);
+        if (data.inLiquid()) {
+            data.descendingLocation(null);
+            data.validFallingLocation(null);
         }
 
-        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle()
-                && !MovingUtil.isInOrOnLiquid(data.to())) {
-            // if we have no ground and haven't been descending for that long just return
-            if (nf.location() == null) nf.location(data.from());
-            // set our first check location, if we haven't already.
-            // if we don't have ground we want to set it to the previous move.
-            // calculate the distance we have fallen
-            final double distance = Math.floor(MathUtil.vertical(nf.location(), data.from()) * 100) / 100;
-            // make sure we have fallen a bit before checking
-            if (distance > 2) {
-                nf.lastCheck(System.currentTimeMillis());
-                if (nf.lastCheckLocation() == null) nf.lastCheckLocation(data.from());
-                final boolean clientHasGround = data.clientOnGround();
+        // ensure we are descending, not on ground, not climbing, no vehicle and not in liquid.
+        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle() && !data.inLiquid()) {
+            // retrieve our fall distance check location
+            final Location descending = data.descendingLocation() == null ? data.from() : data.descendingLocation();
+            data.descendingLocation(descending);
 
-                // Fixes regular NoFall and "Packet" types
-                if (clientHasGround && player.getFallDistance() == 0.0) {
-                    result.setFailed("Client faked OnGround state.");
-                    result.parameter("fDist", player.getFallDistance());
+            final Location valid = data.validFallingLocation();
+            final Location fallDistanceCheck = valid == null ? descending : valid;
 
-                    nf.hasFailed(true);
-                } else if (!clientHasGround && player.getFallDistance() == 0.0) {
-                    result.setFailed("Client faked fall distance");
-                    result.parameter("fDist", player.getFallDistance());
+            final double distanceFallen = MathUtil.vertical(fallDistanceCheck, data.from());
+            // make sure we have fallen
+            if (distanceFallen > 2) {
+                final CheckResult result = new CheckResult();
+                final boolean clientGround = data.clientOnGround();
+                final double fallDistance = player.getFallDistance();
+                if (data.validFallingLocation() == null) data.validFallingLocation(data.from());
 
-                    nf.hasFailed(true);
-                }
-
-                // Fixes other NoFall types where fall distance is accumulated but client is never on the ground
-                if (!clientHasGround) {
-                    final double difference = player.getFallDistance() - distance;
-                    // we have too much off a difference between expected fall distance + player fall dist
-                    if (difference > tolerance) {
-                        result.setFailed("Fall distance not expected.");
-                        result.parameter("fDist", player.getFallDistance());
-                        result.parameter("expected", distance);
-                        result.parameter("tolerance", tolerance);
-
-                        nf.hasFailed(true);
+                // patch other types of NoFall with incorrect fall distances.
+                final double difference = distanceFallen - fallDistance;
+                if (difference > expectedFallDistanceTolerance) {
+                    result.setFailed("Client fall distance not expected.");
+                    result.parameter("fallDistance", fallDistance);
+                    result.parameter("expected", distanceFallen);
+                    result.parameter("difference", difference);
+                    result.parameter("tolerance", expectedFallDistanceTolerance);
+                    data.failedNoFall(checkViolation(player, result).cancel());
+                } else {
+                    // patch basic types of NoFall.
+                    if (clientGround || fallDistance == 0.0) {
+                        result.setFailed("Client on ground or fall distance is 0.0");
+                        result.parameter("fallDistance", fallDistance);
+                        result.parameter("clientGround", clientGround);
+                        data.failedNoFall(checkViolation(player, result).cancel());
                     }
                 }
             }
         }
-
-        checkViolation(player, result);
     }
 
     /**
-     * Cancel if necessary
+     * Check ground
      *
      * @param player the player
-     * @param nf     nf data
-     * @param data   moving data
+     * @param data   their data
      */
-    private void cancelIf(Player player, NoFallData nf, MovingData data) {
-        if (nf.hasFailed() && data.onGround()) {
-            // if we have failed previously, we need to cancel.
-            // calculate the distance fallen, and damage the player.
-            if (nf.location() == null) {
-                nf.reset();
-                return;
+    private void checkGround(Player player, MovingData data) {
+        if (player.isDead() || exempt(player, ExemptionType.DEATH)) return;
+
+        // check if we just checked.
+        if (data.validFallingLocation() != null) {
+            // we have, check data.
+            final int count = data.invalidGround();
+            if (count > invalidGroundMovesAllowed) {
+                final CheckResult result = new CheckResult();
+                result.setFailed("Invalid ground moves more than allowed");
+                result.parameter("count", count);
+                result.parameter("max", invalidGroundMovesAllowed);
+                data.failedNoFall(checkViolation(player, result).cancel());
             }
-            final double distance = MathUtil.vertical(nf.location(), data.from()) - 3.0;
-            player.damage(distance);
-            // reset and return
-            nf.reset();
-        } else if (!nf.hasFailed() && data.onGround()) {
-            nf.reset();
+
+            // check if we have failed no-fall.
+            if (data.failedNoFall()) {
+                data.failedNoFall(false);
+                // cancel the player by setting damage
+                final double damage = MathUtil.vertical(data.validFallingLocation(), data.to());
+                Entities.damageSync(player, damage);
+            }
+        }
+
+        // reset location
+        data.descendingLocation(null);
+        data.validFallingLocation(null);
+
+        // check if client isn't on ground
+        if (!data.clientOnGround()) {
+            // if so, increment "invalid" ground
+            data.invalidGround(data.invalidGround() + 1);
+        } else {
+            data.invalidGround(0);
         }
     }
 
     @Override
     public void reloadConfig() {
-        if (enabled()) load();
+        load();
     }
 
     @Override
     public void load() {
-        tolerance = configuration.getDouble("tolerance");
+        expectedFallDistanceTolerance = configuration.getDouble("expected-fall-distance-tolerance");
+        invalidGroundMovesAllowed = configuration.getInt("invalid-ground-moves-allowed");
     }
 }

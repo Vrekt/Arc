@@ -1,25 +1,19 @@
 package arc.utility;
 
-import arc.Arc;
-import bridge.Bridge;
 import arc.data.moving.MovingData;
+import arc.utility.block.Blocks;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * Moving utility for calculating various things related to movement.
+ * WARNING: Locations here are directly manipulated, you should clone before using any method.
  */
 public final class MovingUtil {
-
-    /**
-     * The bridge
-     */
-    private static final Bridge BRIDGE = Arc.bridge();
 
     /**
      * Check if the location is on a solid block
@@ -29,14 +23,11 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean onGround(Location location) {
-        // test subtracted blocks next
-        final Block selfBlock = location.clone().subtract(0, 0.5, 0).getBlock();
-        if (BRIDGE.materials().isSolid(selfBlock)) return true;
+        final Block selfBlock = Blocks.getBlockSync(location.subtract(0, 0.5, 0));
+        location.add(0, 0.5, 0);
+        if (Blocks.isSolid(selfBlock)) return true;
 
-        // else, get all blocks around us and check if they are solid
-        final Location clone = location.clone();
-        final List<Block> neighbors = neighbors(clone, 0.3, -0.1, 0.3);
-        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isSolid(block));
+        return checkBlocksAround(location, 0.3, -0.1, 0.3, Blocks::isSolid);
     }
 
     /**
@@ -46,23 +37,20 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean hasClimbable(Location location) {
-        final Block selfBlock = location.getBlock();
-        if (BRIDGE.materials().isClimbable(selfBlock)) return true;
-
-        final Location clone = location.clone();
-        final List<Block> neighbors = neighbors(clone, 0.1, -0.06, 0.1);
-        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isClimbable(block));
+        final Block selfBlock = Blocks.getBlockSync(location);
+        if (Blocks.isClimbable(selfBlock)) return true;
+        return checkBlocksAround(location, 0.1, -0.06, 0.1, Blocks::isClimbable);
     }
 
     /**
      * @return if we are in or on liquid.
      */
     public static boolean isInOrOnLiquid(Location location) {
-        if (BRIDGE.materials().isLiquid(location.getBlock())
-                || BRIDGE.materials().isLiquid(location.getBlock().getRelative(BlockFace.DOWN))) return true;
+        if (Blocks.isLiquid(Blocks.getBlockSync(location))) return true;
+        final boolean liquidRelative = Blocks.isLiquid(Blocks.getBlockSync(location, BlockFace.DOWN));
+        location.setY(location.getY() + 1);
 
-        final List<Block> neighbors = neighbors(location, 0.1, -0.01, 0.1);
-        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isLiquid(block));
+        return liquidRelative || checkBlocksAround(location, 0.3, -0.1, 0.3, Blocks::isLiquid);
     }
 
     /**
@@ -70,10 +58,10 @@ public final class MovingUtil {
      * @return {@code true} if the location is on ice
      */
     public static boolean isOnIce(Location location) {
-        if (BRIDGE.materials().isIce(location.getBlock())
-                || BRIDGE.materials().isIce(location.getBlock().getRelative(BlockFace.DOWN))) return true;
-        final List<Block> neighbors = neighbors(location, 0.1, -0.01, 0.1);
-        return neighbors.stream().anyMatch(block -> BRIDGE.materials().isIce(block));
+        if (Blocks.isIce(Blocks.getBlockSync(location))) return true;
+        final boolean iceRelative = Blocks.isIce(Blocks.getBlockSync(location, BlockFace.DOWN));
+        location.setY(location.getY() + 1);
+        return iceRelative || checkBlocksAround(location, 0.1, -0.01, 0.1, Blocks::isIce);
     }
 
     /**
@@ -88,41 +76,44 @@ public final class MovingUtil {
     }
 
     /**
-     * Get a block list of neighbors around a location
+     * Check blocks around a location
      *
      * @param location  the location
-     * @param xModifier the X modifier
-     * @param yModifier the Y modifier
-     * @param zModifier the Z modifier
-     * @return the neighbors
+     * @param xModifier the xModifier
+     * @param yModifier the yModifier
+     * @param zModifier the zModifier
+     * @param predicate the predicate to test against
+     * @return {@code true} if the predicate is successful.
      */
-    public static List<Block> neighbors(Location location, double xModifier, double yModifier, double zModifier) {
+    public static boolean checkBlocksAround(Location location, double xModifier, double yModifier, double zModifier, Predicate<Block> predicate) {
         final double originalX = location.getX();
         final double originalY = location.getY();
         final double originalZ = location.getZ();
-        final List<Block> neighbors = new ArrayList<>();
 
-        neighbors.add(modifyAndReset(location, xModifier, yModifier, -zModifier, originalX, originalY, originalZ));
-        neighbors.add(modifyAndReset(location, -xModifier, yModifier, zModifier, originalX, originalY, originalZ));
-        neighbors.add(modifyAndReset(location, -xModifier, yModifier, -zModifier, originalX, originalY, originalZ));
-        neighbors.add(modifyAndReset(location, xModifier, yModifier, zModifier, originalX, originalY, originalZ));
-        return neighbors;
+        if (predicate.test(getBlockFromModifier(location, xModifier, yModifier, -zModifier, originalX, originalY, originalZ)))
+            return true;
+        if (predicate.test(getBlockFromModifier(location, -xModifier, yModifier, zModifier, originalX, originalY, originalZ)))
+            return true;
+        if (predicate.test(getBlockFromModifier(location, -xModifier, yModifier, -zModifier, originalX, originalY, originalZ)))
+            return true;
+        return predicate.test(getBlockFromModifier(location, xModifier, yModifier, zModifier, originalX, originalY, originalZ));
     }
 
     /**
-     * Modify the location and then reset it
+     * Get a block from a modifier
      *
      * @param location  the location
-     * @param xModifier the X modifier
-     * @param yModifier the Y modifier
-     * @param zModifier the Z modifier
+     * @param xModifier the xModifier
+     * @param yModifier the yModifier
+     * @param zModifier the zModifier
      * @param originalX the original X
      * @param originalY the original Y
      * @param originalZ the original Z
-     * @return the material at the modified location
+     * @return the block
      */
-    public static Block modifyAndReset(Location location, double xModifier, double yModifier, double zModifier, double originalX, double originalY, double originalZ) {
-        final Block block = location.add(xModifier, yModifier, zModifier).getBlock();
+    public static Block getBlockFromModifier(Location location, double xModifier, double yModifier, double zModifier, double originalX, double originalY, double originalZ) {
+        location.add(xModifier, yModifier, zModifier);
+        final Block block = Blocks.getBlockSync(location);
         reset(location, originalX, originalY, originalZ);
         return block;
     }
@@ -142,68 +133,95 @@ public final class MovingUtil {
     }
 
     /**
-     * Update a moving player
+     * Calculate player movement
      *
      * @param data their data
      * @param from from
      * @param to   to
      */
-    public static void updateMovingPlayer(MovingData data, Location from, Location to) {
-        data.from(from);
-        data.to(to);
+    public static void calculateMovement(MovingData data, Location from, Location to) {
+        final long now = System.currentTimeMillis();
+        // prevent cloning multiple times to save performance
+        final Location cloneFrom = from.clone();
+        final Location cloneTo = to.clone();
 
         // calculate ground
-        final boolean wasOnGround = data.onGround();
-        final boolean onGround = onGround(to);
+        final boolean currentOnGround = data.onGround();
+        final boolean previousOnGround = data.wasOnGround();
+        final boolean onGround = MovingUtil.onGround(cloneTo);
+
         data.onGround(onGround);
-        data.wasOnGround(wasOnGround);
+        data.wasOnGround(!onGround || (currentOnGround && previousOnGround));
 
+        // calculate ground stuff.
         if (onGround) {
-            data.ground(to);
-            data.onGroundTime(data.onGroundTime() + 1);
+            data.ground(cloneTo);
+            data.incrementOnGroundTime();
 
-            // calculate ice
-            // TODO: Trapdoors
-            final boolean onIce = isOnIce(to);
-            final int iceTime = onIce ? data.onIceTime() + 1 : 0;
-            data.onIceTime(iceTime);
+            final boolean isOnIce = MovingUtil.isOnIce(cloneTo);
+            final boolean wasOnIce = MovingUtil.isOnIce(cloneFrom);
+
+            data.onIce(isOnIce);
+
+            if (isOnIce) {
+                data.incrementOnIceTime();
+                data.offIceTime(0);
+            } else {
+                data.onIceTime(0);
+                if (!wasOnIce) data.incrementOffIceTime();
+            }
 
         } else {
             data.onGroundTime(0);
         }
 
+        // calculate sprinting and sneaking times
         final boolean sprinting = data.sprinting();
         final boolean sneaking = data.sneaking();
-
-        final int sprintTime = sprinting ? data.sprintTime() + 1 : 0;
-        final int sneakTime = sneaking ? data.sneakTime() + 1 : 0;
-
-        data.sprintTime(sprintTime);
-        data.sneakTime(sneakTime);
-
-        // calculate vertical distance
-        final double distance = MathUtil.vertical(from, to);
-        final double last = data.vertical();
-        data.lastVerticalDistance(last);
-        data.verticalDistance(distance);
-
-        // set ascending/descending states
-        data.ascending(to.getY() > from.getY() && distance > 0.0);
-        data.descending(from.getY() > to.getY() && distance > 0.0);
-        if (data.descending()) {
-            data.descendingTime(data.descendingTime() + 1);
+        if (sprinting) {
+            data.incrementSprintTime();
         } else {
-            data.descendingTime(0);
+            data.sprintTime(0);
         }
 
-        if (data.ascending()) {
-            data.ascendingTime(data.ascendingTime() + 1);
+        if (sneaking) {
+            data.incrementSneakTime();
+        } else {
+            data.sneakTime(0);
+        }
+
+        // distance moved vertically.
+        final double distance = MathUtil.vertical(cloneFrom, cloneTo);
+        data.lastVertical(data.vertical());
+        data.vertical(distance);
+
+        // calculate ascending/descending
+        final boolean ascending = distance > 0.0 && to.getY() > from.getY();
+        final boolean descending = distance > 0.0 && to.getY() < from.getY();
+        data.ascending(ascending);
+        data.descending(descending);
+        if (ascending) {
+            data.incrementAscendingTime();
         } else {
             data.ascendingTime(0);
         }
 
-        data.climbing(distance > 0.0 && hasClimbable(to));
-        data.lastMovingUpdate(System.currentTimeMillis());
+        if (descending) {
+            data.incrementDescendingTime();
+        } else {
+            data.descendingTime(0);
+        }
+
+        // calculate climbing
+        final boolean hasClimbable = MovingUtil.hasClimbable(cloneTo);
+        final boolean climbing = hasClimbable && (ascending || descending);
+        data.hasClimbable(hasClimbable);
+        data.climbing(climbing);
+
+        // calculate liquids
+        final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);
+        data.inLiquid(inLiquid);
+        data.lastMovingUpdate(now);
     }
 
 }

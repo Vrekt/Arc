@@ -15,9 +15,14 @@ import org.bukkit.entity.Player;
 public final class SwingFrequency extends PacketCheck {
 
     /**
-     * Max packets and max packets to kick.
+     * Max packets and packet kick threshold
      */
-    private int maxPackets, maxPacketsKick;
+    private int maxPacketsPerSecond, packetKickThreshold;
+
+    /**
+     * Kick if the threshold is reached
+     */
+    private boolean kickIfThresholdReached;
 
     public SwingFrequency() {
         super(CheckType.SWING_FREQUENCY);
@@ -32,8 +37,9 @@ public final class SwingFrequency extends PacketCheck {
                 .kickLevel(5)
                 .build();
 
-        addConfigurationValue("max-packets", 50);
-        addConfigurationValue("max-packets-kick", 100);
+        addConfigurationValue("max-packets-per-second", 50);
+        addConfigurationValue("kick-if-threshold-reached", false);
+        addConfigurationValue("packet-kick-threshold", 100);
         if (enabled()) load();
     }
 
@@ -45,36 +51,34 @@ public final class SwingFrequency extends PacketCheck {
      */
     private void check(Player player, PacketData data) {
         final CheckResult result = new CheckResult();
+        final int count = data.swingPacketCount();
 
-        if (data.swingPacketCount() > maxPackets) {
+        if (count >= maxPacketsPerSecond) {
             result.setFailed("Too many swing packets per second.");
             result.parameter("packets", data.swingPacketCount());
-            result.parameter("max", maxPackets);
-        } else if (data.swingPacketCount() > maxPacketsKick && !Arc.arc().punishment().hasPendingKick(player)) {
-            Arc.arc().punishment().kickPlayer(player, this);
+            result.parameter("max", maxPacketsPerSecond);
+            if (count >= packetKickThreshold && kickIfThresholdReached && !Arc.arc().punishment().hasPendingKick(player)) {
+                Arc.arc().punishment().kickPlayer(player, this);
+            }
         } else {
             data.cancelSwingPackets(false);
         }
-
         data.swingPacketCount(0);
 
         final ViolationResult violation = checkViolation(player, result);
-        if (violation.cancel()) {
-            data.cancelSwingPackets(true);
-        }
+        data.cancelSwingPackets(violation.cancel());
     }
 
     @Override
     public void reloadConfig() {
-        unload();
-
-        if (enabled()) load();
+        load();
     }
 
     @Override
     public void load() {
-        maxPackets = configuration.getInt("max-packets");
-        maxPacketsKick = configuration.getInt("max-packets-kick");
+        maxPacketsPerSecond = configuration.getInt("max-packets-per-second");
+        kickIfThresholdReached = configuration.getBoolean("kick-if-threshold-reached");
+        packetKickThreshold = configuration.getInt("packet-kick-threshold");
 
         schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {

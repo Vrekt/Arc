@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 public enum CheckSubType {
 
     /**
-     * Kill aura direction
+     * KillAura Direction
      */
     KILL_AURA_DIRECTION(CheckType.KILL_AURA, "direction", "Direction"),
 
     /**
-     * FastUse fastbow
+     * FastUse FastBow
      */
     FAST_USE_FAST_BOW(CheckType.FAST_USE, "fastbow", "FastBow"),
 

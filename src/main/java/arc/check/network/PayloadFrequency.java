@@ -106,9 +106,13 @@ public final class PayloadFrequency extends PacketCheck {
             return;
         }
 
-        // retrieve our data and the packet
         final PacketData data = PacketData.get(player);
-        if (data.cancelPayloadPackets()) event.setCancelled(true);
+        data.incrementPayloadPacketCount();
+
+        if (data.cancelPayloadPackets()) {
+            event.setCancelled(true);
+            return;
+        }
 
         final WrapperPlayClientCustomPayload packet = new WrapperPlayClientCustomPayload(event.getPacket());
         final String channel = packet.getChannel();
@@ -119,7 +123,7 @@ public final class PayloadFrequency extends PacketCheck {
             final byte[] bytes = packet.getContents();
             final int max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
             // check if the length is bigger than the allowed size
-            if (bytes.length > max) {
+            if (bytes.length >= max) {
                 result.setFailed("Payload packet size too big.");
                 result.parameter("length", bytes.length);
                 result.parameter("max", max);
@@ -128,8 +132,6 @@ public final class PayloadFrequency extends PacketCheck {
                     Arc.arc().punishment().kickPlayer(player, this);
                 }
             }
-
-            data.incrementPayloadPacketCount();
         }
 
         final ViolationResult violation = checkViolation(player, result);
@@ -148,9 +150,7 @@ public final class PayloadFrequency extends PacketCheck {
 
     @Override
     public void reloadConfig() {
-        unload();
-
-        if (enabled()) load();
+        load();
     }
 
     @Override

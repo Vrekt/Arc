@@ -4,8 +4,6 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
-import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
-import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.entity.Player;
 
 /**
@@ -36,30 +34,28 @@ public final class NoSwing extends PacketCheck {
     }
 
     /**
-     * Invoked when we interact with an entity.
+     * Check this player for NoSwing
      *
      * @param player the player
-     * @param packet the packet
      */
-    public boolean onAttack(Player player, WrapperPlayClientUseEntity packet) {
-        if (!enabled() || exempt(player)) return false;
+    public boolean check(Player player) {
+        if (exempt(player)) return false;
 
-        if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
-            final long delta = (System.currentTimeMillis()) - CombatData.get(player).lastSwingTime();
-            if (delta > swingTime) {
-                final CheckResult result = new CheckResult(CheckResult.Result.FAILED);
-                result.info("No swing animation within time");
-                result.parameter("delta", delta);
-                result.parameter("min", swingTime);
-                return checkViolation(player, result).cancel();
-            }
+        final long delta = (System.currentTimeMillis()) - CombatData.get(player).lastSwingTime();
+        if (delta > swingTime) {
+            final CheckResult result = new CheckResult();
+            result.setFailed("No swing animation within time");
+            result.parameter("delta", delta);
+            result.parameter("min", swingTime);
+            return checkViolation(player, result).cancel();
         }
+
         return false;
     }
 
     @Override
     public void reloadConfig() {
-        if (enabled()) load();
+        load();
     }
 
     @Override

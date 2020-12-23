@@ -1,5 +1,6 @@
 package arc.data.packet;
 
+import arc.data.Data;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -9,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Handles storing packet
  */
-public final class PacketData {
+public final class PacketData implements Data {
 
     /**
      * The register
@@ -92,4 +93,5 @@ public final class PacketData {
     public void cancelPayloadPackets(boolean cancelPayloadPackets) {
         this.cancelPayloadPackets = cancelPayloadPackets;
     }
+
 }

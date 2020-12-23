@@ -3,11 +3,6 @@ package arc.check.result;
 import arc.check.CheckSubType;
 import org.bukkit.ChatColor;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * Represents a check result.
  */
@@ -39,27 +34,6 @@ public final class CheckResult {
      * Information builder.
      */
     private StringBuilder informationBuilder;
-
-    /**
-     * Initialize this check result
-     *
-     * @param result the result
-     */
-    public CheckResult(Result result) {
-        this.result = result;
-        setFailed();
-    }
-
-    /**
-     * Initialize this check result.
-     *
-     * @param result the result
-     * @param type   the type
-     */
-    public CheckResult(Result result, CheckSubType type) {
-        this.result = result;
-        setFailed(type);
-    }
 
     /**
      * Empty
@@ -144,6 +118,7 @@ public final class CheckResult {
      * @param value     the value
      */
     public void parameter(String parameter, Object value) {
+        if (informationBuilder == null) informationBuilder = new StringBuilder();
         informationBuilder.append("\n").append(ChatColor.GRAY);
         informationBuilder.append(parameter).append("=").append(value.toString());
     }

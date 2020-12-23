@@ -153,6 +153,7 @@ public final class ArcConfiguration extends Configurable {
 
         Arc.arc().checks().reload(this);
         Arc.arc().violations().reload(this);
+        Arc.arc().punishment().reload(this);
     }
 
 }
