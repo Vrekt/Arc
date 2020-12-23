@@ -49,9 +49,10 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
   * Reach
 * `Moving` checks
   * Flight
-    * BoatFly
+    * ~BoatFly~
     * WIP
-  * Speed
+  * ~Speed~
+    * WIP
   * NoFall
   * MorePackets
   * Jesus
