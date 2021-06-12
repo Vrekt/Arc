@@ -1,7 +1,7 @@
 package arc.utility.block;
 
 import arc.Arc;
-import bridge.materials.MaterialsBridge;
+import bridge.material.MaterialApi;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -28,9 +28,9 @@ public final class Blocks {
     private static final Plugin PLUGIN = Arc.plugin();
 
     /**
-     * Materials bridge.
+     * MaterialApi bridge.
      */
-    private static final MaterialsBridge MATERIALS = Arc.bridge().materials();
+    private static final MaterialApi MATERIALS = Arc.bridge().material();
 
     /**
      * Get a block sync

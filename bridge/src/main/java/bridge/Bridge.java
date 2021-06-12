@@ -1,11 +1,10 @@
 package bridge;
 
-import bridge.chat.ChatBridge;
-import bridge.entities.EntitiesBridge;
-import bridge.materials.MaterialsBridge;
+import bridge.api.BukkitApi;
+import bridge.material.MaterialApi;
 
 /**
- * A basic bridge.
+ * Represents a bridge between different API versions
  */
 public interface Bridge {
 
@@ -17,24 +16,13 @@ public interface Bridge {
     Version version();
 
     /**
-     * The bridge materials data
-     *
-     * @return the {@link MaterialsBridge}
+     * @return the material API.
      */
-    MaterialsBridge materials();
+    MaterialApi material();
 
     /**
-     * The bridge for chat
-     *
-     * @return the {@link ChatBridge}
+     * @return the Bukkit API.
      */
-    ChatBridge chat();
-
-    /**
-     * The bridge for entities
-     *
-     * @return the {@link EntitiesBridge}
-     */
-    EntitiesBridge entities();
+    BukkitApi api();
 
 }

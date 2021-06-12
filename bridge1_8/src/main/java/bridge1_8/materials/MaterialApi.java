@@ -1,6 +1,5 @@
 package bridge1_8.materials;
 
-import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -12,8 +11,7 @@ import org.bukkit.material.TrapDoor;
 /**
  * Legacy materials API.
  */
-@SuppressWarnings("Deprecated")
-public final class Materials implements MaterialsBridge {
+public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isFence(Block block) {

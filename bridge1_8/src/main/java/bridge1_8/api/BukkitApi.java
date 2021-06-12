@@ -1,21 +1,26 @@
-package bridge1_8.entities;
+package bridge1_8.api;
 
-import bridge.BoundingBox;
-import bridge.entities.EntitiesBridge;
+import bridge.utility.BoundingBox;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Entities for 1.8
+ * Bukkit API implementation for 1.8
  */
-public final class Entities implements EntitiesBridge {
+public final class BukkitApi implements bridge.api.BukkitApi {
 
     /**
      * Stores entity bounds.
@@ -54,6 +59,36 @@ public final class Entities implements EntitiesBridge {
     }
 
     @Override
+    public Inventory createInventory(String title, int size) {
+        return Bukkit.createInventory(null, size, title);
+    }
+
+    @Override
+    public void broadcast(String message, String permission) {
+        Bukkit.broadcast(message, permission);
+    }
+
+    @Override
+    public void kickPlayer(Player player, String message) {
+        player.kickPlayer(message);
+    }
+
+    @Override
+    public void sendMessage(Player player, String message) {
+        player.sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(Player player, TextComponent message) {
+        player.sendMessage(message);
+    }
+
+    @Override
+    public void addHoverEvent(TextComponent component, String information) {
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(information).create()));
+    }
+
+    @Override
     public BoundingBox getBoundingBox(Entity entity) {
         if (ENTITY_BOUNDS.containsKey(entity.getType())) {
             final Pair<Float, Float> bounds = ENTITY_BOUNDS.get(entity.getType());
@@ -67,5 +102,4 @@ public final class Entities implements EntitiesBridge {
         final AxisAlignedBB nms = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new BoundingBox(nms.a, nms.b, nms.c, nms.d, nms.e, nms.f);
     }
-
 }

@@ -13,9 +13,9 @@ import arc.punishment.PunishmentManager;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
-import bridge1_15.Bridge115;
-import bridge1_16.Bridge116;
-import bridge1_8.Bridge18;
+import bridge1_15.Bridge1_15;
+import bridge1_16.Bridge1_16;
+import bridge1_8.Bridge1_8;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
@@ -31,7 +31,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.0.2";
+    public static final String VERSION_STRING = "2.1";
 
     /**
      * If sync events should be used.
@@ -196,7 +196,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_8() {
         version = Version.VERSION_1_8;
-        bridge = new Bridge18();
+        bridge = new Bridge1_8();
     }
 
     /**
@@ -204,7 +204,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_15() {
         version = Version.VERSION_1_15;
-        bridge = new Bridge115();
+        bridge = new Bridge1_15();
     }
 
     /**
@@ -212,7 +212,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_16() {
         version = Version.VERSION_1_16;
-        bridge = new Bridge116();
+        bridge = new Bridge1_16();
     }
 
 

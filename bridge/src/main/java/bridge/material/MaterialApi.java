@@ -1,13 +1,13 @@
-package bridge.materials;
+package bridge.material;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Materials bridge.
+ * A material API.
  */
-public interface MaterialsBridge {
+public interface MaterialApi {
 
     /**
      * Check if a block is a fence

@@ -12,7 +12,6 @@ import arc.permissions.Permissions;
 import arc.punishment.PunishmentManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
-import bridge.chat.ChatBridge;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -39,11 +38,6 @@ public final class ViolationManager extends Configurable implements Closeable {
      * A list of players who can view violations/debug information
      */
     private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
-
-    /**
-     * Chat bridge
-     */
-    private ChatBridge chatBridge;
 
     /**
      * If sync events should be used.
@@ -79,7 +73,6 @@ public final class ViolationManager extends Configurable implements Closeable {
                 .build();
 
         useSyncEvents = Arc.version().isNewerThan(Version.VERSION_1_8);
-        chatBridge = Arc.bridge().chat();
     }
 
     /**
@@ -150,8 +143,9 @@ public final class ViolationManager extends Configurable implements Closeable {
 
             // build the text component and then send to all viewers.
             final TextComponent component = new TextComponent(violationMessage);
-            chatBridge.addHoverEvent(component, result.information());
-            violationViewers.forEach(viewer -> viewer.spigot().sendMessage(component));
+            Arc.bridge().api().addHoverEvent(component, result.information());
+
+            violationViewers.forEach(viewer -> Arc.bridge().api().sendMessage(player, component));
         }
 
         // add a cancel result if this check should cancel.

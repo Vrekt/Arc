@@ -11,5 +11,7 @@ repositories {
 
 dependencies {
     compile files('paper.jar')
-    compile project(':bridge')
+    compile(project(':bridge')) {
+        transitive = false
+    }
 }

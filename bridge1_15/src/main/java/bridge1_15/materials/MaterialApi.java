@@ -1,15 +1,14 @@
-package bridge1_16.materials;
+package bridge1_15.materials;
 
-import bridge.materials.MaterialsBridge;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Current materials API
+ * 1.15 Material API
  */
-public final class Materials implements MaterialsBridge {
+public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isFence(Block block) {
@@ -33,10 +32,8 @@ public final class Materials implements MaterialsBridge {
 
     @Override
     public boolean isClimbable(Block block) {
-        return block.getState().getBlock() instanceof Ladder
-                || block.getType() == Material.VINE
-                || block.getType() == Material.TWISTING_VINES
-                || block.getType() == Material.WEEPING_VINES;
+        return block.getState() instanceof Ladder
+                || block.getType() == Material.VINE;
     }
 
     @Override
@@ -56,7 +53,7 @@ public final class Materials implements MaterialsBridge {
 
     @Override
     public boolean isWall(Block block) {
-        return block.getState() instanceof Wall;
+        return isFence(block);
     }
 
     @Override
@@ -73,4 +70,5 @@ public final class Materials implements MaterialsBridge {
     public ItemStack createItem(String material, short data) {
         return createItem(material);
     }
+
 }

@@ -12,15 +12,25 @@ repositories {
         url 'https://papermc.io/repo/repository/maven-public/'
     }
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
-    maven { url "https://repo.inventivetalent.org/content/groups/public/"}
+    maven { url "https://repo.inventivetalent.org/content/groups/public/" }
 }
 
 dependencies {
-    compile files('spigot.jar')
-    compile project(':bridge')
-    compile project(':bridge1_8')
-    compile project(':bridge1_15')
-    compile project(':bridge1_16')
-    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0"
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.65.Final'
+
+    compile(project(':bridge')) {
+        transitive = false;
+    }
+    compile(project(':bridge1_8')) {
+        transitive = false
+    }
+    compile(project(':bridge1_15')) {
+        transitive = false;
+    }
+    compile(project(':bridge1_16')) {
+        transitive = false;
+    }
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.6.0"
     compile "org.apache.commons:commons-lang3:3.11"
 }

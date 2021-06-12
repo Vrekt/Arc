@@ -1,4 +1,4 @@
-package bridge;
+package bridge.utility;
 
 /**
  * A basic bounding box.

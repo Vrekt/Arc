@@ -2,7 +2,7 @@ package arc.utility.entity;
 
 import arc.Arc;
 import arc.utility.math.MathUtil;
-import bridge.BoundingBox;
+import bridge.utility.BoundingBox;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -21,7 +21,7 @@ public final class Entities {
      * @return the {@link BoundingBox}
      */
     public static BoundingBox getBoundingBox(Entity entity) {
-        return Arc.bridge().entities().getBoundingBox(entity);
+        return Arc.bridge().api().getBoundingBox(entity);
     }
 
     /**

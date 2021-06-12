@@ -35,7 +35,7 @@ public final class ItemBuilder {
      * @param item the name of the item
      */
     public ItemBuilder(String item) {
-        this.item = Arc.bridge().materials().createItem(item);
+        this.item = Arc.bridge().material().createItem(item);
         this.meta = this.item.getItemMeta();
     }
 
@@ -48,9 +48,9 @@ public final class ItemBuilder {
      */
     public ItemBuilder(String legacyItem, String newItem, int data) {
         if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
-            item = Arc.bridge().materials().createItem(newItem);
+            item = Arc.bridge().material().createItem(newItem);
         } else {
-            item = Arc.bridge().materials().createItem(legacyItem, (short) data);
+            item = Arc.bridge().material().createItem(legacyItem, (short) data);
         }
 
         this.meta = this.item.getItemMeta();
