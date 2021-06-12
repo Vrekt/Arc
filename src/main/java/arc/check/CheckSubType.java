@@ -18,6 +18,11 @@ public enum CheckSubType {
     KILL_AURA_DIRECTION(CheckType.KILL_AURA, "direction", "Direction"),
 
     /**
+     * KillAura Speed
+     */
+    KILL_AURA_ATTACK_SPEED(CheckType.KILL_AURA, "attackspeed", "AttackSpeed"),
+
+    /**
      * FastUse FastBow
      */
     FAST_USE_FAST_BOW(CheckType.FAST_USE, "fastbow", "FastBow"),

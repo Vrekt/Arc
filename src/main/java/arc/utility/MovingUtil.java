@@ -76,6 +76,25 @@ public final class MovingUtil {
     }
 
     /**
+     * Check if the location has a block.
+     *
+     * @param location  the location
+     * @param xModifier the X modifier
+     * @param yModifier the Y modifier
+     * @param zModifier the Z modifier
+     * @param predicate the predicate to test
+     * @return {@code true} if so
+     */
+    public static boolean hasBlock(Location location, double xModifier, double yModifier, double zModifier, Predicate<Block> predicate) {
+        final Block self = Blocks.getBlockSync(location);
+        if (predicate.test(self)) return true;
+        final Block under = Blocks.getBlockSync(location, BlockFace.DOWN);
+        location.setY(location.getY() + 1);
+        if (predicate.test(under)) return true;
+        return checkBlocksAround(location, xModifier, yModifier, zModifier, predicate);
+    }
+
+    /**
      * Check blocks around a location
      *
      * @param location  the location
@@ -144,6 +163,9 @@ public final class MovingUtil {
         // prevent cloning multiple times to save performance
         final Location cloneFrom = from.clone();
         final Location cloneTo = to.clone();
+
+        data.from(cloneFrom);
+        data.to(cloneTo);
 
         // calculate ground
         final boolean currentOnGround = data.onGround();

@@ -1,6 +1,7 @@
 package arc.data.combat;
 
 import arc.data.Data;
+import arc.utility.math.MathUtil;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -38,8 +39,19 @@ public final class CombatData implements Data {
 
     /**
      * Last time the player swung their arm
+     * The last attack
      */
-    private long lastSwingTime;
+    private long lastSwingTime, lastAttackReset, lastAttack;
+
+    /**
+     * Total amount of attacks
+     */
+    private int totalAttacks;
+
+    /**
+     * If attacks should be cancelled.
+     */
+    private boolean cancelAttacks;
 
     public long lastSwingTime() {
         return lastSwingTime;
@@ -49,4 +61,35 @@ public final class CombatData implements Data {
         this.lastSwingTime = lastSwingTime;
     }
 
+    public int totalAttacks() {
+        return totalAttacks;
+    }
+
+    public void totalAttacks(int totalAttacks) {
+        this.totalAttacks = MathUtil.clampInt(totalAttacks, 0, 100);
+    }
+
+    public long lastAttackReset() {
+        return lastAttackReset;
+    }
+
+    public void lastAttackReset(long lastAttackReset) {
+        this.lastAttackReset = lastAttackReset;
+    }
+
+    public boolean cancelAttacks() {
+        return cancelAttacks;
+    }
+
+    public void cancelAttacks(boolean cancelAttacks) {
+        this.cancelAttacks = cancelAttacks;
+    }
+
+    public long lastAttack() {
+        return lastAttack;
+    }
+
+    public void lastAttack(long lastAttack) {
+        this.lastAttack = lastAttack;
+    }
 }

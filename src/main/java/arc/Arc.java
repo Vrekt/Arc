@@ -20,9 +20,8 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.logging.Level;
 
 /**
  * The main entry point for Arc.
@@ -32,7 +31,12 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.0.1";
+    public static final String VERSION_STRING = "2.0.2";
+
+    /**
+     * If sync events should be used.
+     */
+    private static boolean useSyncEvents;
 
     /**
      * The file configuration
@@ -102,6 +106,7 @@ public final class Arc extends JavaPlugin {
         checkManager.initialize();
         violationManager.initialize(arcConfiguration);
         punishmentManager.initialize(arcConfiguration);
+        exemptionManager.initialize(arcConfiguration);
         registerListeners();
 
         getLogger().info("Registering base command...");
@@ -159,7 +164,7 @@ public final class Arc extends JavaPlugin {
     private void verifyCommand() {
         final PluginCommand command = getCommand("arc");
         if (command == null) {
-            getLogger().log(Level.SEVERE, "/arc command not found! You will not be able to use this command.");
+            getLogger().severe("/arc command not found! You will not be able to use this command.");
         } else {
             command.setExecutor(new ArcCommand());
         }
@@ -171,15 +176,17 @@ public final class Arc extends JavaPlugin {
     private boolean loadCompatibleVersions() {
         if (Bukkit.getVersion().contains("1.8.8")) {
             loadFor1_8();
-        } else if (Bukkit.getVersion().contains("1.16.4")) {
+        } else if (Bukkit.getVersion().contains("1.16.5")) {
             loadFor1_16();
         } else if (Bukkit.getVersion().contains("1.15.2")) {
             loadFor1_15();
         } else {
-            getLogger().log(Level.SEVERE, "Arc is not compatible with this version: " + Bukkit.getVersion());
+            getLogger().severe("Arc is not compatible with this version: " + Bukkit.getVersion());
             incompatible = true;
             return false;
         }
+
+        useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
         getLogger().info("Initialized Arc for: " + Bukkit.getVersion());
         return true;
     }
@@ -277,6 +284,21 @@ public final class Arc extends JavaPlugin {
      */
     public ProtocolManager protocol() {
         return protocolManager;
+    }
+
+    /**
+     * Trigger a bukkit event sync.
+     * TODO: Could cause a problem with a-lot of events/violations/exemptions?
+     * TODO: Maybe move it into a queue with a thread constantly processing them.
+     *
+     * @param event the event
+     */
+    public static void triggerEvent(Event event) {
+        if (useSyncEvents) {
+            arc.getServer().getScheduler().runTask(Arc.arc(), () -> arc.getServer().getPluginManager().callEvent(event));
+        } else {
+            arc.getServer().getPluginManager().callEvent(event);
+        }
     }
 
 }

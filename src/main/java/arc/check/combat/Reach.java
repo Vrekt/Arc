@@ -3,7 +3,6 @@ package arc.check.combat;
 import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
-import arc.data.moving.MovingData;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -63,7 +62,6 @@ public final class Reach extends PacketCheck {
      */
     public boolean check(Player player, Entity entity) {
         if (exempt(player)) return false;
-        final MovingData data = MovingData.get(player);
         final CheckResult result = new CheckResult();
 
         // retrieve our recent location and the entity location.

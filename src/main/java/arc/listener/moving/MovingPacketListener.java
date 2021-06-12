@@ -230,9 +230,6 @@ public final class MovingPacketListener extends AbstractPacketListener {
                 // calculate if this move was from one block to another
                 final boolean wasBlockMovement = from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ();
 
-                data.from(from);
-                data.to(to);
-
                 // calc player movement
                 MovingUtil.calculateMovement(data, from, to);
 
@@ -274,6 +271,10 @@ public final class MovingPacketListener extends AbstractPacketListener {
      * @param data   their data
      */
     private void runChecks(Player player, MovingData data) {
+        if (flight.enabled()) {
+            flight.check(player, data);
+        }
+
         if (noFall.enabled()) {
             noFall.check(player, data);
         }

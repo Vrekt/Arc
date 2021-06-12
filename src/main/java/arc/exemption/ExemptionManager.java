@@ -1,7 +1,11 @@
 package arc.exemption;
 
+import arc.Arc;
+import arc.api.events.PlayerExemptionCheckEvent;
 import arc.check.CheckSubType;
 import arc.check.CheckType;
+import arc.configuration.ArcConfiguration;
+import arc.configuration.Configurable;
 import arc.exemption.type.ExemptionType;
 import arc.permissions.Permissions;
 import org.bukkit.GameMode;
@@ -15,12 +19,31 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages player exemptions
  */
-public final class ExemptionManager implements Closeable {
+public final class ExemptionManager extends Configurable implements Closeable {
 
     /**
      * Exemptions by player
      */
     private final Map<UUID, Exemptions> exemptions = new ConcurrentHashMap<>();
+
+    /**
+     * if events should be used.
+     */
+    private boolean useEvents;
+
+    /**
+     * Initialize
+     *
+     * @param configuration the config
+     */
+    public void initialize(ArcConfiguration configuration) {
+        useEvents = configuration.enableEventApi();
+    }
+
+    @Override
+    public void reload(ArcConfiguration configuration) {
+        useEvents = configuration.enableEventApi();
+    }
 
     /**
      * Invoked when a player joins
@@ -62,15 +85,15 @@ public final class ExemptionManager implements Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, CheckType check) {
-        // check general exemption
-        if (isPlayerExemptFromCheck(player, check)) return true;
-        // check flying status
-        if (isFlying(player) && isExemptWhenFlying(check)) return true;
-        // check other added exemptions
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
-        if (exemptions == null) return false;
+        final boolean exemptFromCheck = isPlayerExemptFromCheck(player, check);
+        final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
+        boolean exemptionsMapped = false;
 
-        return exemptions.isExempt(check);
+        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        if (exemptions != null) {
+            exemptionsMapped = exemptions.isExempt(check);
+        }
+        return isExemptFireEvent(player, check, null, (exemptFromCheck || exemptFlying || exemptionsMapped));
     }
 
     /**
@@ -81,7 +104,24 @@ public final class ExemptionManager implements Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, CheckSubType subType) {
-        return player.hasPermission(Permissions.ARC_BYPASS + "." + subType.from().category().name().toLowerCase() + "." + subType.from().getName() + "." + subType.getName());
+        final boolean permission = player.hasPermission(Permissions.ARC_BYPASS + "." + subType.from().category().name().toLowerCase() + "." + subType.from().getName() + "." + subType.getName());
+        return isExemptFireEvent(player, null, subType, permission);
+    }
+
+    /**
+     * Check if a player is exempt AFTER invoking the event/
+     *
+     * @param player  the player
+     * @param check   the check
+     * @param subType the sub-type
+     * @return if the player is exempt
+     */
+    private boolean isExemptFireEvent(Player player, CheckType check, CheckSubType subType, boolean isExempt) {
+        if (!useEvents) return isExempt;
+
+        final PlayerExemptionCheckEvent event = new PlayerExemptionCheckEvent(player, check, subType, isExempt);
+        Arc.triggerEvent(event);
+        return event.isExempt();
     }
 
     /**
@@ -158,7 +198,8 @@ public final class ExemptionManager implements Closeable {
         return check == CheckType.NOFALL
                 || check == CheckType.FLIGHT
                 || check == CheckType.SPEED
-                || check == CheckType.JESUS;
+                || check == CheckType.JESUS
+                || check == CheckType.CRITICALS;
     }
 
     @Override
