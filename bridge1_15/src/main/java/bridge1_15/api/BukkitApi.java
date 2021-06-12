@@ -26,6 +26,11 @@ public final class BukkitApi implements bridge.api.BukkitApi {
     }
 
     @Override
+    public void broadcast(String message) {
+        Bukkit.broadcastMessage(message);
+    }
+
+    @Override
     public void kickPlayer(Player player, String message) {
         player.kickPlayer(message);
     }

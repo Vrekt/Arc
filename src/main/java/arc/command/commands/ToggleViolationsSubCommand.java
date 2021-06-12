@@ -40,6 +40,7 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
 
         final ItemMeta meta = modified.getItemMeta();
         if (meta != null) {
+            // TODO @Deprecated
             meta.setLore(Collections.singletonList(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off.")));
         }
         modified.setItemMeta(meta);

@@ -58,6 +58,7 @@ public final class ItemBuilder {
 
     /**
      * Set the display name
+     * TODO @Deprecated
      *
      * @param name the name
      * @return this
@@ -80,6 +81,7 @@ public final class ItemBuilder {
 
     /**
      * Build
+     * TODO @Deprecated
      *
      * @return the internal {@link ItemStack}
      */

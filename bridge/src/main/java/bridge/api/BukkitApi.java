@@ -29,6 +29,14 @@ public interface BukkitApi {
      */
     void broadcast(String message, String permission);
 
+
+    /**
+     * Broadcast a message
+     *
+     * @param message the message
+     */
+    void broadcast(String message);
+
     /**
      * Kick a player
      *

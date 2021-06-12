@@ -1,7 +1,6 @@
 package arc.inventory;
 
 import arc.Arc;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -59,7 +58,7 @@ public final class InventoryCreator {
      * @param size  the size
      */
     public InventoryCreator(String title, int size) {
-        inventory = Bukkit.createInventory(null, size, title);
+        inventory = Arc.bridge().api().createInventory(title, size);
     }
 
     /**

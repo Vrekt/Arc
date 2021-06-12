@@ -151,7 +151,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .prefix()
                 .time(banConfiguration.globalBanDelay())
                 .value();
-        Bukkit.broadcast(violation, Permissions.ARC_VIOLATIONS);
+        Arc.bridge().api().broadcast(violation, Permissions.ARC_VIOLATIONS);
 
         // schedule the player ban
         final Date finalDate = date;
@@ -197,7 +197,8 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
         // ban the player and kick them
         Bukkit.getBanList(type).addBan(playerBan, message, date, message);
-        player.kickPlayer(message);
+        Arc.bridge().api().kickPlayer(player, message);
+
         pendingPlayerBans.remove(player);
 
         // broadcast the ban
@@ -217,7 +218,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
             // broadcast
             final String broadcast = configMessage.type().value();
-            Bukkit.broadcastMessage(broadcast);
+            Arc.bridge().api().broadcast(broadcast);
         }
 
     }
@@ -236,13 +237,13 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .prefix()
                 .time(kickConfiguration.globalKickDelay())
                 .value();
-        Bukkit.broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
+        Arc.bridge().api().broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
         Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> {
 
             final String message = kickConfiguration.globalKickMessage()
                     .check(check, null)
                     .value();
-            player.kickPlayer(message);
+            Arc.bridge().api().kickPlayer(player, message);
             pendingPlayerKicks.remove(player);
         }, kickConfiguration.globalKickDelay() * 20L);
     }
