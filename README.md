@@ -3,7 +3,7 @@
 # Arc
 Arc is an anticheat built to support older PvP versions and newer game versions.
 
-* Supports 1.8.8, 1.15.2 and 1.16.5
+* Supports 1.8.8, 1.12.2 and 1.16.5
 * Customizable check configurations
 * Extensive configuration
 * Extensive permissions
