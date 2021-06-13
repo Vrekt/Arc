@@ -76,6 +76,12 @@ View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress it
   * Be sure to thoroughly test and make sure no other systems interfere.
   * Documentation should be included.
 
+* To work on Arc yourself, the following things are required:
+  * A PaperSpigot 1.8 jar with NMS.
+  * A CraftBukkit 1.15.2 jar - which can be obtained from BuildTools using `--compile craftbukkit`
+  * A CraftBukkit 1.16.5 jar - which can be obtained from BuildTools using `--compile craftbukkit`
+  * Each CraftBukkit jar must be placed in their respective `bridgex_x` directory.
+
 # Documentation
 
 All the documentation is still work-in-progress and very incomplete.
