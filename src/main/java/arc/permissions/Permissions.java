@@ -60,6 +60,11 @@ public final class Permissions {
     public static final String ARC_COMMANDS_TIMINGS = "arc.commands.timings";
 
     /**
+     * The permission to exempt from certain checks
+     */
+    public static final String ARC_COMMANDS_EXEMPT = "arc.commands.exempt";
+
+    /**
      * Check if the player can view violations
      *
      * @param player the player

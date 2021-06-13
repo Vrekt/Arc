@@ -6,6 +6,7 @@ import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
 import arc.violation.result.ViolationResult;
+import bridge.Version;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
@@ -43,7 +44,8 @@ public final class PayloadFrequency extends PacketCheck {
      */
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
-        if (disableIfNewerThan18()) return;
+        // TODO: unknown
+        if (disableIfNewerThan(Version.VERSION_1_8)) return;
 
         enabled(true)
                 .cancel(true)

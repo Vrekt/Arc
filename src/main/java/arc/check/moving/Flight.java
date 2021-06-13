@@ -66,7 +66,7 @@ public final class Flight extends Check {
         // basically anything over 0.42
         if (hasVerticalMove) checkVerticalDistance(player, data, to, vertical);
 
-        player.sendMessage("Vertical: " + vertical);
+      //  player.sendMessage("Vertical: " + vertical);
 
     }
 

@@ -18,7 +18,6 @@ public final class NoSwing extends PacketCheck {
 
     public NoSwing() {
         super(CheckType.NO_SWING);
-        if (disableIfNewerThan18()) return;
 
         enabled(true)
                 .cancel(true)
@@ -29,7 +28,8 @@ public final class NoSwing extends PacketCheck {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("swing-time", 100);
+        // slightly adjusted for >1.8
+        addConfigurationValue("swing-time", 90);
         if (enabled()) load();
     }
 

@@ -257,12 +257,13 @@ public abstract class Check extends Configurable {
     }
 
     /**
-     * Disables this check if the {@link Version} is newer than {@code Version.VERSION_1_8}
+     * Disables this check if thr provided {@code version} is newer than current
      *
+     * @param version the version
      * @return {@code true} if the check is disabled
      */
-    protected boolean disableIfNewerThan18() {
-        if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
+    protected boolean disableIfNewerThan(Version version) {
+        if (Arc.version().isNewerThan(version)) {
             permanentlyDisabled = true;
             return true;
         }

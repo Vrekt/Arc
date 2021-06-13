@@ -31,6 +31,15 @@ public final class Exemptions {
     }
 
     /**
+     * Add an exemption permanently
+     *
+     * @param check the check
+     */
+    public void addExemptionPermanently(CheckType check) {
+        exemptions.put(check, -1L);
+    }
+
+    /**
      * Add an exemption type
      *
      * @param type the type
@@ -55,10 +64,12 @@ public final class Exemptions {
      * @return {@code true} if so
      */
     public boolean isExempt(CheckType check) {
-        final long time = exemptions.getOrDefault(check, -1L);
-        if (time == -1) return false;
+        final long time = exemptions.getOrDefault(check, 0L);
+        if (time == 0) return false;
+        // perm exemption
+        if (time == -1) return true;
 
-        final boolean result = time == 0 || (System.currentTimeMillis() - time <= 0);
+        final boolean result = (System.currentTimeMillis() - time <= 0);
         if (result) exemptions.remove(check);
         return result;
     }

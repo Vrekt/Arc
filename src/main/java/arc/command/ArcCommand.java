@@ -1,10 +1,7 @@
 package arc.command;
 
 import arc.Arc;
-import arc.command.commands.CancelBanSubCommand;
-import arc.command.commands.ReloadConfigSubCommand;
-import arc.command.commands.TimingsSubCommand;
-import arc.command.commands.ToggleViolationsSubCommand;
+import arc.command.commands.*;
 import arc.inventory.InventoryCreator;
 import arc.inventory.ItemBuilder;
 import arc.permissions.Permissions;
@@ -30,6 +27,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("reload", new ReloadConfigSubCommand());
         addSubCommand("timings", new TimingsSubCommand());
         addSubCommand("cancelban", new CancelBanSubCommand());
+        addSubCommand("exempt", new ExemptPlayerSubCommand());
 
         // initialize help message.
         final String prefix = Arc.arc().configuration().prefix();
@@ -39,6 +37,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         helpLine(Permissions.ARC_COMMANDS_RELOAD_CONFIG, prefix + ChatColor.DARK_AQUA + " /arc reload - " + ChatColor.GRAY + "Reloads the configuration.");
         helpLine(Permissions.ARC_COMMANDS_TIMINGS, prefix + ChatColor.DARK_AQUA + " /arc timings - " + ChatColor.GRAY + "View timings and TPS information.");
         helpLine(Permissions.ARC_COMMANDS_CANCEL_BAN, prefix + ChatColor.DARK_AQUA + " /arc cancelban <player> - " + ChatColor.GRAY + "Cancel a pending player ban.");
+        helpLine(Permissions.ARC_COMMANDS_EXEMPT, prefix + ChatColor.DARK_AQUA + "/arc exempt <player> <check|all> - " + ChatColor.GRAY + "Exempt a player from a check or all checks.");
     }
 
     @Override

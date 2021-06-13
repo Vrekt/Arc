@@ -47,7 +47,7 @@ public final class ItemBuilder {
      * @param data       the possible data
      */
     public ItemBuilder(String legacyItem, String newItem, int data) {
-        if (Arc.version().isNewerThan(Version.VERSION_1_8)) {
+        if (Arc.version().isNewerThan(Version.VERSION_1_12)) {
             item = Arc.bridge().material().createItem(newItem);
         } else {
             item = Arc.bridge().material().createItem(legacyItem, (short) data);

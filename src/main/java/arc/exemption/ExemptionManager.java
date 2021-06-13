@@ -159,6 +159,19 @@ public final class ExemptionManager extends Configurable implements Closeable {
     }
 
     /**
+     * Add an exemption permanently
+     *
+     * @param player the player
+     * @param check  the check
+     */
+    public void addExemptionPermanently(Player player, CheckType... check) {
+        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        for (CheckType checkType : check) {
+            exemptions.addExemptionPermanently(checkType);
+        }
+    }
+
+    /**
      * Add an exemption type
      *
      * @param player the player

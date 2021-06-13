@@ -1,9 +1,11 @@
 package arc.check.player;
 
+import arc.Arc;
 import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
+import bridge.Version;
 import org.bukkit.entity.Player;
 
 /**
@@ -12,13 +14,18 @@ import org.bukkit.entity.Player;
 public final class Regeneration extends Check {
 
     /**
-     * The min time it takes to regain health.
+     * The min time it takes to regain health (1.8)
+     * The min time it takes to regain health (>1.8)
      */
-    private long regenerationTime;
+    private long legacyRegenerationTime, newRegenerationTime;
+
+    /**
+     * IF 1.8
+     */
+    private boolean useLegacy;
 
     public Regeneration() {
         super(CheckType.REGENERATION);
-        if (disableIfNewerThan18()) return;
 
         enabled(true)
                 .cancel(true)
@@ -29,7 +36,8 @@ public final class Regeneration extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("regeneration-time-ms", 3400);
+        addConfigurationValue("legacy-regeneration-time-ms", 3400);
+        addConfigurationValue("new-regeneration-time-ms", 450);
         if (enabled()) load();
     }
 
@@ -45,12 +53,14 @@ public final class Regeneration extends Check {
 
         // the time from now to the last regain event.
         final long time = System.currentTimeMillis() - data.lastHealthRegain();
+        final boolean failed = useLegacy ? time < legacyRegenerationTime : time < newRegenerationTime;
+
         // if its less than the minimum then flag.
-        if (time < regenerationTime) {
+        if (failed) {
             final CheckResult result = new CheckResult();
             result.setFailed("Regaining health too fast.");
             result.parameter("time", time);
-            result.parameter("min", regenerationTime);
+            result.parameter("min", useLegacy ? legacyRegenerationTime : newRegenerationTime);
             return checkViolation(player, result).cancel();
         }
         return false;
@@ -63,6 +73,8 @@ public final class Regeneration extends Check {
 
     @Override
     public void load() {
-        regenerationTime = configuration.getLong("regeneration-time-ms");
+        useLegacy = Arc.version() == Version.VERSION_1_8;
+        legacyRegenerationTime = configuration.getLong("legacy-regeneration-time-ms");
+        newRegenerationTime = configuration.getLong("new-regeneration-time-ms");
     }
 }

@@ -94,4 +94,20 @@ public enum CheckType {
     public CheckCategory category() {
         return category;
     }
+
+    /**
+     * Get a check by name
+     *
+     * @param name the name
+     * @return the {@link CheckType} or {@code null} if not found
+     */
+    public static CheckType getCheckTypeByName(String name) {
+        for (CheckType value : values()) {
+            if (value.getName().equalsIgnoreCase(name)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
 }
