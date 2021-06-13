@@ -11,7 +11,6 @@ import arc.configuration.Configurable;
 import arc.permissions.Permissions;
 import arc.punishment.PunishmentManager;
 import arc.violation.result.ViolationResult;
-import bridge.Version;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -40,11 +39,6 @@ public final class ViolationManager extends Configurable implements Closeable {
     private final Set<Player> violationViewers = ConcurrentHashMap.newKeySet();
 
     /**
-     * If sync events should be used.
-     */
-    private boolean useSyncEvents;
-
-    /**
      * Keeps track of when to expire history
      */
     private Cache<UUID, Violations> historyCache;
@@ -71,8 +65,6 @@ public final class ViolationManager extends Configurable implements Closeable {
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)
                 .build();
-
-        useSyncEvents = Arc.version().isNewerThan(Version.VERSION_1_8);
     }
 
     /**
@@ -115,6 +107,7 @@ public final class ViolationManager extends Configurable implements Closeable {
 
         // call our violation event.
         if (configuration.enableEventApi()) {
+
             final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result);
             Arc.triggerEvent(event);
             // if the event is cancelled, remove the violation level and return no result.

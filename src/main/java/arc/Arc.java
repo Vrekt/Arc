@@ -13,7 +13,7 @@ import arc.punishment.PunishmentManager;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
-import bridge1_15.Bridge1_15;
+import bridge1_12.Bridge1_12;
 import bridge1_16.Bridge1_16;
 import bridge1_8.Bridge1_8;
 import com.comphenix.protocol.ProtocolLibrary;
@@ -174,21 +174,29 @@ public final class Arc extends JavaPlugin {
      * Load compatible versions
      */
     private boolean loadCompatibleVersions() {
-        if (Bukkit.getVersion().contains("1.8.8")) {
-            loadFor1_8();
-        } else if (Bukkit.getVersion().contains("1.16.5")) {
-            loadFor1_16();
-        } else if (Bukkit.getVersion().contains("1.15.2")) {
-            loadFor1_15();
-        } else {
+        version = Version.isCompatible(Bukkit.getVersion());
+
+        if (version == null) {
             getLogger().severe("Arc is not compatible with this version: " + Bukkit.getVersion());
             incompatible = true;
             return false;
-        }
+        } else {
+            switch (version) {
+                case VERSION_1_8:
+                    loadFor1_8();
+                    break;
+                case VERSION_1_12:
+                    loadFor1_12();
+                    break;
+                case VERSION_1_16:
+                    loadFor1_16();
+                    break;
+            }
 
-        useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
-        getLogger().info("Initialized Arc for: " + Bukkit.getVersion());
-        return true;
+            useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
+            getLogger().info("Initialized Arc for: " + Bukkit.getVersion());
+            return true;
+        }
     }
 
     /**
@@ -200,11 +208,11 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
-     * Load arc for 1.15
+     * Load arc for 1.12
      */
-    private void loadFor1_15() {
-        version = Version.VERSION_1_15;
-        bridge = new Bridge1_15();
+    private void loadFor1_12() {
+        version = Version.VERSION_1_12;
+        bridge = new Bridge1_12();
     }
 
     /**

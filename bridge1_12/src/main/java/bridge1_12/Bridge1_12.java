@@ -1,4 +1,4 @@
-package bridge1_15;
+package bridge1_12;
 
 import bridge.Bridge;
 import bridge.Version;
@@ -6,23 +6,23 @@ import bridge.api.BukkitApi;
 import bridge.material.MaterialApi;
 
 /**
- * Current bridge for 1.15
+ * Current bridge for 1.12
  */
-public final class Bridge1_15 implements Bridge {
+public final class Bridge1_12 implements Bridge {
 
     /**
-     * MaterialApi for 1.15
+     * MaterialApi for 1.12
      */
-    private static final MaterialApi MATERIAL_API = new bridge1_15.materials.MaterialApi();
+    private static final MaterialApi MATERIAL_API = new bridge1_12.materials.MaterialApi();
 
     /**
-     * Bukkit API for 1.15
+     * Bukkit API for 1.12
      */
-    private static final BukkitApi BUKKIT_API = new bridge1_15.api.BukkitApi();
+    private static final BukkitApi BUKKIT_API = new bridge1_12.api.BukkitApi();
 
     @Override
     public Version version() {
-        return Version.VERSION_1_15;
+        return Version.VERSION_1_12;
     }
 
     @Override

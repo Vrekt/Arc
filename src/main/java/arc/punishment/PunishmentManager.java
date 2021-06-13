@@ -12,11 +12,10 @@ import arc.configuration.types.ConfigurationString;
 import arc.configuration.types.Placeholders;
 import arc.permissions.Permissions;
 import bridge.Version;
-import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.bukkit.BanList;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 
 import java.io.Closeable;
 import java.util.Date;
@@ -158,7 +157,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
         if (enableEventApi) {
             final PlayerBanEvent event = new PlayerBanEvent(player, check, finalDate, banConfiguration.globalBanDelay());
-            triggerEvent(event);
+            Arc.triggerEvent(event);
 
             if (event.isCancelled()) {
                 pendingPlayerBans.remove(player);
@@ -246,20 +245,6 @@ public final class PunishmentManager extends Configurable implements Closeable {
             Arc.bridge().api().kickPlayer(player, message);
             pendingPlayerKicks.remove(player);
         }, kickConfiguration.globalKickDelay() * 20L);
-    }
-
-
-    /**
-     * Trigger a bukkit event
-     *
-     * @param event the event
-     */
-    private void triggerEvent(Event event) {
-        if (useSyncEvents) {
-            Bukkit.getScheduler().runTask(Arc.arc(), () -> Bukkit.getServer().getPluginManager().callEvent(event));
-        } else {
-            Bukkit.getServer().getPluginManager().callEvent(event);
-        }
     }
 
     @Override

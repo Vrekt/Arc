@@ -1,39 +1,52 @@
-package bridge1_15.materials;
+package bridge1_12.materials;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.type.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.material.Gate;
+import org.bukkit.material.Stairs;
+import org.bukkit.material.Step;
+import org.bukkit.material.TrapDoor;
 
 /**
- * 1.15 Material API
+ * 1.12 Material API
  */
 public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isFence(Block block) {
-        return block.getState() instanceof Fence;
+        switch (block.getType()) {
+            case FENCE:
+            case BIRCH_FENCE:
+            case DARK_OAK_FENCE:
+            case IRON_FENCE:
+            case JUNGLE_FENCE:
+            case NETHER_FENCE:
+            case SPRUCE_FENCE:
+            case ACACIA_FENCE:
+                return true;
+        }
+        return false;
     }
 
     @Override
     public boolean isSlab(Block block) {
-        return block.getState() instanceof Slab;
+        return block.getType().getData().equals(Step.class);
     }
 
     @Override
     public boolean isStair(Block block) {
-        return block.getState() instanceof Stairs;
+        return block.getType().getData().equals(Stairs.class);
     }
 
     @Override
     public boolean isFenceGate(Block block) {
-        return block.getState() instanceof Gate;
+        return block.getType().getData().equals(Gate.class);
     }
 
     @Override
     public boolean isClimbable(Block block) {
-        return block.getState() instanceof Ladder
-                || block.getType() == Material.VINE;
+        return block.getType() == Material.LADDER || block.getType() == Material.VINE;
     }
 
     @Override
@@ -43,17 +56,17 @@ public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isTrapdoor(Block block) {
-        return block.getState() instanceof TrapDoor;
+        return block.getType().getData().equals(TrapDoor.class);
     }
 
     @Override
     public boolean isIce(Block block) {
-        return block.getType() == Material.ICE || block.getType() == Material.PACKED_ICE || block.getType() == Material.BLUE_ICE || block.getType() == Material.FROSTED_ICE;
+        return block.getType() == Material.ICE || block.getType() == Material.PACKED_ICE;
     }
 
     @Override
     public boolean isWall(Block block) {
-        return isFence(block);
+        return block.getType() == Material.COBBLE_WALL;
     }
 
     @Override
@@ -68,7 +81,7 @@ public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public ItemStack createItem(String material, short data) {
-        return createItem(material);
+        return new ItemStack(getMaterial(material), 1, data);
     }
 
 }

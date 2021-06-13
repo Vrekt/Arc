@@ -8,23 +8,29 @@ public enum Version {
     /**
      * 1.8
      */
-    VERSION_1_8(0),
+    VERSION_1_8(0, "1.8.8"),
     /**
-     * 1.15
+     * 1.12
      */
-    VERSION_1_15(1),
+    VERSION_1_12(1, "1.12"),
     /**
      * 1.16
      */
-    VERSION_1_16(2);
+    VERSION_1_16(2, "1.16");
 
     /**
      * The number
      */
     private final int number;
 
-    Version(int number) {
+    /**
+     * Version string
+     */
+    private final String version;
+
+    Version(int number, String version) {
         this.number = number;
+        this.version = version;
     }
 
     /**
@@ -56,6 +62,19 @@ public enum Version {
      */
     public static boolean isNewerThan(Version v1, Version v2) {
         return v1.number > v2.number;
+    }
+
+    /**
+     * Check if the string version is compatible
+     *
+     * @param version the version
+     * @return the version or {@code null} if not compatible.
+     */
+    public static Version isCompatible(String version) {
+        for (Version value : values()) {
+            if (version.contains(value.version)) return value;
+        }
+        return null;
     }
 
 }

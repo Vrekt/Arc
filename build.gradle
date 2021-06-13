@@ -20,17 +20,16 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.65.Final'
 
     compile(project(':bridge')) {
-        transitive = false;
+        transitive = false
     }
     compile(project(':bridge1_8')) {
         transitive = false
     }
-    compile(project(':bridge1_15')) {
-        transitive = false;
+    compile(project(':bridge1_12')) {
+        transitive = false
     }
     compile(project(':bridge1_16')) {
-        transitive = false;
+        transitive = false
     }
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.6.0"
-    compile "org.apache.commons:commons-lang3:3.11"
 }

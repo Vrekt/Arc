@@ -5,24 +5,28 @@ plugins {
 group 'me.vrekt'
 version '1.0-SNAPSHOT'
 
+repositories {
+    mavenCentral()
+}
+
 configurations {
     priority
     sourceSets.main.compileClasspath = configurations.priority + sourceSets.main.compileClasspath
 }
 
+group 'me.vrekt'
+version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 
-    repositories {
-        maven {
-            url 'https://papermc.io/repo/repository/maven-public/'
-        }
+    maven {
+        url 'https://papermc.io/repo/repository/maven-public/'
     }
 }
 
 dependencies {
-    priority 'com.destroystokyo.paper:paper-api:1.15.2-R0.1-SNAPSHOT'
+    priority 'com.destroystokyo.paper:paper-api:1.12.2-R0.1-SNAPSHOT'
     compile files('craftbukkit.jar')
     compile(project(':bridge')) {
         transitive = false

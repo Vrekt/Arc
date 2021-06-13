@@ -22,7 +22,7 @@ public final class Bridge1_16 implements Bridge {
 
     @Override
     public Version version() {
-        return Version.VERSION_1_15;
+        return Version.VERSION_1_16;
     }
 
     @Override

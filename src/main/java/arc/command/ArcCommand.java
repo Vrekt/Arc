@@ -8,7 +8,7 @@ import arc.command.commands.ToggleViolationsSubCommand;
 import arc.inventory.InventoryCreator;
 import arc.inventory.ItemBuilder;
 import arc.permissions.Permissions;
-import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -58,7 +58,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         if (help(argument)) return printHelpLines(sender);
         // execute sub-commands
         if (isSubCommand(argument)) {
-            return executeSubCommand(sender, argument, ArrayUtils.remove(args, 0));
+            return executeSubCommand(sender, argument, (String[]) ArrayUtils.remove(args, 0));
         } else {
             // not found, print help.
             return printHelpLines(sender);

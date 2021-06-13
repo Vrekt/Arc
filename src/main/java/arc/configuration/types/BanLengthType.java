@@ -1,6 +1,6 @@
 package arc.configuration.types;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * The ban length type.

@@ -2,7 +2,7 @@ package arc.configuration.types;
 
 import arc.Arc;
 import arc.check.Check;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 

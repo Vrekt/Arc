@@ -16,11 +16,12 @@ public final class ChatUtil {
      * @param message the message
      */
     public static void sendMessage(Player player, String message) {
-        player.sendMessage(Arc.arc().configuration().prefix() + " " + message);
+        Arc.bridge().api().sendMessage(player, Arc.arc().configuration().prefix() + " " + message);
     }
 
     /**
      * Send a message
+     * TODO: Problems?
      *
      * @param sender  the sender
      * @param message the message

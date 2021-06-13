@@ -1,18 +1,18 @@
-package bridge1_15.api;
+package bridge1_12.api;
 
 import bridge.utility.BoundingBox;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.server.v1_15_R1.AxisAlignedBB;
+import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- * Bukkit API implementation for 1.15
+ * Bukkit API implementation for 1.12
  */
 public final class BukkitApi implements bridge.api.BukkitApi {
     @Override
@@ -53,6 +53,6 @@ public final class BukkitApi implements bridge.api.BukkitApi {
     @Override
     public BoundingBox getBoundingBox(Entity entity) {
         final AxisAlignedBB nms = ((CraftEntity) entity).getHandle().getBoundingBox();
-        return new BoundingBox(nms.minX, nms.minY, nms.minZ, nms.maxX, nms.maxY, nms.maxZ);
+        return new BoundingBox(nms.a, nms.b, nms.c, nms.d, nms.e, nms.f);
     }
 }

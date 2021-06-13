@@ -1,10 +1,11 @@
 main: arc.Arc
 name: Arc
-version: 2.0.1
-description: An anticheat for 1.8.8, 1.15.2 and 1.16.4
+version: 2.1
+description: An anticheat for 1.8.8, 1.12.2 and 1.16.5
 author: Vrekt
 depend:
   - ProtocolLib
+api-version: 1.13
 
 permissions:
   arc.commands.toggleviolations:
@@ -78,8 +79,8 @@ permissions:
             children:
               arc.bypass.combat.killaura.direction:
                 description: Allows the player to bypass KillAura direction check.
-              arc.bypass.combat.killaura.angle:
-                description: Allows the player to bypass the KillAura angle check.
+              arc.bypass.combat.killaura.attackspeed:
+                description: Allows the player to bypass the KillAura attackspeed check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
     children:
