@@ -29,9 +29,9 @@ public final class KickConfiguration extends Configurable {
 
     @Override
     public void read(FileConfiguration configuration) {
-        this.globalKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.GLOBAL_KICK_MESSAGE)));
-        this.globalViolationsKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_KICK_MESSAGE)));
-        this.globalKickDelay = integer(configuration, ConfigurationValues.GLOBAL_KICK_DELAY);
+        this.globalKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_KICK_MESSAGE)));
+        this.globalViolationsKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_KICK_MESSAGE)));
+        this.globalKickDelay = getInteger(configuration, ConfigurationValues.GLOBAL_KICK_DELAY);
     }
 
     @Override

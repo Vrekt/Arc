@@ -17,7 +17,7 @@ public abstract class ConfigurableReader {
      * @param value         the value
      * @return the string
      */
-    protected String string(FileConfiguration configuration, ConfigurationValues value) {
+    protected String getString(FileConfiguration configuration, ConfigurationValues value) {
         final String str = configuration.getString(value.valueName(), value.stringValue());
         if (!configuration.contains(value.valueName())) {
             configuration.set(value.valueName(), value.stringValue());
@@ -32,7 +32,7 @@ public abstract class ConfigurableReader {
      * @param value         the value
      * @return the int
      */
-    protected int integer(FileConfiguration configuration, ConfigurationValues value) {
+    protected int getInteger(FileConfiguration configuration, ConfigurationValues value) {
         final int number = configuration.getInt(value.valueName(), value.intValue());
         if (!configuration.contains(value.valueName())) {
             configuration.set(value.valueName(), value.intValue());
@@ -47,7 +47,7 @@ public abstract class ConfigurableReader {
      * @param value         the value
      * @return the {@link BanList.Type}
      */
-    protected BanList.Type banListType(FileConfiguration configuration, ConfigurationValues value) {
+    protected BanList.Type getBanListType(FileConfiguration configuration, ConfigurationValues value) {
         final String raw = configuration.getString(value.valueName());
         if (raw == null || (!raw.equalsIgnoreCase("IP")
                 && !raw.equalsIgnoreCase("NAME"))) {
@@ -65,7 +65,7 @@ public abstract class ConfigurableReader {
      * @param value         the value
      * @return the {@link BanLengthType}
      */
-    protected BanLengthType banLengthType(FileConfiguration configuration, ConfigurationValues value) {
+    protected BanLengthType getBanLengthType(FileConfiguration configuration, ConfigurationValues value) {
         final String raw = configuration.getString(value.valueName());
         if (raw == null) {
             configuration.set(value.valueName(), value.banLengthTypeValue().name());
@@ -81,7 +81,7 @@ public abstract class ConfigurableReader {
      * @param value         the value
      * @return the boolean
      */
-    protected boolean bool(FileConfiguration configuration, ConfigurationValues value) {
+    protected boolean getBoolean(FileConfiguration configuration, ConfigurationValues value) {
         final boolean b = configuration.getBoolean(value.valueName(), value.booleanValue());
         if (!configuration.contains(value.valueName())) {
             configuration.set(value.valueName(), value.booleanValue());

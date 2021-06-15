@@ -55,14 +55,14 @@ public final class ArcConfiguration extends Configurable {
         kickConfiguration.read(configuration);
         banConfiguration.read(configuration);
 
-        enableCheckTimings = bool(configuration, ConfigurationValues.ENABLE_CHECK_TIMINGS);
-        enableTpsHelper = bool(configuration, ConfigurationValues.ENABLE_TPS_HELPER);
-        tpsHelperLimit = integer(configuration, ConfigurationValues.TPS_HELPER_LIMIT);
-        violationNotifyMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
-        commandNoPermissionMessage = ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
-        prefix = ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.ARC_PREFIX));
-        violationDataTimeout = integer(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
-        enableEventApi = bool(configuration, ConfigurationValues.ENABLE_EVENT_API);
+        enableCheckTimings = getBoolean(configuration, ConfigurationValues.ENABLE_CHECK_TIMINGS);
+        enableTpsHelper = getBoolean(configuration, ConfigurationValues.ENABLE_TPS_HELPER);
+        tpsHelperLimit = getInteger(configuration, ConfigurationValues.TPS_HELPER_LIMIT);
+        violationNotifyMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
+        commandNoPermissionMessage = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
+        prefix = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.ARC_PREFIX));
+        violationDataTimeout = getInteger(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
+        enableEventApi = getBoolean(configuration, ConfigurationValues.ENABLE_EVENT_API);
     }
 
     /**

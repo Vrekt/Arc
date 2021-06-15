@@ -56,14 +56,14 @@ public final class BanConfiguration extends Configurable {
 
     @Override
     public void read(FileConfiguration configuration) {
-        globalBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.GLOBAL_BAN_MESSAGE)));
-        globalBanDelay = integer(configuration, ConfigurationValues.GLOBAL_BAN_DELAY);
-        globalBanType = banListType(configuration, ConfigurationValues.GLOBAL_BAN_TYPE);
-        globalBanLengthType = banLengthType(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH_TYPE);
-        globalBanLength = integer(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH);
-        globalBroadcastBan = bool(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN);
-        globalBroadcastBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN_MESSAGE)));
-        globalViolationsBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', string(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_BAN_MESSAGE)));
+        globalBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_BAN_MESSAGE)));
+        globalBanDelay = getInteger(configuration, ConfigurationValues.GLOBAL_BAN_DELAY);
+        globalBanType = getBanListType(configuration, ConfigurationValues.GLOBAL_BAN_TYPE);
+        globalBanLengthType = getBanLengthType(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH_TYPE);
+        globalBanLength = getInteger(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH);
+        globalBroadcastBan = getBoolean(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN);
+        globalBroadcastBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN_MESSAGE)));
+        globalViolationsBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_BAN_MESSAGE)));
     }
 
     @Override
