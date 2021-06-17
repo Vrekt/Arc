@@ -47,24 +47,6 @@ public final class CheckResult {
     private CancelType cancelType;
 
     /**
-     * Create a new {@link CheckResult}
-     *
-     * @param information information
-     * @param p1          parameter 1
-     * @param o1          object 1
-     * @param p2          parameter 2
-     * @param o2          object 2
-     * @return the new {@link CheckResult}
-     */
-    public static CheckResult of(String information, String p1, Object o1, String p2, Object o2) {
-        final CheckResult result = new CheckResult();
-        result.setFailed(information);
-        result.parameter(p1, o1);
-        result.parameter(p2, o2);
-        return result;
-    }
-
-    /**
      * Empty
      */
     public CheckResult() {

@@ -22,6 +22,7 @@ import bridge1_8.Bridge1_8;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -34,7 +35,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.1";
+    public static final String VERSION_STRING = "2.1.1";
 
     /**
      * If sync events should be used.
@@ -94,6 +95,11 @@ public final class Arc extends JavaPlugin {
     @Override
     public void onEnable() {
         arc = this;
+
+        getLogger().info(ChatColor.RED + "This version of Arc is experimental!");
+        getLogger().info(ChatColor.RED + "Expect random log messages, errors, crashes, and console spam.");
+        getLogger().info(ChatColor.RED + "Please report any issues to GitHub.");
+
         getLogger().info("Checking server version...");
         if (!loadCompatibleVersions()) {
             getServer().getPluginManager().disablePlugin(this);
@@ -230,6 +236,9 @@ public final class Arc extends JavaPlugin {
         bridge = new Bridge1_16();
     }
 
+    /**
+     * Load players who are online already.
+     */
     private void loadOnlinePlayers() {
         Bukkit.getOnlinePlayers()
                 .forEach(player -> {

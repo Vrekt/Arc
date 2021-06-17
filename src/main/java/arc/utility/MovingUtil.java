@@ -3,7 +3,6 @@ package arc.utility;
 import arc.data.moving.MovingData;
 import arc.utility.block.Blocks;
 import arc.utility.math.MathUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -236,8 +235,6 @@ public final class MovingUtil {
         final boolean climbing = hasClimbable && (ascending || descending);
         data.hasClimbable(hasClimbable);
         data.climbing(climbing);
-
-        Bukkit.broadcastMessage(":" + hasClimbable);
 
         // calculate liquids
         final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);
