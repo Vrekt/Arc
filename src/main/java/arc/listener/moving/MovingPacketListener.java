@@ -5,15 +5,11 @@ import arc.check.CheckType;
 import arc.check.moving.*;
 import arc.data.moving.MovingData;
 import arc.listener.AbstractPacketListener;
-import arc.permissions.Permissions;
-import arc.utility.MovingUtil;
 import com.comphenix.packetwrapper.*;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.PacketEvent;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.util.NumberConversions;
 
 /**
  * Listens for player movement packets.
@@ -21,41 +17,12 @@ import org.bukkit.util.NumberConversions;
 public final class MovingPacketListener extends AbstractPacketListener {
 
     /**
-     * Delta
-     */
-    private static final double DELTA = 1f / 384;
-
-    /**
-     * The flight check
-     */
-    private final Flight flight;
-
-    /**
-     * The jesus check
-     */
-    private final Jesus jesus;
-
-    /**
      * The MorePackets check
      */
     private final MorePackets morePackets;
 
-    /**
-     * The NoFall check
-     */
-    private final NoFall noFall;
-
-    /**
-     * The speed check
-     */
-    private final Speed speed;
-
     public MovingPacketListener() {
-        flight = (Flight) Arc.arc().checks().getCheck(CheckType.FLIGHT);
-        jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
         morePackets = (MorePackets) Arc.arc().checks().getCheck(CheckType.MORE_PACKETS);
-        noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
-        speed = (Speed) Arc.arc().checks().getCheck(CheckType.SPEED);
     }
 
     @Override
@@ -114,7 +81,6 @@ public final class MovingPacketListener extends AbstractPacketListener {
             return;
         }
 
-        updateMovement(player, data, player.getLocation(), packet.getX(), packet.getY(), packet.getZ());
         updateClientGround(data, packet.getOnGround(), false, false);
     }
 
@@ -140,7 +106,6 @@ public final class MovingPacketListener extends AbstractPacketListener {
             return;
         }
 
-        updateMovement(player, data, player.getLocation(), packet.getX(), packet.getY(), packet.getZ());
         updateClientGround(data, packet.getOnGround(), false, false);
     }
 
@@ -194,54 +159,6 @@ public final class MovingPacketListener extends AbstractPacketListener {
     }
 
     /**
-     * Check if the player has moved at all.
-     *
-     * @param location the player location
-     * @param newX     new X
-     * @param newY     new Y
-     * @param newZ     new Z
-     * @return {@code true} if so
-     */
-    private boolean hasMoved(Location location, double newX, double newY, double newZ) {
-        return location.getX() != newX || location.getY() != newY || location.getZ() != newZ;
-    }
-
-    /**
-     * Update player movement
-     *
-     * @param player   the player
-     * @param data     their data
-     * @param location the location
-     * @param newX     new X
-     * @param newY     new Y
-     * @param newZ     new Z
-     */
-    private void updateMovement(Player player, MovingData data, Location location, double newX, double newY, double newZ) {
-        if (!NumberConversions.isFinite(newX) || !NumberConversions.isFinite(newY) || !NumberConversions.isFinite(newZ) || (Permissions.canBypassChecks(player)))
-            return;
-
-        if (hasMoved(location, newX, newY, newZ)) {
-            // we have moved, check delta first.
-            final double delta = Math.pow(location.getX() - newX, 2) + Math.pow(location.getY() - newY, 2) + Math.pow(location.getZ() - newZ, 2);
-            if (delta > DELTA) { // 0.002 ish, 1/ 256 was too high of a number
-                // retrieve from and to locations
-                final Location from = data.to() != null ? data.to().clone() : new Location(player.getWorld(), newX, newY, newZ);
-                final Location to = new Location(player.getWorld(), newX, newY, newZ);
-                // calculate if this move was from one block to another
-                final boolean wasBlockMovement = from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY() || from.getBlockZ() != to.getBlockZ();
-
-                // calc player movement
-                MovingUtil.calculateMovement(data, from, to);
-
-                // run checks
-                runChecks(player, data);
-
-                if (wasBlockMovement) runBlockChecks(player, data);
-            }
-        }
-    }
-
-    /**
      * Update client ground status
      * TODO: I think this is wrong.
      *
@@ -262,32 +179,6 @@ public final class MovingPacketListener extends AbstractPacketListener {
         } else {
             data.clientOnGround(onGround);
         }
-    }
-
-    /**
-     * Run movement related checks
-     *
-     * @param player the player
-     * @param data   their data
-     */
-    private void runChecks(Player player, MovingData data) {
-        if (flight.enabled()) {
-            flight.check(player, data);
-        }
-
-        if (noFall.enabled()) {
-            noFall.check(player, data);
-        }
-    }
-
-    /**
-     * Run movement - but block restricted checks
-     *
-     * @param player the player
-     * @param data   their data
-     */
-    private void runBlockChecks(Player player, MovingData data) {
-        if (jesus.enabled()) jesus.check(player, data);
     }
 
 }

@@ -3,14 +3,9 @@ package arc.utility.block;
 import arc.Arc;
 import bridge.material.MaterialApi;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
-
-import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 
 /**
  * A basic block utility
@@ -31,41 +26,6 @@ public final class Blocks {
      * MaterialApi bridge.
      */
     private static final MaterialApi MATERIALS = Arc.bridge().material();
-
-    /**
-     * Get a block sync
-     *
-     * @param location the location
-     * @param relative the relative
-     * @return the block
-     */
-    public static Block getBlockSync(Location location, BlockFace relative) {
-        return getBlockSync(location.add(relative.getModX(), relative.getModY(), relative.getModZ()));
-    }
-
-    /**
-     * Get a block sync.
-     * If the chunk is loaded, the block is returned.
-     * Otherwise, the chunk is loaded sync and the block is returned.
-     *
-     * @param location the location
-     * @return the block
-     */
-    public static Block getBlockSync(Location location) {
-        if (Objects.requireNonNull(location.getWorld()).isChunkLoaded(location.getBlockX() >> 4, location.getBlockZ() >> 4)) {
-            return location.getBlock();
-        } else {
-            try {
-                return SCHEDULER.callSyncMethod(PLUGIN, () -> {
-                    location.getWorld().loadChunk(location.getBlockX() >> 4, location.getBlockZ() >> 4);
-                    return location.getBlock();
-                }).get();
-            } catch (InterruptedException | ExecutionException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return location.getBlock();
-    }
 
     /**
      * Check if the block is a fence.

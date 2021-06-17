@@ -4,12 +4,15 @@ import arc.check.CheckManager;
 import arc.command.ArcCommand;
 import arc.configuration.ArcConfiguration;
 import arc.data.Data;
+import arc.data.moving.MovingData;
 import arc.exemption.ExemptionManager;
 import arc.listener.combat.CombatPacketListener;
 import arc.listener.connection.PlayerConnectionListener;
+import arc.listener.moving.MovingEventListener;
 import arc.listener.moving.MovingPacketListener;
 import arc.listener.player.PlayerListener;
 import arc.punishment.PunishmentManager;
+import arc.utility.MovingUtil;
 import arc.violation.ViolationManager;
 import bridge.Bridge;
 import bridge.Version;
@@ -107,6 +110,9 @@ public final class Arc extends JavaPlugin {
         violationManager.initialize(arcConfiguration);
         punishmentManager.initialize(arcConfiguration);
         exemptionManager.initialize(arcConfiguration);
+
+        loadOnlinePlayers();
+
         registerListeners();
 
         getLogger().info("Registering base command...");
@@ -138,6 +144,7 @@ public final class Arc extends JavaPlugin {
     private void registerListeners() {
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
+        getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
 
         new MovingPacketListener().register(protocolManager);
         new CombatPacketListener().register(protocolManager);
@@ -223,6 +230,20 @@ public final class Arc extends JavaPlugin {
         bridge = new Bridge1_16();
     }
 
+    private void loadOnlinePlayers() {
+        Bukkit.getOnlinePlayers()
+                .forEach(player -> {
+                    Arc.arc().violations().onPlayerJoin(player);
+                    Arc.arc().exemptions().onPlayerJoin(player);
+
+                    final MovingData data = MovingData.get(player);
+
+                    // calculate player movement
+                    MovingUtil.calculateMovement(data, player.getLocation(), player.getLocation());
+                    data.from(player.getLocation());
+                    data.to(player.getLocation());
+                });
+    }
 
     /**
      * @return the internal plugin

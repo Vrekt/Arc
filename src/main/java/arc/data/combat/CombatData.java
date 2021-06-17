@@ -41,7 +41,7 @@ public final class CombatData implements Data {
      * Last time the player swung their arm
      * The last attack
      */
-    private long lastSwingTime, lastAttackReset, lastAttack;
+    private long lastSwingTime, lastAttackReset, lastAttack, lastAttackNoSwing;
 
     /**
      * Total amount of attacks
@@ -91,5 +91,13 @@ public final class CombatData implements Data {
 
     public void lastAttack(long lastAttack) {
         this.lastAttack = lastAttack;
+    }
+
+    public long lastAttackNoSwing() {
+        return lastAttackNoSwing;
+    }
+
+    public void lastAttackNoSwing(long lastAttackNoSwing) {
+        this.lastAttackNoSwing = lastAttackNoSwing;
     }
 }

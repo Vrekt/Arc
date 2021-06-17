@@ -2,6 +2,7 @@ package arc.check.result;
 
 import arc.check.CheckSubType;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 
 /**
  * Represents a check result.
@@ -34,6 +35,34 @@ public final class CheckResult {
      * Information builder.
      */
     private StringBuilder informationBuilder;
+
+    /**
+     * The cancel location
+     */
+    private Location cancel;
+
+    /**
+     * The cancel type
+     */
+    private CancelType cancelType;
+
+    /**
+     * Create a new {@link CheckResult}
+     *
+     * @param information information
+     * @param p1          parameter 1
+     * @param o1          object 1
+     * @param p2          parameter 2
+     * @param o2          object 2
+     * @return the new {@link CheckResult}
+     */
+    public static CheckResult of(String information, String p1, Object o1, String p2, Object o2) {
+        final CheckResult result = new CheckResult();
+        result.setFailed(information);
+        result.parameter(p1, o1);
+        result.parameter(p2, o2);
+        return result;
+    }
 
     /**
      * Empty
@@ -124,6 +153,16 @@ public final class CheckResult {
     }
 
     /**
+     * Set where to cancel to
+     *
+     * @param location the location
+     */
+    public void cancelTo(Location location, CancelType type) {
+        this.cancel = location;
+        this.cancelType = type;
+    }
+
+    /**
      * @return if the player has failed
      */
     public boolean failed() {
@@ -149,6 +188,31 @@ public final class CheckResult {
      */
     public boolean hasSubType() {
         return subType != null;
+    }
+
+    /**
+     * @return the cancel location
+     */
+    public Location cancel() {
+        return cancel;
+    }
+
+    /**
+     * @return the cancel type
+     */
+    public CancelType cancelType() {
+        return cancelType;
+    }
+
+    /**
+     * Reset this result
+     */
+    public void reset() {
+        if (result == Result.FAILED) {
+            cancel = null;
+            result = Result.PASSED;
+            informationBuilder.setLength(0);
+        }
     }
 
 }

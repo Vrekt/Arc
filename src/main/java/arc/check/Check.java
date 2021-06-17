@@ -1,6 +1,7 @@
 package arc.check;
 
 import arc.Arc;
+import arc.check.result.CancelType;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
@@ -12,6 +13,7 @@ import arc.violation.ViolationManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -210,6 +212,20 @@ public abstract class Check extends Configurable {
      */
     protected ViolationResult checkViolation(Player player, CheckResult result) {
         if (result.failed()) return VIOLATION_MANAGER.violation(player, this, result);
+        return ViolationResult.EMPTY;
+    }
+
+    /**
+     * Process the check result.
+     *
+     * @param result the result
+     */
+    protected ViolationResult checkViolation(Player player, CheckResult result, Location cancel, CancelType type) {
+        if (result.failed()) {
+            final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
+            if (vr.cancel()) result.cancelTo(cancel, type);
+            return vr;
+        }
         return ViolationResult.EMPTY;
     }
 

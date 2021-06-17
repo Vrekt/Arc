@@ -3,6 +3,7 @@ package arc.utility;
 import arc.data.moving.MovingData;
 import arc.utility.block.Blocks;
 import arc.utility.math.MathUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -23,7 +24,7 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean onGround(Location location) {
-        final Block selfBlock = Blocks.getBlockSync(location.subtract(0, 0.5, 0));
+        final Block selfBlock = location.subtract(0, 0.5, 0).getBlock();
         location.add(0, 0.5, 0);
         if (Blocks.isSolid(selfBlock)) return true;
 
@@ -37,7 +38,7 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean hasClimbable(Location location) {
-        final Block selfBlock = Blocks.getBlockSync(location);
+        final Block selfBlock = location.getBlock();
         if (Blocks.isClimbable(selfBlock)) return true;
         return checkBlocksAround(location, 0.1, -0.06, 0.1, Blocks::isClimbable);
     }
@@ -46,10 +47,8 @@ public final class MovingUtil {
      * @return if we are in or on liquid.
      */
     public static boolean isInOrOnLiquid(Location location) {
-        if (Blocks.isLiquid(Blocks.getBlockSync(location))) return true;
-        final boolean liquidRelative = Blocks.isLiquid(Blocks.getBlockSync(location, BlockFace.DOWN));
-        location.setY(location.getY() + 1);
-
+        if (Blocks.isLiquid(location.getBlock())) return true;
+        final boolean liquidRelative = Blocks.isLiquid(location.getBlock().getRelative(BlockFace.DOWN));
         return liquidRelative || checkBlocksAround(location, 0.3, -0.1, 0.3, Blocks::isLiquid);
     }
 
@@ -58,9 +57,8 @@ public final class MovingUtil {
      * @return {@code true} if the location is on ice
      */
     public static boolean isOnIce(Location location) {
-        if (Blocks.isIce(Blocks.getBlockSync(location))) return true;
-        final boolean iceRelative = Blocks.isIce(Blocks.getBlockSync(location, BlockFace.DOWN));
-        location.setY(location.getY() + 1);
+        if (Blocks.isIce(location.getBlock())) return true;
+        final boolean iceRelative = Blocks.isIce(location.getBlock().getRelative(BlockFace.DOWN));
         return iceRelative || checkBlocksAround(location, 0.1, -0.01, 0.1, Blocks::isIce);
     }
 
@@ -86,10 +84,9 @@ public final class MovingUtil {
      * @return {@code true} if so
      */
     public static boolean hasBlock(Location location, double xModifier, double yModifier, double zModifier, Predicate<Block> predicate) {
-        final Block self = Blocks.getBlockSync(location);
+        final Block self = location.getBlock();
         if (predicate.test(self)) return true;
-        final Block under = Blocks.getBlockSync(location, BlockFace.DOWN);
-        location.setY(location.getY() + 1);
+        final Block under = location.getBlock().getRelative(BlockFace.DOWN);
         if (predicate.test(under)) return true;
         return checkBlocksAround(location, xModifier, yModifier, zModifier, predicate);
     }
@@ -132,7 +129,7 @@ public final class MovingUtil {
      */
     public static Block getBlockFromModifier(Location location, double xModifier, double yModifier, double zModifier, double originalX, double originalY, double originalZ) {
         location.add(xModifier, yModifier, zModifier);
-        final Block block = Blocks.getBlockSync(location);
+        final Block block = location.getBlock();
         reset(location, originalX, originalY, originalZ);
         return block;
     }
@@ -218,8 +215,8 @@ public final class MovingUtil {
         data.vertical(distance);
 
         // calculate ascending/descending
-        final boolean ascending = distance > 0.0 && to.getY() > from.getY();
-        final boolean descending = distance > 0.0 && to.getY() < from.getY();
+        final boolean ascending = distance > 0.0 && cloneTo.getY() > cloneFrom.getY();
+        final boolean descending = distance > 0.0 && cloneTo.getY() < cloneFrom.getY();
         data.ascending(ascending);
         data.descending(descending);
         if (ascending) {
@@ -240,10 +237,13 @@ public final class MovingUtil {
         data.hasClimbable(hasClimbable);
         data.climbing(climbing);
 
+        Bukkit.broadcastMessage(":" + hasClimbable);
+
         // calculate liquids
         final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);
         data.inLiquid(inLiquid);
         data.lastMovingUpdate(now);
+
     }
 
 }
