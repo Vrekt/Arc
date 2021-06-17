@@ -5,7 +5,6 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
-import org.bukkit.material.Step;
 import org.bukkit.material.TrapDoor;
 
 /**
@@ -31,7 +30,7 @@ public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isSlab(Block block) {
-        return block.getType().getData().equals(Step.class);
+        return block.getType() == Material.STEP || block.getType() == Material.WOOD_STEP;
     }
 
     @Override

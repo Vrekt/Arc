@@ -60,13 +60,13 @@ public final class KillAura extends PacketCheck {
      *
      * @param player the player
      * @param entity the entity
+     * @param data   their data
      */
-    public boolean check(Player player, Entity entity) {
+    public boolean check(Player player, Entity entity, CombatData data) {
         if (exempt(player)) return false;
 
         // grab a new result, our entity and player data.
         final CheckResult result = new CheckResult();
-        final CombatData data = CombatData.get(player);
 
         // check direction
         direction(player, entity, result);
@@ -122,6 +122,7 @@ public final class KillAura extends PacketCheck {
         // check attack deltas
         final long delta = System.currentTimeMillis() - data.lastAttack();
         data.lastAttack(System.currentTimeMillis());
+
         if (delta <= minAttackDelta) {
             result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Attack delta below min");
             result.parameter("delta", delta);

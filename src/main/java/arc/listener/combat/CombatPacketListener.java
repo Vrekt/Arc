@@ -68,10 +68,13 @@ public final class CombatPacketListener extends AbstractPacketListener {
             final Player player = event.getPlayer();
             final Entity entity = packet.getTarget(player.getWorld());
             if (entity instanceof LivingEntity) {
+
                 boolean checkKillAura = false, checkCriticals = false, checkReach = false, checkNoSwing = false;
-                if (killAura.enabled()) checkKillAura = killAura.check(player, entity);
+                final CombatData data = CombatData.get(player);
+
+                if (killAura.enabled()) checkKillAura = killAura.check(player, entity, data);
                 if (reach.enabled()) checkReach = reach.check(player, entity);
-                if (noSwing.enabled()) checkNoSwing = noSwing.check(player);
+                if (noSwing.enabled()) checkNoSwing = noSwing.check(player, data);
                 if (criticals.enabled()) checkCriticals = criticals.check(player);
 
                 if (checkKillAura || checkCriticals || checkReach || checkNoSwing) event.setCancelled(true);

@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents player moving data.
@@ -64,7 +65,9 @@ public final class MovingData implements Data {
      * If we are in liquid
      * If we were in liquid
      */
-    private boolean ascending, descending, hasClimbable, climbing, sneaking, sprinting, onIce, inLiquid, wasInLiquid;
+    private boolean ascending, descending, hasClimbable, climbing, onIce, inLiquid, wasInLiquid;
+
+    private final AtomicBoolean sneaking = new AtomicBoolean(), sprinting = new AtomicBoolean();
 
     /**
      * The various packet counts.
@@ -89,8 +92,9 @@ public final class MovingData implements Data {
      * The time off ice
      * Invalid ground
      * The time in liquid
+     * The time climbing
      */
-    private int sneakTime, sprintTime, onIceTime, offIceTime, invalidGround, liquidTime;
+    private int sneakTime, sprintTime, onIceTime, offIceTime, invalidGround, liquidTime, climbTime;
 
     /**
      * The current and last vertical distance
@@ -224,19 +228,19 @@ public final class MovingData implements Data {
     }
 
     public boolean sneaking() {
-        return sneaking;
+        return sneaking.get();
     }
 
     public void sneaking(boolean sneaking) {
-        this.sneaking = sneaking;
+        this.sneaking.set(sneaking);
     }
 
     public boolean sprinting() {
-        return sprinting;
+        return sprinting.get();
     }
 
     public void sprinting(boolean sprinting) {
-        this.sprinting = sprinting;
+        this.sprinting.set(sprinting);
     }
 
     public int flyingPackets() {
@@ -513,5 +517,13 @@ public final class MovingData implements Data {
 
     public void similarMovementAmount(int similarMovementAmount) {
         this.similarMovementAmount = MathUtil.clampInt(similarMovementAmount, 0, 100);
+    }
+
+    public int climbTime() {
+        return climbTime;
+    }
+
+    public void climbTime(int climbTime) {
+        this.climbTime = MathUtil.clampInt(climbTime, 0, 100);
     }
 }
