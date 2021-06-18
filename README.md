@@ -44,15 +44,14 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * `Combat` checks
   * KillAura
     * Direction
+    * Attack Speed
     * WIP.
   * Criticals
   * Reach
+  * NoSwing
 * `Moving` checks
   * Flight
-    * ~BoatFly~
-    * WIP
-  * ~Speed~
-    * WIP
+    * Contains multiple related checks but is still WIP.
   * NoFall
   * MorePackets
   * Jesus
