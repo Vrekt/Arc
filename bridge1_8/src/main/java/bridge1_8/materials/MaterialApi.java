@@ -30,7 +30,7 @@ public final class MaterialApi implements bridge.material.MaterialApi {
 
     @Override
     public boolean isSlab(Block block) {
-        return block.getType() == Material.STEP || block.getType() == Material.WOOD_STEP;
+        return block.getType() == Material.STEP || block.getType() == Material.WOOD_STEP || block.getType() == Material.STONE_SLAB2;
     }
 
     @Override

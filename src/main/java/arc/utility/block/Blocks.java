@@ -2,25 +2,12 @@ package arc.utility.block;
 
 import arc.Arc;
 import bridge.material.MaterialApi;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * A basic block utility
  */
 public final class Blocks {
-
-    /**
-     * Scheduler
-     */
-    private static final BukkitScheduler SCHEDULER = Bukkit.getScheduler();
-
-    /**
-     * Plugin
-     */
-    private static final Plugin PLUGIN = Arc.plugin();
 
     /**
      * MaterialApi bridge.

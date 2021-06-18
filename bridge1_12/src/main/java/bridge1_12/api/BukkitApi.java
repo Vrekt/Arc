@@ -10,6 +10,8 @@ import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Bukkit API implementation for 1.12
@@ -55,4 +57,10 @@ public final class BukkitApi implements bridge.api.BukkitApi {
         final AxisAlignedBB nms = ((CraftEntity) entity).getHandle().getBoundingBox();
         return new BoundingBox(nms.a, nms.b, nms.c, nms.d, nms.e, nms.f);
     }
+
+    @Override
+    public PotionEffect getPotionEffect(Player player, PotionEffectType type) {
+        return player.getPotionEffect(type);
+    }
+
 }

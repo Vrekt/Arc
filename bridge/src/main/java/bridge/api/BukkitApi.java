@@ -5,6 +5,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * A bridge for the Bukkit API.
@@ -77,5 +79,14 @@ public interface BukkitApi {
      * @return the {@link BoundingBox}
      */
     BoundingBox getBoundingBox(Entity entity);
+
+    /**
+     * Get a potion effect
+     *
+     * @param player the player
+     * @param type   the type
+     * @return the {@link PotionEffect}
+     */
+    PotionEffect getPotionEffect(Player player, PotionEffectType type);
 
 }

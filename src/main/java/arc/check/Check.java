@@ -218,7 +218,10 @@ public abstract class Check extends Configurable {
     /**
      * Process the check result.
      *
+     * @param player the player
      * @param result the result
+     * @param cancel the cancel location
+     * @param type   the type of cancel
      */
     protected ViolationResult checkViolation(Player player, CheckResult result, Location cancel, CancelType type) {
         if (result.failed()) {

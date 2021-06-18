@@ -29,6 +29,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * The main entry point for Arc.
+ * ....
  */
 public final class Arc extends JavaPlugin {
 
@@ -134,14 +135,19 @@ public final class Arc extends JavaPlugin {
     public void onDisable() {
         if (incompatible) return;
 
+        getLogger().info("Removing packet listeners and closing managers...");
+        unregisterListeners();
+
         exemptionManager.close();
         violationManager.close();
         checkManager.close();
         punishmentManager.close();
-        unregisterListeners();
 
+        getLogger().info("Removing player data...");
         Bukkit.getOnlinePlayers().forEach(Data::removeAll);
         arc = null;
+
+        getLogger().info("Goodbye.");
     }
 
     /**

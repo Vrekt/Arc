@@ -216,7 +216,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     public void close() {
         history.clear();
         violationViewers.clear();
-        historyCache.invalidateAll();
+        if (historyCache != null) historyCache.invalidateAll();
     }
 
 }
