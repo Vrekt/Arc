@@ -85,9 +85,6 @@ permissions:
                 description: Allows the player to bypass the KillAura attackspeed check.
   arc.violations:
     description: Allows the player to view player violations as they come in.
-  arc.administrator:
-    description: Allows the player permission to manage Arc.
-    default: false
 
 commands:
   arc:

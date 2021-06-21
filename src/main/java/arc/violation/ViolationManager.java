@@ -138,7 +138,7 @@ public final class ViolationManager extends Configurable implements Closeable {
             final TextComponent component = new TextComponent(violationMessage);
             Arc.bridge().api().addHoverEvent(component, result.information());
 
-            violationViewers.forEach(viewer -> Arc.bridge().api().sendMessage(player, component));
+            violationViewers.forEach(viewer -> Arc.bridge().api().sendMessage(viewer, component));
         }
 
         // add a cancel result if this check should cancel.
