@@ -19,8 +19,10 @@ public final class NoFall extends Check {
      * The inaccuracy/tolerance amount to allow when calculating fall distance.
      * If (e-fallDist < 1.0) = safe
      * If (e-fallDist > 1.0) = flag
+     * <p>
+     * The threshold to when start checking.
      */
-    private double expectedFallDistanceTolerance;
+    private double expectedFallDistanceTolerance, distanceFallenThreshold;
 
     /**
      * The times allowed where we can be on ground but the client can't be.
@@ -41,6 +43,7 @@ public final class NoFall extends Check {
 
         addConfigurationValue("expected-fall-distance-tolerance", 1.0);
         addConfigurationValue("invalid-ground-moves-allowed", 50);
+        addConfigurationValue("distance-fallen-threshold", 2.5);
         if (enabled()) load();
     }
 
@@ -60,16 +63,20 @@ public final class NoFall extends Check {
 
         // ensure we are descending, not on ground, not climbing, no vehicle and not in liquid.
         if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle() && !data.inLiquid()) {
+
+            // check if we are descending from a ladder first.
+            final boolean comingFromLadder = data.ladderLocation() != null && data.to().getY() < data.ladderLocation().getY();
+
             // retrieve our fall distance check location
             final Location descending = data.descendingLocation() == null ? data.from() : data.descendingLocation();
             data.descendingLocation(descending);
 
             final Location valid = data.validFallingLocation();
-            final Location fallDistanceCheck = valid == null ? descending : valid;
+            final Location fallDistanceCheck = comingFromLadder ? data.ladderLocation() : valid == null ? descending : valid;
 
             final double distanceFallen = MathUtil.vertical(fallDistanceCheck, data.from());
             // make sure we have fallen
-            if (distanceFallen > 2) {
+            if (distanceFallen > distanceFallenThreshold) {
                 final CheckResult result = new CheckResult();
                 final boolean clientGround = data.clientOnGround();
                 final double fallDistance = player.getFallDistance();
@@ -86,7 +93,7 @@ public final class NoFall extends Check {
                     data.failedNoFall(checkViolation(player, result).cancel());
                 } else {
                     // patch basic types of NoFall.
-                    if (clientGround || fallDistance == 0.0) {
+                    if (clientGround || fallDistance == 0.0 && !data.hasSlimeblock()) {
                         result.setFailed("Client on ground or fall distance is 0.0");
                         result.parameter("fallDistance", fallDistance);
                         result.parameter("clientGround", clientGround);
@@ -119,11 +126,13 @@ public final class NoFall extends Check {
             }
 
             // check if we have failed no-fall.
-            if (data.failedNoFall()) {
+            if (data.failedNoFall() && !data.hasSlimeblock()) {
                 data.failedNoFall(false);
                 // cancel the player by setting damage
                 final double damage = MathUtil.vertical(data.validFallingLocation(), data.to());
                 Entities.damageSync(player, damage);
+            } else if (data.failedNoFall()) {
+                data.failedNoFall(false);
             }
         }
 
@@ -149,5 +158,6 @@ public final class NoFall extends Check {
     public void load() {
         expectedFallDistanceTolerance = configuration.getDouble("expected-fall-distance-tolerance");
         invalidGroundMovesAllowed = configuration.getInt("invalid-ground-moves-allowed");
+        distanceFallenThreshold = configuration.getDouble("distance-fallen-threshold");
     }
 }

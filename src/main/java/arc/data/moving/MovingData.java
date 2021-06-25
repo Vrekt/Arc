@@ -59,13 +59,13 @@ public final class MovingData implements Data {
     /**
      * Ascending/Descending state
      * If we have a climbable
-     * If we are climbing or not
+     * If we are climbing or not + had
      * If we are sneaking/sprinting
      * If we are on ice
      * If we are in liquid
      * If we were in liquid
      */
-    private boolean ascending, descending, hasClimbable, climbing, onIce, inLiquid, wasInLiquid;
+    private boolean ascending, descending, hasClimbable, hadClimbable, climbing, onIce, inLiquid, wasInLiquid;
 
     private final AtomicBoolean sneaking = new AtomicBoolean(), sprinting = new AtomicBoolean();
 
@@ -110,8 +110,10 @@ public final class MovingData implements Data {
     /**
      * The descending location for distance tracking.
      * The valid falling location for distance checking.
+     * The last ladder location
+     * Global descending location that doesn't reset.
      */
-    private Location descendingLocation, validFallingLocation;
+    private Location descendingLocation, validFallingLocation, ladderLocation, globalDescendingLocation;
 
     /**
      * If the player has failed no-fall.
@@ -138,6 +140,11 @@ public final class MovingData implements Data {
      * The criticals similar movement amount.
      */
     private int noMovementAmount, similarMovementAmount;
+
+    /**
+     * If we have slimeblock
+     */
+    private boolean hasSlimeblock;
 
     public Location from() {
         return from;
@@ -217,6 +224,14 @@ public final class MovingData implements Data {
 
     public void hasClimbable(boolean hasClimbable) {
         this.hasClimbable = hasClimbable;
+    }
+
+    public boolean hadClimbable() {
+        return hadClimbable;
+    }
+
+    public void hadClimbable(boolean hadClimbable) {
+        this.hadClimbable = hadClimbable;
     }
 
     public boolean climbing() {
@@ -431,6 +446,14 @@ public final class MovingData implements Data {
         this.descendingLocation = descendingLocation;
     }
 
+    public Location ladderLocation() {
+        return ladderLocation;
+    }
+
+    public void ladderLocation(Location ladderLocation) {
+        this.ladderLocation = ladderLocation;
+    }
+
     public Location validFallingLocation() {
         return validFallingLocation;
     }
@@ -525,5 +548,21 @@ public final class MovingData implements Data {
 
     public void climbTime(int climbTime) {
         this.climbTime = MathUtil.clampInt(climbTime, 0, 100);
+    }
+
+    public boolean hasSlimeblock() {
+        return hasSlimeblock;
+    }
+
+    public void hasSlimeblock(boolean hasSlimeblock) {
+        this.hasSlimeblock = hasSlimeblock;
+    }
+
+    public Location globalDescendingLocation() {
+        return globalDescendingLocation;
+    }
+
+    public void globalDescendingLocation(Location globalDescendingLocation) {
+        this.globalDescendingLocation = globalDescendingLocation;
     }
 }

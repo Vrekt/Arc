@@ -114,4 +114,14 @@ public final class Blocks {
         return MATERIALS.isSolid(block);
     }
 
+    /**
+     * Check if a block is a slime-block
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    public static boolean isSlimeblock(Block block) {
+        return MATERIALS.isSlimeblock(block);
+    }
+
 }

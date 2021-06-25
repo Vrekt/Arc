@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 2.1.1
+version: 2.2
 description: An anticheat for 1.8.8, 1.12.2 and 1.16.5
 author: Vrekt
 depend:

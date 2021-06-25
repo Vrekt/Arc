@@ -82,6 +82,13 @@ public interface MaterialApi {
     boolean isWall(Block block);
 
     /**
+     * Check if the block is a slime block
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isSlimeblock(Block block);
+
+    /**
      * Get a material
      *
      * @param name the name

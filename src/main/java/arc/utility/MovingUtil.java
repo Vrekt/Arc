@@ -174,7 +174,13 @@ public final class MovingUtil {
         // calculate ground stuff.
         if (onGround) {
             data.ground(cloneTo);
+            // make sure ladder is reset once we touch ground again.
+            data.ladderLocation(null);
             data.incrementOnGroundTime();
+
+            // slime block checking
+            final boolean hasSlimeblock = MovingUtil.hasBlock(cloneTo, 0, -1, 0, Blocks::isSlimeblock);
+            data.hasSlimeblock(hasSlimeblock);
 
             final boolean isOnIce = MovingUtil.isOnIce(cloneTo);
             final boolean wasOnIce = MovingUtil.isOnIce(cloneFrom);
@@ -191,6 +197,12 @@ public final class MovingUtil {
 
         } else {
             data.onGroundTime(0);
+
+            // extra modifier
+            final boolean hasSlimeblock = MovingUtil.hasBlock(cloneTo, 0, -2, 0, Blocks::isSlimeblock);
+            data.hasSlimeblock(hasSlimeblock);
+
+            data.onIce(false);
         }
 
         // calculate sprinting and sneaking times
@@ -216,6 +228,8 @@ public final class MovingUtil {
         // calculate ascending/descending
         final boolean ascending = distance > 0.0 && cloneTo.getY() > cloneFrom.getY();
         final boolean descending = distance > 0.0 && cloneTo.getY() < cloneFrom.getY();
+        final boolean justStartedDescending = !data.descending() && descending;
+
         data.ascending(ascending);
         data.descending(descending);
         if (ascending) {
@@ -230,11 +244,22 @@ public final class MovingUtil {
             data.descendingTime(0);
         }
 
+        // set descending location just now.
+        if (justStartedDescending) {
+            data.globalDescendingLocation(cloneFrom);
+        }
+
         // calculate climbing
         final boolean hasClimbable = MovingUtil.hasClimbable(cloneTo);
-        final boolean climbing = hasClimbable && (ascending || descending);
+        final boolean hadClimbable = MovingUtil.hasClimbable(cloneFrom);
+        final boolean climbing = (hasClimbable || hadClimbable) && (ascending || descending);
         data.hasClimbable(hasClimbable);
+        data.hadClimbable(hadClimbable);
         data.climbing(climbing);
+
+        if (data.climbing()) {
+            data.ladderLocation(to);
+        }
 
         // calculate liquids
         final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);

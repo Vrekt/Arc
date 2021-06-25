@@ -72,6 +72,11 @@ public final class MaterialApi implements bridge.material.MaterialApi {
     }
 
     @Override
+    public boolean isSlimeblock(Block block) {
+        return block.getType() == Material.SLIME_BLOCK;
+    }
+
+    @Override
     public Material getMaterial(String name) {
         return Material.getMaterial(name);
     }

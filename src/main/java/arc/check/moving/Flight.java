@@ -50,6 +50,7 @@ public final class Flight extends Check {
         addConfigurationValue("climbing-cooldown", 5);
         addConfigurationValue("max-ascend-time", 7);
         addConfigurationValue("jump-boost-ascend-amplifier", 3);
+        addConfigurationValue("slime-block-distance-fallen-threshold", 0);
 
         if (enabled()) load();
     }
@@ -69,7 +70,7 @@ public final class Flight extends Check {
 
         // check if we have a slab.
         final boolean hasSlab = MovingUtil.hasBlock(to, 0.3, -0.1, 0.3, Blocks::isSlab);
-        final boolean hasStair = MovingUtil.hasBlock(to, 0, -0.5, 0, Blocks::isStair);
+        final boolean hasStair = MovingUtil.hasBlock(to, 0.3, -0.1, 0.3, Blocks::isStair);
         final boolean hasFence = MovingUtil.hasBlock(to, 0.5, -1, 0.5, block -> (Blocks.isFence(block) || Blocks.isFenceGate(block)));
 
         // check if its a valid vertical move.
@@ -103,7 +104,7 @@ public final class Flight extends Check {
         }
 
         result.reset();
-        // player.sendMessage("Vertical: " + vertical);
+        player.sendMessage("Vertical: " + vertical);
     }
 
     /**
@@ -116,6 +117,7 @@ public final class Flight extends Check {
      */
     private boolean checkVerticalMove(Player player, MovingData data, double vertical, CheckResult result) {
         if (data.ascending()) {
+            // check if we have launch from a slime-block.
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
 
@@ -129,12 +131,12 @@ public final class Flight extends Check {
             final int modifier = player.hasPotionEffect(PotionEffectType.JUMP)
                     ? BukkitApi.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier()
                     + jumpBoostAscendAmplifier : 0;
-            if (data.ascendingTime() > (maxAscendTime + modifier)) {
+            if (data.ascendingTime() > (maxAscendTime + modifier) && !data.hadClimbable()) {
                 result.setFailed("Ascending for too long");
                 result.parameter("vertical", vertical);
                 result.parameter("time", data.ascendingTime());
                 result.parameter("max", (maxAscendTime + modifier));
-                return checkViolation(player, result, data.ground(), CancelType.GROUND).cancel();
+                return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
 
         }
@@ -158,7 +160,8 @@ public final class Flight extends Check {
                 result.parameter("cooldown", cooldown);
                 return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
-        } else if (data.descending() && data.descendingTime() >= cooldown) {
+            // reverse the cooldown here, since we are going down instead of up.
+        } else if (data.descending() && data.descendingTime() >= (climbingCooldown) + (vertical * 2)) {
             if (vertical > maxClimbSpeedDown) {
                 result.setFailed("Descending a ladder too fast");
                 result.parameter("vertical", vertical);
