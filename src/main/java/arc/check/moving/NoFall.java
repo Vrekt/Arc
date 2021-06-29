@@ -5,7 +5,6 @@ import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.exemption.type.ExemptionType;
-import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -55,14 +54,20 @@ public final class NoFall extends Check {
      */
     public void check(Player player, MovingData data) {
         if (exempt(player) || exempt(player, ExemptionType.DEATH)) return;
-        if (data.onGround()) checkGround(player, data);
+
+        if (data.onGround()) {
+            checkGround(player, data);
+            return;
+        }
+
         if (data.inLiquid()) {
             data.descendingLocation(null);
             data.validFallingLocation(null);
+            return;
         }
 
         // ensure we are descending, not on ground, not climbing, no vehicle and not in liquid.
-        if (data.descending() && !data.onGround() && !data.climbing() && !player.isInsideVehicle() && !data.inLiquid()) {
+        if (data.descending() && !data.climbing() && !player.isInsideVehicle()) {
 
             // check if we are descending from a ladder first.
             final boolean comingFromLadder = data.ladderLocation() != null && data.to().getY() < data.ladderLocation().getY();
@@ -85,19 +90,19 @@ public final class NoFall extends Check {
                 // patch other types of NoFall with incorrect fall distances.
                 final double difference = distanceFallen - fallDistance;
                 if (difference > expectedFallDistanceTolerance) {
-                    result.setFailed("Client fall distance not expected.");
-                    result.parameter("fallDistance", fallDistance);
-                    result.parameter("expected", distanceFallen);
-                    result.parameter("difference", difference);
-                    result.parameter("tolerance", expectedFallDistanceTolerance);
-                    data.failedNoFall(checkViolation(player, result).cancel());
+                    result.setFailed("Client fall distance not expected.")
+                            .withParameter("fallDistance", fallDistance)
+                            .withParameter("expected", distanceFallen)
+                            .withParameter("difference", difference)
+                            .withParameter("tolerance", expectedFallDistanceTolerance);
+                    data.failedNoFall(checkViolation(player, result));
                 } else {
                     // patch basic types of NoFall.
                     if (clientGround || fallDistance == 0.0 && !data.hasSlimeblock()) {
-                        result.setFailed("Client on ground or fall distance is 0.0");
-                        result.parameter("fallDistance", fallDistance);
-                        result.parameter("clientGround", clientGround);
-                        data.failedNoFall(checkViolation(player, result).cancel());
+                        result.setFailed("Client on ground or fall distance is 0.0")
+                                .withParameter("fallDistance", fallDistance)
+                                .withParameter("clientGround", clientGround);
+                        data.failedNoFall(checkViolation(player, result));
                     }
                 }
             }
@@ -119,18 +124,19 @@ public final class NoFall extends Check {
             final int count = data.invalidGround();
             if (count > invalidGroundMovesAllowed) {
                 final CheckResult result = new CheckResult();
-                result.setFailed("Invalid ground moves more than allowed");
-                result.parameter("count", count);
-                result.parameter("max", invalidGroundMovesAllowed);
-                data.failedNoFall(checkViolation(player, result).cancel());
+                result.setFailed("Invalid ground moves more than allowed")
+                        .withParameter("count", count)
+                        .withParameter("max", invalidGroundMovesAllowed);
+                data.failedNoFall(checkViolation(player, result));
             }
 
             // check if we have failed no-fall.
+            // Hopefully, prevent false damage from slime-blocks. even if the player flags.
             if (data.failedNoFall() && !data.hasSlimeblock()) {
                 data.failedNoFall(false);
                 // cancel the player by setting damage
                 final double damage = MathUtil.vertical(data.validFallingLocation(), data.to());
-                Entities.damageSync(player, damage);
+                player.damage(damage);
             } else if (data.failedNoFall()) {
                 data.failedNoFall(false);
             }

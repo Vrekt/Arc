@@ -1,6 +1,7 @@
 package arc.inventory;
 
 import arc.Arc;
+import arc.utility.material.MaterialAccess;
 import bridge.Version;
 import org.bukkit.ChatColor;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +36,7 @@ public final class ItemBuilder {
      * @param item the name of the item
      */
     public ItemBuilder(String item) {
-        this.item = Arc.bridge().material().createItem(item);
+        this.item = MaterialAccess.createItem(item);
         this.meta = this.item.getItemMeta();
     }
 
@@ -48,9 +49,9 @@ public final class ItemBuilder {
      */
     public ItemBuilder(String legacyItem, String newItem, int data) {
         if (Arc.version().isNewerThan(Version.VERSION_1_12)) {
-            item = Arc.bridge().material().createItem(newItem);
+            item = MaterialAccess.createItem(newItem);
         } else {
-            item = Arc.bridge().material().createItem(legacyItem, (short) data);
+            item = MaterialAccess.createItem(legacyItem, (short) data);
         }
 
         this.meta = this.item.getItemMeta();

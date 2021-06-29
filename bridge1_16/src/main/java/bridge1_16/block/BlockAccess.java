@@ -1,33 +1,18 @@
-package bridge1_16.materials;
+package bridge1_16.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
-import org.bukkit.inventory.ItemStack;
 
 /**
- * Material API for 1.16
+ * Block access for 1.16
  */
-public final class MaterialApi implements bridge.material.MaterialApi {
+public final class BlockAccess implements bridge.block.BlockAccess {
+
 
     @Override
-    public boolean isFence(Block block) {
-        return block.getState() instanceof Fence;
-    }
-
-    @Override
-    public boolean isSlab(Block block) {
-        return block.getState() instanceof Slab;
-    }
-
-    @Override
-    public boolean isStair(Block block) {
-        return block.getState() instanceof Stairs;
-    }
-
-    @Override
-    public boolean isFenceGate(Block block) {
-        return block.getState() instanceof Gate;
+    public boolean hasVerticalModifier(Block block) {
+        return block.getState() instanceof Fence || block.getState() instanceof Slab || block.getState() instanceof Stairs || block.getState() instanceof Gate || isWall(block);
     }
 
     @Override
@@ -61,21 +46,6 @@ public final class MaterialApi implements bridge.material.MaterialApi {
     @Override
     public boolean isSlimeblock(Block block) {
         return block.getType() == Material.SLIME_BLOCK;
-    }
-
-    @Override
-    public Material getMaterial(String name) {
-        return Material.getMaterial(name);
-    }
-
-    @Override
-    public ItemStack createItem(String material) {
-        return new ItemStack(getMaterial(material));
-    }
-
-    @Override
-    public ItemStack createItem(String material, short data) {
-        return createItem(material);
     }
 
 }

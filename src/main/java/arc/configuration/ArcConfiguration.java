@@ -26,8 +26,9 @@ public final class ArcConfiguration extends Configurable {
      * If check timings should be enabled.
      * If the TPS helper should be enabled.
      * If the event API should be enabled.
+     * If debug messages are enabled.
      */
-    private boolean enableCheckTimings, enableTpsHelper, enableEventApi;
+    private boolean enableCheckTimings, enableTpsHelper, enableEventApi, debugMessages;
 
     /**
      * TPS helper limit
@@ -63,6 +64,7 @@ public final class ArcConfiguration extends Configurable {
         prefix = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.ARC_PREFIX));
         violationDataTimeout = getInteger(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
         enableEventApi = getBoolean(configuration, ConfigurationValues.ENABLE_EVENT_API);
+        debugMessages = getBoolean(configuration, ConfigurationValues.DEBUG_MESSAGES);
     }
 
     /**
@@ -98,6 +100,22 @@ public final class ArcConfiguration extends Configurable {
      */
     public boolean enableEventApi() {
         return enableEventApi;
+    }
+
+    /**
+     * @return if enabled debug messages
+     */
+    public boolean enableDebugMessages() {
+        return debugMessages;
+    }
+
+    /**
+     * Set the debug messages state.
+     *
+     * @param debugMessages the state
+     */
+    public void setDebugMessagesState(boolean debugMessages) {
+        this.debugMessages = debugMessages;
     }
 
     /**

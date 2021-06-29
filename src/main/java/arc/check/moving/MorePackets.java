@@ -5,7 +5,6 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -66,9 +65,7 @@ public final class MorePackets extends Check {
         // check flying counts
         if (flyingCount > maxFlyingPacketsPerSecond) {
             populateResult(result, "Too many flying packets per second", flyingCount, maxFlyingPacketsPerSecond);
-            final ViolationResult vr = checkViolation(player, result);
-            data.cancelFlying(vr.cancel());
-
+            data.cancelFlying(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, flyingCount);
         } else {
             data.cancelFlying(false);
@@ -77,15 +74,11 @@ public final class MorePackets extends Check {
         // check position and position_look counts
         if (positionCount > maxPositionPacketsPerSecond) {
             populateResult(result, "Too many position packets per second", positionCount, maxPositionPacketsPerSecond);
-            final ViolationResult vr = checkViolation(player, result);
-            data.cancelPosition(vr.cancel());
-
+            data.cancelPosition(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, positionCount);
         } else if (positionLookCount > maxPositionPacketsPerSecond) {
             populateResult(result, "Too many position look packets per second", positionLookCount, maxPositionPacketsPerSecond);
-            final ViolationResult vr = checkViolation(player, result);
-            data.cancelPosition(vr.cancel());
-
+            data.cancelPosition(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, positionLookCount);
         } else {
             data.cancelPosition(false);
@@ -94,9 +87,7 @@ public final class MorePackets extends Check {
         // check look counts
         if (lookCount > maxLookPacketsPerSecond) {
             populateResult(result, "Too many look packets per second", lookCount, maxLookPacketsPerSecond);
-            final ViolationResult vr = checkViolation(player, result);
-            data.cancelLook(vr.cancel());
-
+            data.cancelLook(checkViolation(player, result));
             kickPlayerIfThresholdReached(player, lookCount);
         } else {
             data.cancelLook(false);
@@ -117,9 +108,9 @@ public final class MorePackets extends Check {
      * @param max         the max
      */
     private void populateResult(CheckResult result, String information, int count, int max) {
-        result.setFailed(information);
-        result.parameter("count", count);
-        result.parameter("max", max);
+        result.setFailed(information)
+                .withParameter("count", count)
+                .withParameter("max", max);
     }
 
     /**
@@ -129,7 +120,8 @@ public final class MorePackets extends Check {
      * @param count  the count
      */
     private void kickPlayerIfThresholdReached(Player player, int count) {
-        if (kickIfThresholdReached && count >= packetKickThreshold && !Arc.arc().punishment().hasPendingKick(player)) {
+        if (kickIfThresholdReached && count >= packetKickThreshold
+                && !Arc.arc().punishment().hasPendingKick(player)) {
             Arc.arc().punishment().kickPlayer(player, this);
         }
     }

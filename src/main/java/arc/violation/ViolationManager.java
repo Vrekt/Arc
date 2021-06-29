@@ -10,6 +10,7 @@ import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.permissions.Permissions;
 import arc.punishment.PunishmentManager;
+import arc.utility.api.BukkitAccess;
 import arc.violation.result.ViolationResult;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -136,9 +137,9 @@ public final class ViolationManager extends Configurable implements Closeable {
 
             // build the text component and then send to all viewers.
             final TextComponent component = new TextComponent(violationMessage);
-            Arc.bridge().api().addHoverEvent(component, result.information());
+            BukkitAccess.addHoverEvent(component, result.information());
 
-            violationViewers.forEach(viewer -> Arc.bridge().api().sendMessage(viewer, component));
+            violationViewers.forEach(viewer -> BukkitAccess.sendMessage(viewer, component));
         }
 
         // add a cancel result if this check should cancel.

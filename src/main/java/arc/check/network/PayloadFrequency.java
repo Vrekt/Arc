@@ -5,8 +5,6 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
-import arc.violation.result.ViolationResult;
-import bridge.Version;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
@@ -44,8 +42,6 @@ public final class PayloadFrequency extends PacketCheck {
      */
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
-        // TODO: unknown
-        if (disableIfNewerThan(Version.VERSION_1_8)) return;
 
         enabled(true)
                 .cancel(true)
@@ -80,17 +76,17 @@ public final class PayloadFrequency extends PacketCheck {
         final CheckResult result = new CheckResult();
 
         if (count > maxPacketsPerInterval) {
-            result.setFailed("Too many payload packets per interval.");
-            result.parameter("count", count);
-            result.parameter("max", maxPacketsPerInterval);
+            result.setFailed("Too many payload packets per interval.")
+                    .withParameter("count", count)
+                    .withParameter("max", maxPacketsPerInterval);
 
-            if (maxPacketsPerIntervalKick && !Arc.arc().punishment().hasPendingKick(player)) {
+            if (maxPacketsPerIntervalKick
+                    && !Arc.arc().punishment().hasPendingKick(player)) {
                 Arc.arc().punishment().kickPlayer(player, this);
             }
         }
 
-        final ViolationResult violation = checkViolation(player, result);
-        data.cancelPayloadPackets(violation.cancel());
+        data.cancelPayloadPackets(checkViolation(player, result));
         data.payloadPacketCount(0);
     }
 
@@ -108,6 +104,7 @@ public final class PayloadFrequency extends PacketCheck {
             return;
         }
 
+        if (exempt(player)) return;
         final PacketData data = PacketData.get(player);
         data.incrementPayloadPacketCount();
 
@@ -126,18 +123,18 @@ public final class PayloadFrequency extends PacketCheck {
             final int max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
             // check if the length is bigger than the allowed size
             if (bytes.length >= max) {
-                result.setFailed("Payload packet size too big.");
-                result.parameter("length", bytes.length);
-                result.parameter("max", max);
+                result.setFailed("Payload packet size too big.")
+                        .withParameter("length", bytes.length)
+                        .withParameter("max", max);
 
-                if (maxPacketSizeKick && !Arc.arc().punishment().hasPendingKick(player)) {
+                if (maxPacketSizeKick
+                        && !Arc.arc().punishment().hasPendingKick(player)) {
                     Arc.arc().punishment().kickPlayer(player, this);
                 }
             }
         }
 
-        final ViolationResult violation = checkViolation(player, result);
-        data.cancelPayloadPackets(violation.cancel());
+        data.cancelPayloadPackets(checkViolation(player, result));
     }
 
     /**
@@ -170,7 +167,7 @@ public final class PayloadFrequency extends PacketCheck {
         registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
         schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                check(player, PacketData.get(player));
+                if (!exempt(player)) check(player, PacketData.get(player));
             }
         }, interval, interval);
     }

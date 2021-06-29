@@ -5,7 +5,7 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
-import arc.utility.entity.Entities;
+import arc.utility.entity.EntityAccess;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -74,7 +74,7 @@ public final class KillAura extends PacketCheck {
         attackSpeed(player, data, result);
 
         // return result.
-        return checkViolation(player, result).cancel();
+        return checkViolation(player, result);
     }
 
     /**
@@ -90,19 +90,19 @@ public final class KillAura extends PacketCheck {
         final Location playerLocation = player.getLocation();
         final Location entityLocation = entity.getLocation();
 
-        final float yawToEntity = Entities.getYawToEntity(playerLocation, playerLocation.getYaw(), entityLocation);
-        final float pitchToEntity = Entities.getPitchToEntity(playerLocation, playerLocation.getPitch(), entityLocation, player, entity);
+        final float yawToEntity = EntityAccess.getYawToEntity(playerLocation, playerLocation.getYaw(), entityLocation);
+        final float pitchToEntity = EntityAccess.getPitchToEntity(playerLocation, playerLocation.getPitch(), entityLocation);
 
         if (yawToEntity >= maxYawDifference) {
-            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Yaw difference greater than allowed.");
-            result.parameter("yawToEntity", yawToEntity);
-            result.parameter("maxYawDiff", maxYawDifference);
+            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Yaw difference greater than allowed.")
+                    .withParameter("yawToEntity", yawToEntity)
+                    .withParameter("maxYawDiff", maxYawDifference);
         }
 
         if (pitchToEntity >= maxPitchDifference) {
-            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Pitch difference greater than allowed.");
-            result.parameter("pitchToEntity", pitchToEntity);
-            result.parameter("maxPitchDiff", maxPitchDifference);
+            result.setFailed(CheckSubType.KILL_AURA_DIRECTION, "Pitch difference greater than allowed.")
+                    .withParameter("pitchToEntity", pitchToEntity)
+                    .withParameter("maxPitchDiff", maxPitchDifference);
         }
     }
 
@@ -120,17 +120,18 @@ public final class KillAura extends PacketCheck {
         data.totalAttacks(attacks);
 
         // check attack deltas
-        final long delta = System.currentTimeMillis() - data.lastAttack();
-        data.lastAttack(System.currentTimeMillis());
+        final long now = System.currentTimeMillis();
+        final long delta = now - data.lastAttack();
+        data.lastAttack(now);
 
         if (delta <= minAttackDelta) {
-            result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Attack delta below min");
-            result.parameter("delta", delta);
-            result.parameter("min", minAttackDelta);
+            result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Attack delta below min")
+                    .withParameter("delta", delta)
+                    .withParameter("min", minAttackDelta);
         }
 
         // check if we have reached 1 or more seconds.
-        if (System.currentTimeMillis() - data.lastAttackReset() >= 1000) {
+        if (now - data.lastAttackReset() >= 1000) {
             // reset data
             data.lastAttackReset(System.currentTimeMillis());
             data.totalAttacks(0);
@@ -138,9 +139,9 @@ public final class KillAura extends PacketCheck {
             // check attacks against max.
             final boolean maxAttacks = attacks >= maxAttacksPerSecond;
             if (maxAttacks && !result.failed()) {
-                result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Too many attacks per second.");
-                result.parameter("attacks", attacks);
-                result.parameter("max", maxAttacksPerSecond);
+                result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Too many attacks per second.")
+                        .withParameter("attacks", attacks)
+                        .withParameter("max", maxAttacksPerSecond);
                 data.cancelAttacks(true);
             }
 
@@ -150,8 +151,8 @@ public final class KillAura extends PacketCheck {
 
         // finally, check in general if we should be cancelling.
         if (data.cancelAttacks() && !result.failed()) {
-            result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Cancelling attacks due to cooldown.");
-            result.parameter("timeLeft", (System.currentTimeMillis() - data.lastAttackReset()));
+            result.setFailed(CheckSubType.KILL_AURA_ATTACK_SPEED, "Cancelling attacks due to cooldown.")
+                    .withParameter("timeLeft", (now - data.lastAttackReset()));
         }
     }
 

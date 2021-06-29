@@ -5,7 +5,6 @@ import arc.check.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
-import arc.violation.result.ViolationResult;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -54,19 +53,19 @@ public final class SwingFrequency extends PacketCheck {
         final int count = data.swingPacketCount();
 
         if (count >= maxPacketsPerSecond) {
-            result.setFailed("Too many swing packets per second.");
-            result.parameter("packets", data.swingPacketCount());
-            result.parameter("max", maxPacketsPerSecond);
-            if (count >= packetKickThreshold && kickIfThresholdReached && !Arc.arc().punishment().hasPendingKick(player)) {
+            result.setFailed("Too many swing packets per second.")
+                    .withParameter("packets", data.swingPacketCount())
+                    .withParameter("max", maxPacketsPerSecond);
+
+            if (count >= packetKickThreshold && kickIfThresholdReached
+                    && !Arc.arc().punishment().hasPendingKick(player)) {
                 Arc.arc().punishment().kickPlayer(player, this);
             }
         } else {
             data.cancelSwingPackets(false);
         }
         data.swingPacketCount(0);
-
-        final ViolationResult violation = checkViolation(player, result);
-        data.cancelSwingPackets(violation.cancel());
+        data.cancelSwingPackets(checkViolation(player, result));
     }
 
     @Override

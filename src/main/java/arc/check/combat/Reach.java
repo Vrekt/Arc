@@ -91,16 +91,16 @@ public final class Reach extends PacketCheck {
         // retrieve the allowed amount
         final double allowed = player.getGameMode() == GameMode.CREATIVE ? maxCreativeDistance : maxSurvivalDistance;
         if (distance > allowed) {
-            result.setFailed("Distance greater than allowed.");
-            result.parameter("distance", distance);
-            result.parameter("allowed", allowed);
-            result.parameter("ignore-y", ignoreVerticalAxis);
-            result.parameter("eyeHeight", eyeHeight);
-            result.parameter("vel", velocity);
-            result.parameter("entityVel", entityVelocity);
+            result.setFailed("Distance greater than allowed.")
+                    .withParameter("distance", distance)
+                    .withParameter("allowed", allowed)
+                    .withParameter("ignore-y", ignoreVerticalAxis)
+                    .withParameter("eyeHeight", eyeHeight)
+                    .withParameter("vel", velocity)
+                    .withParameter("entityVel", entityVelocity);
         }
 
-        return checkViolation(player, result).cancel();
+        return checkViolation(player, result);
     }
 
     @Override

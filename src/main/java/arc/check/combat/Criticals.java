@@ -70,9 +70,9 @@ public final class Criticals extends PacketCheck {
                 data.noMovementAmount(amount);
 
                 if (amount >= maxNoMovementAllowed) {
-                    result.setFailed("max no movements reached");
-                    result.parameter("amount", amount);
-                    result.parameter("max", maxNoMovementAllowed);
+                    result.setFailed("max no movements reached")
+                            .withParameter("amount", amount)
+                            .withParameter("max", maxNoMovementAllowed);
                 }
             } else {
                 data.noMovementAmount(data.noMovementAmount() - 1);
@@ -80,9 +80,9 @@ public final class Criticals extends PacketCheck {
 
             // check basic distance
             if (!result.failed() && (vertical == last) && vertical <= minimumDistanceAllowed) {
-                result.setFailed("Vertical less than allowed");
-                result.parameter("vertical", vertical);
-                result.parameter("min", minimumDistanceAllowed);
+                result.setFailed("Vertical less than allowed")
+                        .withParameter("vertical", vertical)
+                        .withParameter("min", minimumDistanceAllowed);
             }
 
             // check similar movements based on difference.
@@ -91,17 +91,17 @@ public final class Criticals extends PacketCheck {
                 data.similarMovementAmount(amount);
 
                 if (amount >= maxSimilarMovementAllowed) {
-                    result.setFailed("max similar movement amount reached");
-                    result.parameter("amount", amount);
-                    result.parameter("max", maxSimilarMovementAllowed);
-                    result.parameter("diff", difference);
+                    result.setFailed("max similar movement amount reached")
+                            .withParameter("amount", amount)
+                            .withParameter("max", maxSimilarMovementAllowed)
+                            .withParameter("diff", difference);
                 }
             } else {
                 data.similarMovementAmount(data.similarMovementAmount() - 1);
             }
         }
 
-        return checkViolation(player, result).cancel();
+        return checkViolation(player, result);
     }
 
     /**

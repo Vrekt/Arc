@@ -28,6 +28,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("timings", new TimingsSubCommand());
         addSubCommand("cancelban", new CancelBanSubCommand());
         addSubCommand("exempt", new ExemptPlayerSubCommand());
+        addSubCommand("debug", new DebugSubCommand());
 
         // initialize help message.
         final String prefix = Arc.arc().configuration().prefix();
@@ -38,6 +39,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         helpLine(Permissions.ARC_COMMANDS_TIMINGS, prefix + ChatColor.DARK_AQUA + " /arc timings - " + ChatColor.GRAY + "View timings and TPS information.");
         helpLine(Permissions.ARC_COMMANDS_CANCEL_BAN, prefix + ChatColor.DARK_AQUA + " /arc cancelban <player> - " + ChatColor.GRAY + "Cancel a pending player ban.");
         helpLine(Permissions.ARC_COMMANDS_EXEMPT, prefix + ChatColor.DARK_AQUA + "/arc exempt <player> <check|all> - " + ChatColor.GRAY + "Exempt a player from a check or all checks.");
+        helpLine(Permissions.ARC_COMMANDS_DEBUG, prefix + ChatColor.DARK_AQUA + "/arc debug - " + ChatColor.GRAY + "Toggle debug messages.");
     }
 
     @Override

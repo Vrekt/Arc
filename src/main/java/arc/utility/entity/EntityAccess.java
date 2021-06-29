@@ -1,52 +1,12 @@
 package arc.utility.entity;
 
-import arc.Arc;
 import arc.utility.math.MathUtil;
-import bridge.utility.BoundingBox;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * Entity util.
  */
-public final class Entities {
-
-    /**
-     * Get the bounding box of an entity
-     *
-     * @param entity the entity
-     * @return the {@link BoundingBox}
-     */
-    public static BoundingBox getBoundingBox(Entity entity) {
-        return Arc.bridge().api().getBoundingBox(entity);
-    }
-
-    /**
-     * Damage the player sync
-     *
-     * @param player the player
-     * @param damage the damage
-     */
-    public static void damageSync(Player player, double damage) {
-        Bukkit.getScheduler().runTask(Arc.plugin(), () -> {
-            if (player.isDead()) return;
-            player.damage(damage);
-        });
-    }
-
-    /**
-     * Teleport a player sync
-     *
-     * @param player the player
-     * @param to     the location
-     * @param cause  the cause
-     */
-    public static void teleportSync(Player player, Location to, PlayerTeleportEvent.TeleportCause cause) {
-        Bukkit.getScheduler().runTask(Arc.plugin(), () -> player.teleport(to, cause));
-    }
+public final class EntityAccess {
 
     /**
      * Get the yaw value required to face the entity.
@@ -80,11 +40,9 @@ public final class Entities {
      * @param playerLocation the player location
      * @param playerPitch    the players pitch
      * @param entityLocation the entity location
-     * @param player         the player
-     * @param entity         the entity
      * @return the pitch
      */
-    public static float getPitchToEntity(Location playerLocation, float playerPitch, Location entityLocation, Player player, Entity entity) {
+    public static float getPitchToEntity(Location playerLocation, float playerPitch, Location entityLocation) {
         final double deltaX = entityLocation.getX() - playerLocation.getX();
         final double deltaY = entityLocation.getY() - playerLocation.getY();
         final double deltaZ = entityLocation.getZ() - playerLocation.getZ();

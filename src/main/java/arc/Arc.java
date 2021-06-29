@@ -36,7 +36,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.2";
+    public static final String VERSION_STRING = "2.2.1";
 
     /**
      * If sync events should be used.
@@ -134,6 +134,9 @@ public final class Arc extends JavaPlugin {
     @Override
     public void onDisable() {
         if (incompatible) return;
+
+        getLogger().info("Saving file configuration...");
+        saveConfig();
 
         getLogger().info("Removing packet listeners and closing managers...");
         unregisterListeners();

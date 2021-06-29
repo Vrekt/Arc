@@ -1,7 +1,8 @@
 package bridge;
 
-import bridge.api.BukkitApi;
-import bridge.material.MaterialApi;
+import bridge.api.BukkitAccess;
+import bridge.block.BlockAccess;
+import bridge.material.MaterialAccess;
 
 /**
  * Represents a bridge between different API versions
@@ -13,16 +14,21 @@ public interface Bridge {
      *
      * @return the version
      */
-    Version version();
+    Version getVersion();
 
     /**
-     * @return the material API.
+     * @return the block access
      */
-    MaterialApi material();
+    BlockAccess getBlockAccess();
 
     /**
-     * @return the Bukkit API.
+     * @return the material access
      */
-    BukkitApi api();
+    MaterialAccess getMaterialAccess();
+
+    /**
+     * @return the Bukkit access
+     */
+    BukkitAccess getBukkitAccess();
 
 }

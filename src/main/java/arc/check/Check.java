@@ -9,12 +9,14 @@ import arc.configuration.check.CheckConfiguration;
 import arc.configuration.check.CheckConfigurationBuilder;
 import arc.exemption.ExemptionManager;
 import arc.exemption.type.ExemptionType;
+import arc.utility.api.BukkitAccess;
 import arc.violation.ViolationManager;
 import arc.violation.result.ViolationResult;
 import bridge.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 /**
@@ -31,6 +33,11 @@ public abstract class Check extends Configurable {
      * Violations
      */
     private static final ViolationManager VIOLATION_MANAGER = Arc.arc().violations();
+
+    /**
+     * Configuration
+     */
+    private static final ArcConfiguration CONFIGURATION = Arc.arc().configuration();
 
     /**
      * The check type
@@ -65,6 +72,16 @@ public abstract class Check extends Configurable {
     protected Check(CheckType checkType) {
         this.checkType = checkType;
         this.builder = new CheckConfigurationBuilder(checkType);
+    }
+
+    /**
+     * Send a debug message
+     *
+     * @param player  the player
+     * @param message the message
+     */
+    protected void debug(Player player, String message) {
+        if (CONFIGURATION.enableDebugMessages()) BukkitAccess.sendMessage(player, message);
     }
 
     /**
@@ -210,9 +227,20 @@ public abstract class Check extends Configurable {
      *
      * @param result the result
      */
-    protected ViolationResult checkViolation(Player player, CheckResult result) {
+    protected ViolationResult checkViolationWithResult(Player player, CheckResult result) {
         if (result.failed()) return VIOLATION_MANAGER.violation(player, this, result);
         return ViolationResult.EMPTY;
+    }
+
+    /**
+     * Process the provided {@code result}
+     *
+     * @param player the player
+     * @param result the result
+     * @return {@code true} if the check should cancel.
+     */
+    protected boolean checkViolation(Player player, CheckResult result) {
+        return checkViolationWithResult(player, result).cancel();
     }
 
     /**
@@ -230,6 +258,16 @@ public abstract class Check extends Configurable {
             return vr;
         }
         return ViolationResult.EMPTY;
+    }
+
+    /**
+     * Set back the player
+     *
+     * @param player the player
+     * @param where  where to
+     */
+    protected void setbackPlayer(Player player, Location where) {
+        player.teleport(where, PlayerTeleportEvent.TeleportCause.PLUGIN);
     }
 
     /**

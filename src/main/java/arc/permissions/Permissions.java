@@ -60,6 +60,11 @@ public final class Permissions {
     public static final String ARC_COMMANDS_EXEMPT = "arc.commands.exempt";
 
     /**
+     * The permission to enable/disable debug.
+     */
+    public static final String ARC_COMMANDS_DEBUG = "arc.commands.debug";
+
+    /**
      * Check if the player can view violations
      *
      * @param player the player

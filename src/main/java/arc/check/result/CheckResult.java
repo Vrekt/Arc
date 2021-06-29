@@ -104,6 +104,20 @@ public final class CheckResult {
     }
 
     /**
+     * Attach parameter debug information to this result.
+     *
+     * @param parameter the parameter
+     * @param value     the value
+     * @return this
+     */
+    public CheckResult withParameter(String parameter, Object value) {
+        if (informationBuilder == null) informationBuilder = new StringBuilder();
+        informationBuilder.append("\n").append(ChatColor.GRAY);
+        informationBuilder.append(parameter).append("=").append(value.toString());
+        return this;
+    }
+
+    /**
      * Set failed
      */
     public CheckResult setFailed() {
@@ -120,18 +134,6 @@ public final class CheckResult {
     public void info(String information) {
         informationBuilder.append(ChatColor.RED).append(information);
         informationBuilder.append("\n");
-    }
-
-    /**
-     * Add a parameter
-     *
-     * @param parameter the parameter
-     * @param value     the value
-     */
-    public void parameter(String parameter, Object value) {
-        if (informationBuilder == null) informationBuilder = new StringBuilder();
-        informationBuilder.append("\n").append(ChatColor.GRAY);
-        informationBuilder.append(parameter).append("=").append(value.toString());
     }
 
     /**

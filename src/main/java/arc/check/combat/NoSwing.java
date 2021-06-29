@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Combat check for NoSwing
- *
+ * <p>
  * TODO: Can be improved.
  * TODO: Schedule timer after an attack to check if we received a swing packet then.
  * TODO: But depending on attack speed, could be bypassed, so maybe check swing packets == attack packets
@@ -66,10 +66,10 @@ public final class NoSwing extends PacketCheck {
         final long delta = System.currentTimeMillis() - data.lastSwingTime();
         if (delta > swingTime) {
             final CheckResult result = new CheckResult();
-            result.setFailed("No swing animation within time");
-            result.parameter("delta", delta);
-            result.parameter("min", swingTime);
-            return checkViolation(player, result).cancel();
+            result.setFailed("No swing animation within time")
+                    .withParameter("delta", delta)
+                    .withParameter("min", swingTime);
+            return checkViolation(player, result);
         }
         return false;
     }
@@ -86,14 +86,14 @@ public final class NoSwing extends PacketCheck {
         final long delta = now - data.lastAttackNoSwing();
         final long swingDelta = now - data.lastSwingTime();
 
-        data.lastAttackNoSwing(System.currentTimeMillis());
+        data.lastAttackNoSwing(now);
         // we have attacked within the last second.
         if (delta <= 1000 && swingDelta >= newSwingTime) {
             final CheckResult result = new CheckResult();
-            result.setFailed("No swing animation within time");
-            result.parameter("delta", delta);
-            result.parameter("min", swingDelta);
-            return checkViolation(player, result).cancel();
+            result.setFailed("No swing animation within time")
+                    .withParameter("delta", delta)
+                    .withParameter("min", swingDelta);
+            return checkViolation(player, result);
         }
 
         return false;

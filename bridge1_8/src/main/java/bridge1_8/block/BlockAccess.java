@@ -1,19 +1,18 @@
-package bridge1_12.materials;
+package bridge1_8.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Gate;
 import org.bukkit.material.Stairs;
 import org.bukkit.material.TrapDoor;
 
 /**
- * 1.12 Material API
+ * Block access for 1.8
  */
-public final class MaterialApi implements bridge.material.MaterialApi {
+public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
-    public boolean isFence(Block block) {
+    public boolean hasVerticalModifier(Block block) {
         switch (block.getType()) {
             case FENCE:
             case BIRCH_FENCE:
@@ -23,27 +22,15 @@ public final class MaterialApi implements bridge.material.MaterialApi {
             case NETHER_FENCE:
             case SPRUCE_FENCE:
             case ACACIA_FENCE:
+            case STEP:
+            case WOOD_STEP:
+            case STONE_SLAB2:
+            case BED_BLOCK:
+            case BED:
                 return true;
         }
-        return false;
-    }
 
-    @Override
-    public boolean isSlab(Block block) {
-        return block.getType() == Material.STEP
-                || block.getType() == Material.WOOD_STEP
-                || block.getType() == Material.PURPUR_SLAB
-                || block.getType() == Material.STONE_SLAB2;
-    }
-
-    @Override
-    public boolean isStair(Block block) {
-        return block.getType().getData().equals(Stairs.class);
-    }
-
-    @Override
-    public boolean isFenceGate(Block block) {
-        return block.getType().getData().equals(Gate.class);
+        return block.getType().getData().equals(Stairs.class) || block.getType().getData().equals(Gate.class) || isWall(block);
     }
 
     @Override
@@ -75,20 +62,4 @@ public final class MaterialApi implements bridge.material.MaterialApi {
     public boolean isSlimeblock(Block block) {
         return block.getType() == Material.SLIME_BLOCK;
     }
-
-    @Override
-    public Material getMaterial(String name) {
-        return Material.getMaterial(name);
-    }
-
-    @Override
-    public ItemStack createItem(String material) {
-        return new ItemStack(getMaterial(material));
-    }
-
-    @Override
-    public ItemStack createItem(String material, short data) {
-        return new ItemStack(getMaterial(material), 1, data);
-    }
-
 }

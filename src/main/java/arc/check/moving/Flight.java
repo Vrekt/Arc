@@ -5,9 +5,9 @@ import arc.check.CheckType;
 import arc.check.result.CancelType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.utility.MovingUtil;
-import arc.utility.api.BukkitApi;
-import arc.utility.block.Blocks;
+import arc.utility.api.BukkitAccess;
+import arc.utility.block.BlockAccess;
+import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -24,8 +24,11 @@ public final class Flight extends Check {
      * The max jump distance.
      * Max climbing speeds
      * The amount of time a player has to be on a climbable
+     * <p>
+     * The distance (from the ground) required to start checking ascending stuff.
+     * The distance (from the ground) (horizontal) that is capped, if the hDist > capped, no check is executed.
      */
-    private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown;
+    private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown, groundDistanceThreshold, groundDistanceHorizontalCap;
 
     /**
      * The max ascend time
@@ -50,8 +53,9 @@ public final class Flight extends Check {
         addConfigurationValue("climbing-cooldown", 5);
         addConfigurationValue("max-ascend-time", 7);
         addConfigurationValue("jump-boost-ascend-amplifier", 3);
+        addConfigurationValue("ground-distance-threshold", 1.25);
+        addConfigurationValue("ground-distance-horizontal-cap", 0.50);
         addConfigurationValue("slime-block-distance-fallen-threshold", 0);
-
         if (enabled()) load();
     }
 
@@ -68,17 +72,15 @@ public final class Flight extends Check {
         final double vertical = data.vertical();
         final Location to = data.to();
 
-        // check if we have a slab.
-        final boolean hasSlab = MovingUtil.hasBlock(to, 0.3, -0.1, 0.3, Blocks::isSlab);
-        final boolean hasStair = MovingUtil.hasBlock(to, 0.3, -0.1, 0.3, Blocks::isStair);
-        final boolean hasFence = MovingUtil.hasBlock(to, 0.5, -1, 0.5, block -> (Blocks.isFence(block) || Blocks.isFenceGate(block)));
+        // detect slabs and stairs.
+        final boolean slabAndStairModifier = BlockAccess.hasVerticalModifierAt(to, to.getWorld(), 0.3, -0.1, 0.3);
+        // fences, gates
+        final boolean otherVerticalModifier = BlockAccess.hasVerticalModifierAt(to, to.getWorld(), 0.5, -1, 0.5);
 
         // check if its a valid vertical move.
         final boolean hasVerticalMove = vertical > 0.0
                 && !player.isInsideVehicle()
-                && !hasSlab
-                && !hasStair
-                && !hasFence
+                && !(slabAndStairModifier || otherVerticalModifier)
                 && !data.inLiquid()
                 && !data.hasClimbable();
 
@@ -104,7 +106,7 @@ public final class Flight extends Check {
         }
 
         result.reset();
-        player.sendMessage("Vertical: " + vertical);
+        debug(player, "Vertical: " + vertical);
     }
 
     /**
@@ -117,25 +119,42 @@ public final class Flight extends Check {
      */
     private boolean checkVerticalMove(Player player, MovingData data, double vertical, CheckResult result) {
         if (data.ascending()) {
+            // check ground distance.
+            final double distance = MathUtil.vertical(data.ground(), data.to());
+            if (distance >= groundDistanceThreshold) {
+                // high off ground (hopefully) check.
+                // make sure we are within the limits of the ground.
+                // we don't want a flag when the player is wildly jumping around.
+                final double hDist = MathUtil.horizontal(data.ground(), data.to());
+                if (data.ascendingTime() >= 5 && hDist < groundDistanceHorizontalCap) {
+                    result.setFailed("Vertical distance from ground greater than allowed within limits.")
+                            .withParameter("distance", distance)
+                            .withParameter("threshold", groundDistanceThreshold)
+                            .withParameter("hDist", hDist)
+                            .withParameter("cap", groundDistanceHorizontalCap);
+                    return checkViolation(player, result, data.ground(), CancelType.GROUND).cancel();
+                }
+            }
+
             // check if we have launch from a slime-block.
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
 
             if (vertical > maxJumpHeight) {
-                result.setFailed("Vertical move greater than max jump height.");
-                result.parameter("vertical", vertical);
-                result.parameter("max", maxJumpHeight);
+                result.setFailed("Vertical move greater than max jump height.")
+                        .withParameter("vertical", vertical)
+                        .withParameter("max", maxJumpHeight);
                 return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
 
             final int modifier = player.hasPotionEffect(PotionEffectType.JUMP)
-                    ? BukkitApi.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier()
+                    ? BukkitAccess.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier()
                     + jumpBoostAscendAmplifier : 0;
             if (data.ascendingTime() > (maxAscendTime + modifier) && !data.hadClimbable()) {
-                result.setFailed("Ascending for too long");
-                result.parameter("vertical", vertical);
-                result.parameter("time", data.ascendingTime());
-                result.parameter("max", (maxAscendTime + modifier));
+                result.setFailed("Ascending for too long")
+                        .withParameter("vertical", vertical)
+                        .withParameter("time", data.ascendingTime())
+                        .withParameter("max", (maxAscendTime + modifier));
                 return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
 
@@ -154,19 +173,19 @@ public final class Flight extends Check {
     private boolean checkClimbingMovement(Player player, MovingData data, double vertical, double cooldown, CheckResult result) {
         if (data.ascending() && data.ascendingTime() >= cooldown) {
             if (vertical > maxClimbSpeedUp) {
-                result.setFailed("Climbing a ladder too fast");
-                result.parameter("vertical", vertical);
-                result.parameter("max", maxClimbSpeedUp);
-                result.parameter("cooldown", cooldown);
+                result.setFailed("Climbing a ladder too fast")
+                        .withParameter("vertical", vertical)
+                        .withParameter("max", maxClimbSpeedUp)
+                        .withParameter("cooldown", cooldown);
                 return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
             // reverse the cooldown here, since we are going down instead of up.
         } else if (data.descending() && data.descendingTime() >= (climbingCooldown) + (vertical * 2)) {
             if (vertical > maxClimbSpeedDown) {
-                result.setFailed("Descending a ladder too fast");
-                result.parameter("vertical", vertical);
-                result.parameter("max", maxClimbSpeedDown);
-                result.parameter("cooldown", cooldown);
+                result.setFailed("Descending a ladder too fast")
+                        .withParameter("vertical", vertical)
+                        .withParameter("max", maxClimbSpeedDown)
+                        .withParameter("cooldown", cooldown);
                 return checkViolation(player, result, data.from(), CancelType.FROM).cancel();
             }
         }
@@ -199,7 +218,7 @@ public final class Flight extends Check {
     private double getJumpHeight(Player player) {
         double current = maxJumpDistance;
         if (player.hasPotionEffect(PotionEffectType.JUMP)) {
-            current += (0.4 * BukkitApi.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier());
+            current += (0.4 * BukkitAccess.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier());
         }
         return current;
     }
@@ -217,5 +236,7 @@ public final class Flight extends Check {
         climbingCooldown = configuration.getDouble("climbing-cooldown");
         maxAscendTime = configuration.getInt("max-ascend-time");
         jumpBoostAscendAmplifier = configuration.getInt("jump-boost-ascend-amplifier");
+        groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
+        groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
     }
 }

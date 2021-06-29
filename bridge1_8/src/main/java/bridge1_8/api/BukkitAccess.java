@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Bukkit API implementation for 1.8
  */
-public final class BukkitApi implements bridge.api.BukkitApi {
+public final class BukkitAccess implements bridge.api.BukkitAccess {
 
     /**
      * Stores entity bounds.

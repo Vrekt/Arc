@@ -62,7 +62,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param player player
      */
     private void doJoinExemptions(Player player) {
-        addExemption(player, CheckType.MORE_PACKETS, 500);
+        addExemption(player, CheckType.MORE_PACKETS, 1000);
         addExemption(player, CheckType.NOFALL, 500);
     }
 

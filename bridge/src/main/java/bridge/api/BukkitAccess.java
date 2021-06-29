@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
  * A bridge for the Bukkit API.
  * Contains methods that were deprecated for newer versions.
  */
-public interface BukkitApi {
+public interface BukkitAccess {
 
     /**
      * Create an inventory

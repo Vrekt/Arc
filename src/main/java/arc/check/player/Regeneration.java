@@ -58,10 +58,10 @@ public final class Regeneration extends Check {
         // if its less than the minimum then flag.
         if (failed) {
             final CheckResult result = new CheckResult();
-            result.setFailed("Regaining health too fast.");
-            result.parameter("time", time);
-            result.parameter("min", useLegacy ? legacyRegenerationTime : newRegenerationTime);
-            return checkViolation(player, result).cancel();
+            result.setFailed("Regaining health too fast.")
+                    .withParameter("time", time)
+                    .withParameter("min", useLegacy ? legacyRegenerationTime : newRegenerationTime);
+            return checkViolation(player, result);
         }
         return false;
     }

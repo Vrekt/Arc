@@ -4,11 +4,9 @@ import arc.check.Check;
 import arc.check.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
-import arc.utility.entity.Entities;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 /**
  * Checks if the player is walking on water.
@@ -93,9 +91,9 @@ public final class Jesus extends Check {
 
                 // basic check, if on ground and no vertical, flag.
                 if (clientGround && vertical == 0.0) {
-                    result.setFailed("Client on ground or vertical is 0.0");
-                    result.parameter("clientGround", true);
-                    result.parameter("vertical", vertical);
+                    result.setFailed("Client on ground and vertical is 0.0")
+                            .withParameter("clientGround", true)
+                            .withParameter("vertical", vertical);
                 } else {
                     // alternative check for other types
                     final double distance = Math.floor(MathUtil.vertical(water, to) * 100) / 100;
@@ -114,13 +112,13 @@ public final class Jesus extends Check {
                         // then, that's odd already, since vanilla has much more crazy vertical movements
                         final double difference = Math.abs(distance - lastDistance);
                         if (difference <= ascendingMinDifferenceDistance) {
-                            result.setFailed("Odd ascending behaviour");
-                            result.parameter("ascendingTime", data.ascendingTime());
-                            result.parameter("maxAscendingTime", 10);
-                            result.parameter("waterDistance", distance);
-                            result.parameter("lastWaterDistance", lastDistance);
-                            result.parameter("difference", difference);
-                            result.parameter("min", ascendingMinDifferenceDistance);
+                            result.setFailed("Odd ascending behaviour")
+                                    .withParameter("ascendingTime", data.ascendingTime())
+                                    .withParameter("maxAscendingTime", 10)
+                                    .withParameter("waterDistance", distance)
+                                    .withParameter("lastWaterDistance", lastDistance)
+                                    .withParameter("difference", difference)
+                                    .withParameter("min", ascendingMinDifferenceDistance);
                         }
                     }
 
@@ -136,22 +134,22 @@ public final class Jesus extends Check {
                             && liquidTime >= timeInLiquidRequiredDistanceChecking
                             && distance == 0.0
                             && noDistanceChanges >= maxNoDistanceChangeAllowed) {
-                        result.setFailed("vertical distance has not changed overtime");
-                        result.parameter("liquidTime", liquidTime);
-                        result.parameter("required", timeInLiquidRequiredDistanceChecking);
-                        result.parameter("noDistanceChanges", noDistanceChanges);
-                        result.parameter("max", maxNoDistanceChangeAllowed);
-                        result.parameter("distance", 0.0);
+                        result.setFailed("vertical distance has not changed overtime")
+                                .withParameter("liquidTime", liquidTime)
+                                .withParameter("required", timeInLiquidRequiredDistanceChecking)
+                                .withParameter("noDistanceChanges", noDistanceChanges)
+                                .withParameter("max", maxNoDistanceChangeAllowed)
+                                .withParameter("distance", 0.0);
                     }
                 }
 
                 // teleport our player back to a desirable location, if they failed.
-                if (checkViolation(player, result).cancel()) {
-                    if (data.ground() == null) {
-                        Entities.teleportSync(player, data.from(), PlayerTeleportEvent.TeleportCause.PLUGIN);
-                    } else {
+                if (checkViolation(player, result)) {
+                    if (data.ground() != null) {
                         final double distance = MathUtil.distance(data.ground(), data.to());
-                        Entities.teleportSync(player, distance > maxSetbackDistance ? data.from() : data.ground(), PlayerTeleportEvent.TeleportCause.PLUGIN);
+                        setbackPlayer(player, distance > maxSetbackDistance ? data.from() : data.ground());
+                    } else {
+                        setbackPlayer(player, data.from());
                     }
                 }
             }

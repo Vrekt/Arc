@@ -1,6 +1,7 @@
 package arc.utility.chat;
 
 import arc.Arc;
+import arc.utility.api.BukkitAccess;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -10,13 +11,18 @@ import org.bukkit.entity.Player;
 public final class ChatUtil {
 
     /**
+     * Prefix.
+     */
+    private static final String PREFIX = Arc.arc().configuration().prefix() + " ";
+
+    /**
      * Send a message
      *
      * @param player  the player
      * @param message the message
      */
     public static void sendMessage(Player player, String message) {
-        Arc.bridge().api().sendMessage(player, Arc.arc().configuration().prefix() + " " + message);
+        BukkitAccess.sendMessage(player, PREFIX + message);
     }
 
     /**
@@ -27,7 +33,7 @@ public final class ChatUtil {
      * @param message the message
      */
     public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(Arc.arc().configuration().prefix() + " " + message);
+        sender.sendMessage(PREFIX + message);
     }
 
 }

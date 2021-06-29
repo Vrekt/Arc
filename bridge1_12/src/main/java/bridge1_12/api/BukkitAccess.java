@@ -1,63 +1,61 @@
-package bridge1_16.api;
+package bridge1_12.api;
 
 import bridge.utility.BoundingBox;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
-import net.minecraft.server.v1_16_R3.AxisAlignedBB;
+import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 /**
- * Bukkit API implementation for 1.16
+ * Bukkit API implementation for 1.12
  */
-public final class BukkitApi implements bridge.api.BukkitApi {
+public final class BukkitAccess implements bridge.api.BukkitAccess {
     @Override
     public Inventory createInventory(String title, int size) {
-        return Bukkit.createInventory(null, size, Component.text(title));
+        return Bukkit.createInventory(null, size, title);
     }
 
     @Override
     public void broadcast(String message, String permission) {
-        Bukkit.broadcast(Component.text(message), permission);
+        Bukkit.broadcast(message, permission);
     }
 
     @Override
     public void broadcast(String message) {
-        Bukkit.broadcast(Component.text(message));
+        Bukkit.broadcastMessage(message);
     }
 
     @Override
     public void kickPlayer(Player player, String message) {
-        player.kick(Component.text(message), PlayerKickEvent.Cause.PLUGIN);
+        player.kickPlayer(message);
     }
 
     @Override
     public void sendMessage(Player player, String message) {
-        player.sendMessage(Component.text(message));
+        player.sendMessage(message);
     }
 
     @Override
     public void sendMessage(Player player, TextComponent message) {
-        player.sendMessage(Component.text(message.getText()));
+        player.sendMessage(message);
     }
 
     @Override
     public void addHoverEvent(TextComponent component, String information) {
-        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(information)));
+        component.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(information).create()));
     }
 
     @Override
     public BoundingBox getBoundingBox(Entity entity) {
         final AxisAlignedBB nms = ((CraftEntity) entity).getHandle().getBoundingBox();
-        return new BoundingBox(nms.minX, nms.minY, nms.minZ, nms.maxX, nms.maxY, nms.maxZ);
+        return new BoundingBox(nms.a, nms.b, nms.c, nms.d, nms.e, nms.f);
     }
 
     @Override

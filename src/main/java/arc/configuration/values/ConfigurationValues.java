@@ -25,7 +25,8 @@ public enum ConfigurationValues {
     ARC_COMMAND_NO_PERMISSION_MESSAGE(new ConfigurationValue<>("arc-command-no-permission-message", "Unknown command. Type /help for help.")),
     ARC_PREFIX(new ConfigurationValue<>("arc-prefix", "&8[&cArc&8]")),
     VIOLATION_DATA_TIMEOUT(new ConfigurationValue<>("violation-data-timeout", 30)),
-    ENABLE_EVENT_API(new ConfigurationValue<>("enable-event-api", true));
+    ENABLE_EVENT_API(new ConfigurationValue<>("enable-event-api", true)),
+    DEBUG_MESSAGES(new ConfigurationValue<>("debug-messages", false));
 
     /**
      * The value
