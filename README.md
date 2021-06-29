@@ -88,6 +88,7 @@ All the documentation is still work-in-progress and very incomplete.
 Although, most things within the code are very clear and documented.
 
 * Here are the various documentation links
+  * [Commands](https://github.com/Vrekt/Arc/wiki/Commands) 
   * [API](https://github.com/Vrekt/Arc/wiki/API)
   * [Configuration](https://github.com/Vrekt/Arc/wiki/Configuration)
   * [Check Configuration](https://github.com/Vrekt/Arc/wiki/Check-configuration)
