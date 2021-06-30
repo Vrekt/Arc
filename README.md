@@ -63,6 +63,12 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
   * FastUse
     * FastBow
     * FastConsume
+* `Block` checks
+  * Reach
+    * Breaking
+    * Placing
+    * Interaction
+  * Still WIP
 
 *...All checks are still work in progress and subject to change*
 
