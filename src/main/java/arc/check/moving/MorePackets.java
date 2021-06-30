@@ -2,7 +2,7 @@ package arc.check.moving;
 
 import arc.Arc;
 import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import org.bukkit.Bukkit;
@@ -121,8 +121,8 @@ public final class MorePackets extends Check {
      */
     private void kickPlayerIfThresholdReached(Player player, int count) {
         if (kickIfThresholdReached && count >= packetKickThreshold
-                && !Arc.arc().punishment().hasPendingKick(player)) {
-            Arc.arc().punishment().kickPlayer(player, this);
+                && !Arc.getInstance().getPunishmentManager().hasPendingKick(player)) {
+            Arc.getInstance().getPunishmentManager().kickPlayer(player, this);
         }
     }
 

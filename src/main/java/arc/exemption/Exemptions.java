@@ -1,6 +1,6 @@
 package arc.exemption;
 
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.exemption.type.ExemptionType;
 
 import java.util.*;

@@ -8,15 +8,15 @@ public enum Version {
     /**
      * 1.8
      */
-    VERSION_1_8(0, "1.8.8"),
+    VERSION_1_8(0, "1.8.8", "version-1-8-8"),
     /**
      * 1.12
      */
-    VERSION_1_12(1, "1.12"),
+    VERSION_1_12(1, "1.12", "version-1-12"),
     /**
      * 1.16
      */
-    VERSION_1_16(2, "1.16");
+    VERSION_1_16(2, "1.16", "version-1-16");
 
     /**
      * The number
@@ -25,12 +25,28 @@ public enum Version {
 
     /**
      * Version string
+     * Friendly name for configuration
      */
-    private final String version;
+    private final String version, friendlyName;
 
-    Version(int number, String version) {
+    Version(int number, String version, String friendlyName) {
         this.number = number;
         this.version = version;
+        this.friendlyName = friendlyName;
+    }
+
+    /**
+     * @return the version string
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * @return the config friendly name
+     */
+    public String getFriendlyName() {
+        return friendlyName;
     }
 
     /**

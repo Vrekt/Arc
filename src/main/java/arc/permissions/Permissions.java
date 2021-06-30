@@ -1,7 +1,7 @@
 package arc.permissions;
 
-import arc.check.CheckCategory;
-import arc.check.CheckType;
+import arc.check.types.CheckCategory;
+import arc.check.types.CheckType;
 import org.bukkit.entity.Player;
 
 /**

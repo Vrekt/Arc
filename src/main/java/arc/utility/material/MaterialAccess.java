@@ -12,7 +12,7 @@ public final class MaterialAccess {
     /**
      * Access
      */
-    private static final bridge.material.MaterialAccess ACCESS = Arc.bridge().getMaterialAccess();
+    private static final bridge.material.MaterialAccess ACCESS = Arc.getBridge().getMaterialAccess();
 
     /**
      * Get a material

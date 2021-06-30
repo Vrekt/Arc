@@ -9,10 +9,14 @@ import org.bukkit.block.data.type.*;
  */
 public final class BlockAccess implements bridge.block.BlockAccess {
 
-
     @Override
     public boolean hasVerticalModifier(Block block) {
-        return block.getState() instanceof Fence || block.getState() instanceof Slab || block.getState() instanceof Stairs || block.getState() instanceof Gate || isWall(block);
+        return block.getState() instanceof Fence
+                || block.getState() instanceof Slab
+                || block.getState() instanceof Stairs
+                || block.getState() instanceof Gate
+                || isWall(block)
+                || block.getType() == Material.SNOW;
     }
 
     @Override

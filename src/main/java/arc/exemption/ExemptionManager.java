@@ -2,8 +2,8 @@ package arc.exemption;
 
 import arc.Arc;
 import arc.api.events.PlayerExemptionCheckEvent;
-import arc.check.CheckSubType;
-import arc.check.CheckType;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.exemption.type.ExemptionType;

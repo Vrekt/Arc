@@ -4,7 +4,7 @@ import arc.Arc;
 import arc.api.events.PlayerViolationEvent;
 import arc.api.events.PostPlayerViolationEvent;
 import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
@@ -58,10 +58,11 @@ public final class ViolationManager extends Configurable implements Closeable {
      * Initialize
      *
      * @param configuration the configuration
+     * @param manager       the manager
      */
-    public void initialize(ArcConfiguration configuration) {
+    public void initialize(ArcConfiguration configuration, PunishmentManager manager) {
         this.configuration = configuration;
-        this.punishmentManager = Arc.arc().punishment();
+        this.punishmentManager = manager;
 
         historyCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(configuration.violationDataTimeout(), TimeUnit.MINUTES)

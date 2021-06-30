@@ -22,13 +22,13 @@ public final class CancelBanSubCommand extends ArcSubCommand {
             return;
         }
 
-        final boolean pending = Arc.arc().punishment().hasPendingBan(arguments[0]);
+        final boolean pending = Arc.getInstance().getPunishmentManager().hasPendingBan(arguments[0]);
         if (!pending) {
             ChatUtil.sendMessage(sender, ChatColor.RED + "That player does not have a pending ban.");
             return;
         }
 
-        Arc.arc().punishment().cancelBan(arguments[0]);
+        Arc.getInstance().getPunishmentManager().cancelBan(arguments[0]);
         ChatUtil.sendMessage(sender, ChatColor.GREEN + "The pending ban for " + ChatColor.GRAY + arguments[0] + ChatColor.GREEN + " has been cancelled.");
     }
 }

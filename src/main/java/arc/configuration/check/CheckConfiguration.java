@@ -1,10 +1,11 @@
 package arc.configuration.check;
 
 import arc.Arc;
-import arc.check.CheckSubType;
-import arc.check.CheckType;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
+import bridge.Version;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -26,6 +27,11 @@ public final class CheckConfiguration extends Configurable {
      * The map of sub-type sections.
      */
     private final Map<CheckSubType, ConfigurationSection> subTypeSections = new HashMap<>();
+
+    /**
+     * The map of versions
+     */
+    private final Map<Version, ConfigurationSection> versionSections = new HashMap<>();
 
     /**
      * The section for this check
@@ -78,6 +84,12 @@ public final class CheckConfiguration extends Configurable {
                 subTypeSections.put(subType, subTypeSection);
             }
         });
+
+        // retrieve versions
+        for (Version value : Version.values()) {
+            final ConfigurationSection versionSection = section.getConfigurationSection(value.getFriendlyName());
+            if (versionSection != null) versionSections.put(value, versionSection);
+        }
     }
 
     @Override
@@ -88,12 +100,24 @@ public final class CheckConfiguration extends Configurable {
 
     /**
      * Get the sub-type section
+     * If the section is not found, will return the default {@code section} within this configuration.
      *
      * @param subType the sub-type
      * @return the section
      */
-    public ConfigurationSection subTypeSection(CheckSubType subType) {
-        return subTypeSections.getOrDefault(subType, null);
+    public ConfigurationSection getSubType(CheckSubType subType) {
+        return subTypeSections.getOrDefault(subType, section);
+    }
+
+    /**
+     * Get a version section
+     * If the section is not found, will return the default {@code section} within this configuration.
+     *
+     * @param version the version
+     * @return the section
+     */
+    public ConfigurationSection getVersion(Version version) {
+        return versionSections.getOrDefault(version, section);
     }
 
     /**
@@ -103,8 +127,17 @@ public final class CheckConfiguration extends Configurable {
      */
     public void createSubTypeSection(CheckSubType subType) {
         if (section.isConfigurationSection(subType.getName())) return;
-        final ConfigurationSection newSection = section.createSection(subType.getName());
-        subTypeSections.put(subType, newSection);
+        subTypeSections.put(subType, section.createSection(subType.getName()));
+    }
+
+    /**
+     * Create a version section
+     *
+     * @param version the version
+     */
+    public void createVersionSection(Version version) {
+        if (section.isConfigurationSection(version.getFriendlyName())) return;
+        versionSections.put(version, section.createSection(version.getFriendlyName()));
     }
 
     /**
@@ -125,12 +158,32 @@ public final class CheckConfiguration extends Configurable {
      * @param valueName the value name
      * @param value     the value
      */
-    public void addConfigurationValue(CheckSubType type, String valueName, Object value) {
-        final ConfigurationSection section = subTypeSection(type);
-        if (section == null) {
-            Arc.arc().getLogger().warning("Failed to write to sub-type: " + type.getName());
+    public void addConfigurationValueTo(CheckSubType type, String valueName, Object value) {
+        final ConfigurationSection section = getSubType(type);
+
+        // basic comparison
+        if (section.getName().equals(this.section.getName())) {
+            Arc.getPlugin().getLogger().warning("Failed to write to sub-type: " + type.getName());
             return;
         }
+        if (section.contains(valueName)) return;
+        section.set(valueName, value);
+    }
+
+    /**
+     * Add a configuration value for a certain version
+     *
+     * @param version   the version
+     * @param valueName the value name
+     * @param value     the value
+     */
+    public void addConfigurationValueFor(Version version, String valueName, Object value) {
+        final ConfigurationSection section = getVersion(version);
+        if (section.getName().equals(this.section.getName())) {
+            Arc.getPlugin().getLogger().warning("Failed to write a version section to the configuration: " + version + ", value: " + valueName);
+            return;
+        }
+
         if (section.contains(valueName)) return;
         section.set(valueName, value);
     }

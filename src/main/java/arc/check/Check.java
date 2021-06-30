@@ -3,6 +3,8 @@ package arc.check;
 import arc.Arc;
 import arc.check.result.CancelType;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.configuration.check.CheckConfiguration;
@@ -27,17 +29,17 @@ public abstract class Check extends Configurable {
     /**
      * Exemptions
      */
-    private static final ExemptionManager EXEMPTION_MANAGER = Arc.arc().exemptions();
+    private static final ExemptionManager EXEMPTION_MANAGER = Arc.getInstance().getExemptionManager();
 
     /**
      * Violations
      */
-    private static final ViolationManager VIOLATION_MANAGER = Arc.arc().violations();
+    private static final ViolationManager VIOLATION_MANAGER = Arc.getInstance().getViolationManager();
 
     /**
      * Configuration
      */
-    private static final ArcConfiguration CONFIGURATION = Arc.arc().configuration();
+    private static final ArcConfiguration CONFIGURATION = Arc.getInstance().getArcConfiguration();
 
     /**
      * The check type
@@ -219,7 +221,7 @@ public abstract class Check extends Configurable {
      * @param value     the value
      */
     protected void addConfigurationValue(CheckSubType type, String valueName, Object value) {
-        configuration.addConfigurationValue(type, valueName, value);
+        configuration.addConfigurationValueTo(type, valueName, value);
     }
 
     /**
@@ -278,7 +280,7 @@ public abstract class Check extends Configurable {
      * @param delay    initial delay
      */
     protected void schedule(Runnable runnable, long delay, long every) {
-        scheduled = Bukkit.getScheduler().runTaskTimer(Arc.plugin(), runnable, delay, every);
+        scheduled = Bukkit.getScheduler().runTaskTimer(Arc.getPlugin(), runnable, delay, every);
     }
 
     /**
@@ -320,7 +322,7 @@ public abstract class Check extends Configurable {
      * @return {@code true} if the check is disabled
      */
     protected boolean disableIfNewerThan(Version version) {
-        if (Arc.version().isNewerThan(version)) {
+        if (Arc.getMCVersion().isNewerThan(version)) {
             permanentlyDisabled = true;
             return true;
         }
@@ -366,6 +368,13 @@ public abstract class Check extends Configurable {
      */
     public String getName() {
         return checkType.getName();
+    }
+
+    /**
+     * @return the pretty name.
+     */
+    public String getPrettyName() {
+        return checkType.getPrettyName();
     }
 
     /**

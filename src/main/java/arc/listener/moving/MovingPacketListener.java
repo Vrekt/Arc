@@ -1,7 +1,7 @@
 package arc.listener.moving;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.moving.*;
 import arc.data.moving.MovingData;
 import arc.listener.AbstractPacketListener;
@@ -22,7 +22,7 @@ public final class MovingPacketListener extends AbstractPacketListener {
     private final MorePackets morePackets;
 
     public MovingPacketListener() {
-        morePackets = (MorePackets) Arc.arc().checks().getCheck(CheckType.MORE_PACKETS);
+        morePackets = (MorePackets) Arc.getInstance().getCheckManager().getCheck(CheckType.MORE_PACKETS);
     }
 
     @Override

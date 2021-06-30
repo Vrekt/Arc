@@ -157,21 +157,22 @@ public final class ArcConfiguration extends Configurable {
      * @return the {@link FileConfiguration} from {@link Arc}
      */
     public FileConfiguration fileConfiguration() {
-        return Arc.arc().getConfig();
+        return Arc.getPlugin().getConfig();
     }
 
     /**
      * Reload the configuration
      */
     public void reloadConfiguration() {
-        Arc.plugin().reloadConfig();
+        Arc.getPlugin().reloadConfig();
 
-        final FileConfiguration configuration = Arc.plugin().getConfig();
+        final FileConfiguration configuration = Arc.getPlugin().getConfig();
         read(configuration);
 
-        Arc.arc().checks().reload(this);
-        Arc.arc().violations().reload(this);
-        Arc.arc().punishment().reload(this);
+        Arc.getInstance().getCheckManager().reload(this);
+        Arc.getInstance().getViolationManager().reload(this);
+        Arc.getInstance().getExemptionManager().reload(this);
+        Arc.getInstance().getPunishmentManager().reload(this);
     }
 
 }

@@ -19,8 +19,8 @@ public final class PlayerConnectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
-        Arc.arc().violations().onPlayerJoin(player);
-        Arc.arc().exemptions().onPlayerJoin(player);
+        Arc.getInstance().getViolationManager().onPlayerJoin(player);
+        Arc.getInstance().getExemptionManager().onPlayerJoin(player);
 
         initializePlayerData(player);
     }
@@ -28,8 +28,8 @@ public final class PlayerConnectionListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onPlayerLeave(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
-        Arc.arc().violations().onPlayerLeave(player);
-        Arc.arc().exemptions().onPlayerLeave(player);
+        Arc.getInstance().getViolationManager().onPlayerLeave(player);
+        Arc.getInstance().getExemptionManager().onPlayerLeave(player);
         Data.removeAll(player);
     }
 
@@ -40,11 +40,7 @@ public final class PlayerConnectionListener implements Listener {
      */
     private void initializePlayerData(Player player) {
         final MovingData data = MovingData.get(player);
-
-        // calculate player movement
         MovingUtil.calculateMovement(data, player.getLocation(), player.getLocation());
-        data.from(player.getLocation());
-        data.to(player.getLocation());
     }
 
 }

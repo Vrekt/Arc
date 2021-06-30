@@ -1,9 +1,9 @@
 package arc.check.player;
 
 import arc.bridge.packets.BridgePlayClientBlockPlace;
-import arc.check.CheckSubType;
-import arc.check.CheckType;
-import arc.check.PacketCheck;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
+import arc.check.implementations.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
 import com.comphenix.protocol.PacketType;
@@ -125,10 +125,10 @@ public final class FastUse extends PacketCheck {
 
     @Override
     public void load() {
-        final ConfigurationSection fastBowSection = configuration.subTypeSection(CheckSubType.FAST_USE_FAST_BOW);
+        final ConfigurationSection fastBowSection = configuration.getSubType(CheckSubType.FAST_USE_FAST_BOW);
         useDeltaMinimum = fastBowSection.getLong("use-delta-min");
         deltaShotMinimum = fastBowSection.getLong("delta-shot-min");
-        final ConfigurationSection fastConsumeSection = configuration.subTypeSection(CheckSubType.FAST_USE_FAST_CONSUME);
+        final ConfigurationSection fastConsumeSection = configuration.getSubType(CheckSubType.FAST_USE_FAST_CONSUME);
         consumeTime = fastConsumeSection.getLong("consume-time-ms");
         registerPacketListener(PacketType.Play.Client.BLOCK_PLACE, this::onBlockPlace);
     }

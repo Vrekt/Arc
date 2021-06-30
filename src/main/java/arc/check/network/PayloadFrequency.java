@@ -1,8 +1,8 @@
 package arc.check.network;
 
 import arc.Arc;
-import arc.check.CheckType;
-import arc.check.PacketCheck;
+import arc.check.types.CheckType;
+import arc.check.implementations.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
@@ -81,8 +81,8 @@ public final class PayloadFrequency extends PacketCheck {
                     .withParameter("max", maxPacketsPerInterval);
 
             if (maxPacketsPerIntervalKick
-                    && !Arc.arc().punishment().hasPendingKick(player)) {
-                Arc.arc().punishment().kickPlayer(player, this);
+                    && !Arc.getInstance().getPunishmentManager().hasPendingKick(player)) {
+                Arc.getInstance().getPunishmentManager().kickPlayer(player, this);
             }
         }
 
@@ -128,8 +128,8 @@ public final class PayloadFrequency extends PacketCheck {
                         .withParameter("max", max);
 
                 if (maxPacketSizeKick
-                        && !Arc.arc().punishment().hasPendingKick(player)) {
-                    Arc.arc().punishment().kickPlayer(player, this);
+                        && !Arc.getInstance().getPunishmentManager().hasPendingKick(player)) {
+                    Arc.getInstance().getPunishmentManager().kickPlayer(player, this);
                 }
             }
         }

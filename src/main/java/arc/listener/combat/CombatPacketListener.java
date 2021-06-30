@@ -1,11 +1,11 @@
 package arc.listener.combat;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
-import arc.check.combat.Reach;
+import arc.check.combat.AttackReach;
 import arc.data.combat.CombatData;
 import arc.data.packet.PacketData;
 import arc.listener.AbstractPacketListener;
@@ -29,9 +29,9 @@ public final class CombatPacketListener extends AbstractPacketListener {
     private final Criticals criticals;
 
     /**
-     * Reach
+     * BlockBreakReach
      */
-    private final Reach reach;
+    private final AttackReach reach;
 
     /**
      * No swing
@@ -50,10 +50,10 @@ public final class CombatPacketListener extends AbstractPacketListener {
     }
 
     public CombatPacketListener() {
-        criticals = (Criticals) Arc.arc().checks().getCheck(CheckType.CRITICALS);
-        reach = (Reach) Arc.arc().checks().getCheck(CheckType.REACH);
-        noSwing = (NoSwing) Arc.arc().checks().getCheck(CheckType.NO_SWING);
-        killAura = (KillAura) Arc.arc().checks().getCheck(CheckType.KILL_AURA);
+        criticals = Arc.getInstance().getCheckManager().getCheck(CheckType.CRITICALS);
+        reach = Arc.getInstance().getCheckManager().getCheck(CheckType.REACH);
+        noSwing = Arc.getInstance().getCheckManager().getCheck(CheckType.NO_SWING);
+        killAura = Arc.getInstance().getCheckManager().getCheck(CheckType.KILL_AURA);
     }
 
     /**

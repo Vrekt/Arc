@@ -36,7 +36,7 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
     @Override
     public void executeFromInventory(ItemStack item, InventoryCreator inventory, Player player) {
         final ItemStack modified = item.clone();
-        final boolean violations = Arc.arc().violations().toggleViolationsViewer(player);
+        final boolean violations = Arc.getInstance().getViolationManager().toggleViolationsViewer(player);
 
         final ItemMeta meta = modified.getItemMeta();
         if (meta != null) {
@@ -54,7 +54,7 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
      * @return {@code true} if violations are on.
      */
     private boolean toggleState(Player player) {
-        return Arc.arc().violations().toggleViolationsViewer(player);
+        return Arc.getInstance().getViolationManager().toggleViolationsViewer(player);
     }
 
 }

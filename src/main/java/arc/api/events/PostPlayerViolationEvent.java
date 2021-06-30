@@ -1,6 +1,6 @@
 package arc.api.events;
 
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.violation.result.ViolationResult;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;

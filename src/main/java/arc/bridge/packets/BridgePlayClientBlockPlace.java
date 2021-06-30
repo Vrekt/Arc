@@ -19,7 +19,7 @@ public final class BridgePlayClientBlockPlace extends AbstractPacket {
 
     public BridgePlayClientBlockPlace(PacketContainer packet) {
         super(packet, TYPE);
-        this.version = Arc.version();
+        this.version = Arc.getMCVersion();
     }
 
     /**

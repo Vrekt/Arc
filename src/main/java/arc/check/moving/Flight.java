@@ -1,7 +1,7 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.result.CancelType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
@@ -78,7 +78,8 @@ public final class Flight extends Check {
         final boolean otherVerticalModifier = BlockAccess.hasVerticalModifierAt(to, to.getWorld(), 0.5, -1, 0.5);
 
         // check if its a valid vertical move.
-        final boolean hasVerticalMove = vertical > 0.0
+        // TODO, better slab stuff.
+        final boolean validVerticalMove = vertical > 0.0
                 && !player.isInsideVehicle()
                 && !(slabAndStairModifier || otherVerticalModifier)
                 && !data.inLiquid()
@@ -86,7 +87,7 @@ public final class Flight extends Check {
 
         // check vertical distance moves,
         // basically anything over 0.42
-        if (hasVerticalMove) {
+        if (validVerticalMove) {
             if (checkVerticalMove(player, data, vertical, result)) handleCancel(player, data, result);
         }
 

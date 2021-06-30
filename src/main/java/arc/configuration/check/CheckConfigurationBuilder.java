@@ -1,7 +1,7 @@
 package arc.configuration.check;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -28,7 +28,7 @@ public final class CheckConfigurationBuilder {
     public CheckConfigurationBuilder(CheckType check) {
         this.check = check;
 
-        final FileConfiguration configuration = Arc.arc().getConfig();
+        final FileConfiguration configuration = Arc.getPlugin().getConfig();
         final String name = check.getName();
         if (configuration.isConfigurationSection(name)) {
             section = configuration.getConfigurationSection(name);

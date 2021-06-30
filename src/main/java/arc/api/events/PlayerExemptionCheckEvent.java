@@ -1,7 +1,7 @@
 package arc.api.events;
 
-import arc.check.CheckSubType;
-import arc.check.CheckType;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;

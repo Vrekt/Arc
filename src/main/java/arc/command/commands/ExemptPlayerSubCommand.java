@@ -1,7 +1,7 @@
 package arc.command.commands;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.permissions.Permissions;
 import arc.utility.chat.ChatUtil;
 import org.bukkit.Bukkit;
@@ -46,7 +46,7 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
 
         final String check = arguments.length == 1 ? arguments[0] : arguments[1];
         if (check.equalsIgnoreCase("all")) {
-            Arc.arc().exemptions().addExemptionPermanently(who, CheckType.values());
+            Arc.getInstance().getExemptionManager().addExemptionPermanently(who, CheckType.values());
             sender.sendMessage(ChatColor.GREEN + (isMyself ? "You are " : "The player " + ChatColor.RED + who.getName() + ChatColor.GREEN + "is ") + "now exempt from all checks.");
         } else {
             final CheckType checkType = CheckType.getCheckTypeByName(check);
@@ -54,7 +54,7 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
                 sender.sendMessage(ChatColor.RED + "Check not found.");
                 return;
             }
-            Arc.arc().exemptions().addExemptionPermanently(who, checkType);
+            Arc.getInstance().getExemptionManager().addExemptionPermanently(who, checkType);
             sender.sendMessage(ChatColor.GREEN + (isMyself ? "You are " : "The player " + ChatColor.RED + who.getName() + ChatColor.GREEN + "is ") + " now exempt from " + ChatColor.RED + checkType.name());
         }
     }

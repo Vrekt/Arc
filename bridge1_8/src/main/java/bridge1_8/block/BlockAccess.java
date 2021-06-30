@@ -27,6 +27,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
             case STONE_SLAB2:
             case BED_BLOCK:
             case BED:
+            case SNOW:
                 return true;
         }
 

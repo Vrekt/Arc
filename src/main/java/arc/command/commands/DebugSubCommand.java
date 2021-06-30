@@ -19,11 +19,11 @@ public final class DebugSubCommand extends ArcSubCommand {
     @Override
     public void execute(CommandSender sender, String[] arguments) {
         // reverse state, set local state.
-        final boolean state = !Arc.arc().configuration().enableDebugMessages();
-        Arc.arc().configuration().setDebugMessagesState(state);
+        final boolean state = !Arc.getInstance().getArcConfiguration().enableDebugMessages();
+        Arc.getInstance().getArcConfiguration().setDebugMessagesState(state);
 
         // save config state.
-        Arc.arc().configuration().fileConfiguration().set(ConfigurationValues.DEBUG_MESSAGES.valueName(), state);
+        Arc.getInstance().getArcConfiguration().fileConfiguration().set(ConfigurationValues.DEBUG_MESSAGES.valueName(), state);
         ChatUtil.sendMessage(sender, ChatColor.GRAY + "Debug messages are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
     }
 }

@@ -17,7 +17,7 @@ public final class BukkitAccess {
     /**
      * Access
      */
-    private static final bridge.api.BukkitAccess ACCESS = Arc.bridge().getBukkitAccess();
+    private static final bridge.api.BukkitAccess ACCESS = Arc.getBridge().getBukkitAccess();
 
     /**
      * Create an inventory

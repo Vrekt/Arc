@@ -1,8 +1,8 @@
 package arc.check.combat;
 
-import arc.check.CheckSubType;
-import arc.check.CheckType;
-import arc.check.PacketCheck;
+import arc.check.types.CheckSubType;
+import arc.check.types.CheckType;
+import arc.check.implementations.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
 import arc.utility.entity.EntityAccess;
@@ -163,10 +163,10 @@ public final class KillAura extends PacketCheck {
 
     @Override
     public void load() {
-        final ConfigurationSection directionSection = configuration.subTypeSection(CheckSubType.KILL_AURA_DIRECTION);
+        final ConfigurationSection directionSection = configuration.getSubType(CheckSubType.KILL_AURA_DIRECTION);
         maxYawDifference = (float) directionSection.getDouble("max-yaw-difference");
         maxPitchDifference = (float) directionSection.getDouble("max-pitch-difference");
-        final ConfigurationSection speedSection = configuration.subTypeSection(CheckSubType.KILL_AURA_ATTACK_SPEED);
+        final ConfigurationSection speedSection = configuration.getSubType(CheckSubType.KILL_AURA_ATTACK_SPEED);
         maxAttacksPerSecond = speedSection.getInt("max-attacks-per-second");
         minAttackDelta = speedSection.getLong("min-attack-delta");
     }

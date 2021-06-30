@@ -55,9 +55,9 @@ public final class ConfigurationString {
      */
     public ConfigurationString check(Check check, String subType) {
         if (subType != null) {
-            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getName() + ChatColor.GRAY + " " + subType + " ");
+            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + ChatColor.GRAY + " " + subType + " ");
         } else {
-            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getName());
+            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + " ");
         }
         return this;
     }
@@ -79,7 +79,7 @@ public final class ConfigurationString {
      * @return this
      */
     public ConfigurationString prefix() {
-        value = StringUtils.replace(value, Placeholders.PREFIX.placeholder(), Arc.arc().configuration().prefix());
+        value = StringUtils.replace(value, Placeholders.PREFIX.placeholder(), Arc.getInstance().getArcConfiguration().prefix());
         return this;
     }
 
@@ -100,7 +100,7 @@ public final class ConfigurationString {
      * @return this
      */
     public ConfigurationString type() {
-        value = StringUtils.replace(value, Placeholders.TYPE.placeholder(), Arc.arc().configuration().banConfiguration().globalBanLengthType().prettyName());
+        value = StringUtils.replace(value, Placeholders.TYPE.placeholder(), Arc.getInstance().getArcConfiguration().banConfiguration().globalBanLengthType().prettyName());
         return this;
     }
 

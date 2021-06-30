@@ -77,7 +77,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
         this.banConfiguration = configuration.banConfiguration();
         this.kickConfiguration = configuration.kickConfiguration();
 
-        enableEventApi = Arc.arc().configuration().enableEventApi();
+        enableEventApi = Arc.getInstance().getArcConfiguration().enableEventApi();
     }
 
     /**
@@ -165,9 +165,9 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
             final Date eventDate = event.date();
             final int eventDelay = event.delay();
-            Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> ban(player, check, eventDate, length), eventDelay * 20L);
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> ban(player, check, eventDate, length), eventDelay * 20L);
         } else {
-            Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> ban(player, check, finalDate, length), banConfiguration.globalBanDelay() * 20L);
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> ban(player, check, finalDate, length), banConfiguration.globalBanDelay() * 20L);
         }
     }
 
@@ -183,7 +183,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
         if (!hasPendingBan(player.getName())) return;
         final BanList.Type type = banConfiguration.globalBanType();
         if (type == BanList.Type.IP && player.getAddress() == null) {
-            Arc.arc().getLogger().warning("Failed to ban player " + player.getName());
+            Arc.getPlugin().getLogger().warning("Failed to ban player " + player.getName());
             pendingPlayerBans.remove(player);
             return;
         }
@@ -236,8 +236,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .time(kickConfiguration.globalKickDelay())
                 .value();
         BukkitAccess.broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
-        Bukkit.getScheduler().runTaskLater(Arc.plugin(), () -> {
-
+        Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> {
             final String message = kickConfiguration.globalKickMessage()
                     .check(check, null)
                     .value();

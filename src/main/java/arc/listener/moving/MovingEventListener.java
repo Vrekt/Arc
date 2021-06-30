@@ -1,7 +1,7 @@
 package arc.listener.moving;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.moving.Flight;
 import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
@@ -41,10 +41,10 @@ public final class MovingEventListener implements Listener {
     private final Speed speed;
 
     public MovingEventListener() {
-        flight = (Flight) Arc.arc().checks().getCheck(CheckType.FLIGHT);
-        jesus = (Jesus) Arc.arc().checks().getCheck(CheckType.JESUS);
-        noFall = (NoFall) Arc.arc().checks().getCheck(CheckType.NOFALL);
-        speed = (Speed) Arc.arc().checks().getCheck(CheckType.SPEED);
+        flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
+        jesus = Arc.getInstance().getCheckManager().getCheck(CheckType.JESUS);
+        noFall = Arc.getInstance().getCheckManager().getCheck(CheckType.NOFALL);
+        speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

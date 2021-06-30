@@ -48,7 +48,7 @@ public final class ItemBuilder {
      * @param data       the possible data
      */
     public ItemBuilder(String legacyItem, String newItem, int data) {
-        if (Arc.version().isNewerThan(Version.VERSION_1_12)) {
+        if (Arc.getMCVersion().isNewerThan(Version.VERSION_1_12)) {
             item = MaterialAccess.createItem(newItem);
         } else {
             item = MaterialAccess.createItem(legacyItem, (short) data);

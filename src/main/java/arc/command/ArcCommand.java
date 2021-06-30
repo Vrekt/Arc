@@ -12,6 +12,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The base command for /arc
@@ -31,7 +32,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         addSubCommand("debug", new DebugSubCommand());
 
         // initialize help message.
-        final String prefix = Arc.arc().configuration().prefix();
+        final String prefix = Arc.getInstance().getArcConfiguration().prefix();
         helpLine(prefix + ChatColor.DARK_AQUA + " /arc - " + ChatColor.GRAY + "Opens the inventory UI if you are a player.");
         helpLine(prefix + ChatColor.DARK_AQUA + " /arc help - " + ChatColor.GRAY + "Shows this message");
         helpLine(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS, prefix + ChatColor.DARK_AQUA + " /arc violations - " + ChatColor.GRAY + "Toggle violations on or off.");
@@ -43,7 +44,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!checkBasePermissions(sender)) return true;
         final boolean isPlayer = sender instanceof Player;
         if (args.length == 0 && isPlayer) {
@@ -78,7 +79,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
                 .build();
 
         // create toggle violations item
-        final boolean violations = Arc.arc().violations().isViolationViewer(player);
+        final boolean violations = Arc.getInstance().getViolationManager().isViolationViewer(player);
         final ItemStack toggleViolationsItem = new ItemBuilder("NETHER_STAR")
                 .displayName(ChatColor.RED + "Toggle violations")
                 .lore(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))

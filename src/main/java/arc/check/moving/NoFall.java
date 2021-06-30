@@ -1,7 +1,7 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import arc.exemption.type.ExemptionType;

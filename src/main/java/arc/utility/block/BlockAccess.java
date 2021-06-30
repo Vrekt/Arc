@@ -15,7 +15,7 @@ public final class BlockAccess {
     /**
      * Block access
      */
-    private static final bridge.block.BlockAccess ACCESS = Arc.bridge().getBlockAccess();
+    private static final bridge.block.BlockAccess ACCESS = Arc.getBridge().getBlockAccess();
 
     /**
      * Check if the provided origin and modified X, Y, Z coordinates have a vertical modifier

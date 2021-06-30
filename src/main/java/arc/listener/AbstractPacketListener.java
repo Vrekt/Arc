@@ -25,7 +25,7 @@ public abstract class AbstractPacketListener {
      * @param consumer the consumer
      */
     protected void listener(ProtocolManager protocol, PacketType packetType, Consumer<PacketEvent> consumer) {
-        protocol.addPacketListener(new PacketAdapter(Arc.plugin(), ListenerPriority.HIGHEST, packetType) {
+        protocol.addPacketListener(new PacketAdapter(Arc.getPlugin(), ListenerPriority.HIGHEST, packetType) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 consumer.accept(event);

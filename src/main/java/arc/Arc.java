@@ -6,6 +6,7 @@ import arc.configuration.ArcConfiguration;
 import arc.data.Data;
 import arc.data.moving.MovingData;
 import arc.exemption.ExemptionManager;
+import arc.listener.block.BlockActionListener;
 import arc.listener.combat.CombatPacketListener;
 import arc.listener.connection.PlayerConnectionListener;
 import arc.listener.moving.MovingEventListener;
@@ -36,7 +37,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.2.1";
+    public static final String VERSION_STRING = "2.3";
 
     /**
      * If sync events should be used.
@@ -110,16 +111,17 @@ public final class Arc extends JavaPlugin {
         getLogger().info("Reading configuration...");
         saveDefaultConfig();
         arcConfiguration.read(getConfig());
+        getLogger().info("Debug state is: " + arcConfiguration.enableDebugMessages());
 
         getLogger().info("Registering checks and listeners...");
         loadExternalPlugins();
+
         checkManager.initialize();
-        violationManager.initialize(arcConfiguration);
+        violationManager.initialize(arcConfiguration, punishmentManager);
         punishmentManager.initialize(arcConfiguration);
         exemptionManager.initialize(arcConfiguration);
 
         loadOnlinePlayers();
-
         registerListeners();
 
         getLogger().info("Registering base command...");
@@ -160,6 +162,7 @@ public final class Arc extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
         getServer().getPluginManager().registerEvents(new PlayerListener(), this);
         getServer().getPluginManager().registerEvents(new MovingEventListener(), this);
+        getServer().getPluginManager().registerEvents(new BlockActionListener(), this);
 
         new MovingPacketListener().register(protocolManager);
         new CombatPacketListener().register(protocolManager);
@@ -251,85 +254,82 @@ public final class Arc extends JavaPlugin {
     private void loadOnlinePlayers() {
         Bukkit.getOnlinePlayers()
                 .forEach(player -> {
-                    Arc.arc().violations().onPlayerJoin(player);
-                    Arc.arc().exemptions().onPlayerJoin(player);
+                    violationManager.onPlayerJoin(player);
+                    exemptionManager.onPlayerJoin(player);
 
+                    // calculate initial data.
                     final MovingData data = MovingData.get(player);
-
-                    // calculate player movement
                     MovingUtil.calculateMovement(data, player.getLocation(), player.getLocation());
-                    data.from(player.getLocation());
-                    data.to(player.getLocation());
                 });
     }
 
     /**
      * @return the internal plugin
      */
-    public static JavaPlugin plugin() {
+    public static JavaPlugin getPlugin() {
         return arc;
     }
 
     /**
      * @return arc
      */
-    public static Arc arc() {
+    public static Arc getInstance() {
         return arc;
     }
 
     /**
-     * @return the version
+     * @return the MC version.
      */
-    public static Version version() {
+    public static Version getMCVersion() {
         return version;
     }
 
     /**
      * @return the bridge
      */
-    public static Bridge bridge() {
+    public static Bridge getBridge() {
         return bridge;
     }
 
     /**
-     * @return the arc configuration
+     * @return the configuration
      */
-    public ArcConfiguration configuration() {
+    public ArcConfiguration getArcConfiguration() {
         return arcConfiguration;
     }
 
     /**
      * @return the violation manager
      */
-    public ViolationManager violations() {
+    public ViolationManager getViolationManager() {
         return violationManager;
     }
 
     /**
-     * @return the exemptions manager
+     * @return the exemption manager
      */
-    public ExemptionManager exemptions() {
+    public ExemptionManager getExemptionManager() {
         return exemptionManager;
-    }
-
-    /**
-     * @return the check manager
-     */
-    public CheckManager checks() {
-        return checkManager;
     }
 
     /**
      * @return the punishment manager
      */
-    public PunishmentManager punishment() {
+    public PunishmentManager getPunishmentManager() {
         return punishmentManager;
+    }
+
+    /**
+     * @return the check manager
+     */
+    public CheckManager getCheckManager() {
+        return checkManager;
     }
 
     /**
      * @return the protocol manager
      */
-    public ProtocolManager protocol() {
+    public ProtocolManager getProtocolManager() {
         return protocolManager;
     }
 
@@ -342,7 +342,7 @@ public final class Arc extends JavaPlugin {
      */
     public static void triggerEvent(Event event) {
         if (useSyncEvents) {
-            arc.getServer().getScheduler().runTask(Arc.arc(), () -> arc.getServer().getPluginManager().callEvent(event));
+            arc.getServer().getScheduler().runTask(Arc.arc, () -> arc.getServer().getPluginManager().callEvent(event));
         } else {
             arc.getServer().getPluginManager().callEvent(event);
         }

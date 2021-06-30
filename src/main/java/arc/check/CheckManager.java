@@ -1,14 +1,18 @@
 package arc.check;
 
+import arc.check.block.blockbreak.BlockBreakReach;
+import arc.check.block.blockinteract.BlockInteractReach;
+import arc.check.block.blockplace.BlockPlaceReach;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
-import arc.check.combat.Reach;
+import arc.check.combat.AttackReach;
 import arc.check.moving.*;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
+import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 
@@ -39,11 +43,14 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new Regeneration());
         add(new FastUse());
         add(new Jesus());
-        add(new Reach());
+        add(new AttackReach());
         add(new NoSwing());
         add(new KillAura());
         add(new Flight());
         add(new Speed());
+        add(new BlockBreakReach());
+        add(new BlockPlaceReach());
+        add(new BlockInteractReach());
     }
 
     /**
@@ -63,11 +70,17 @@ public final class CheckManager extends Configurable implements Closeable {
     /**
      * Get a check
      *
-     * @param checkType the type
+     * @param check the check
+     * @param <T>   the type
      * @return the check
      */
-    public Check getCheck(CheckType checkType) {
-        return checks.stream().filter(check -> check.type() == checkType).findAny().orElseThrow(() -> new NoSuchElementException("Could not find check " + checkType.getName()));
+    @SuppressWarnings("unchecked")
+    public <T extends Check> T getCheck(CheckType check) {
+        return (T) checks
+                .stream()
+                .filter(c -> c.type() == check)
+                .findAny()
+                .orElseThrow(() -> new NoSuchElementException("Could not find check " + check.getName()));
     }
 
     /**

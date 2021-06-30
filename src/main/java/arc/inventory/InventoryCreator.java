@@ -142,7 +142,7 @@ public final class InventoryCreator {
     public void show(Player player) {
         this.player = player;
         player.openInventory(inventory);
-        Arc.plugin().getServer().getPluginManager().registerEvents(listener, Arc.plugin());
+        Arc.getPlugin().getServer().getPluginManager().registerEvents(listener, Arc.getPlugin());
     }
 
     /**

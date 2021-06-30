@@ -1,7 +1,7 @@
 package arc.check.combat;
 
-import arc.check.CheckType;
-import arc.check.PacketCheck;
+import arc.check.types.CheckType;
+import arc.check.implementations.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.moving.MovingData;
 import org.bukkit.entity.Player;

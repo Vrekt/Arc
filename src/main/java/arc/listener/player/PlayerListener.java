@@ -1,7 +1,7 @@
 package arc.listener.player;
 
 import arc.Arc;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
 import arc.data.player.PlayerData;
@@ -34,8 +34,8 @@ public final class PlayerListener implements Listener {
     private final FastUse fastUse;
 
     public PlayerListener() {
-        regeneration = (Regeneration) Arc.arc().checks().getCheck(CheckType.REGENERATION);
-        fastUse = (FastUse) Arc.arc().checks().getCheck(CheckType.FAST_USE);
+        regeneration = Arc.getInstance().getCheckManager().getCheck(CheckType.REGENERATION);
+        fastUse = Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_USE);
     }
 
     /**
@@ -120,13 +120,13 @@ public final class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onDeath(PlayerDeathEvent event) {
         final Player player = event.getEntity();
-        Arc.arc().exemptions().addExemption(player, ExemptionType.DEATH);
+        Arc.getInstance().getExemptionManager().addExemption(player, ExemptionType.DEATH);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onRespawn(PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
-        Arc.arc().exemptions().removeExemption(player, ExemptionType.DEATH);
+        Arc.getInstance().getExemptionManager().removeExemption(player, ExemptionType.DEATH);
     }
 
 }

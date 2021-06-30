@@ -1,6 +1,6 @@
 package arc.violation;
 
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 
 import java.util.HashMap;
 import java.util.Map;

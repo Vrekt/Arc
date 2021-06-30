@@ -1,7 +1,7 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.types.CheckType;
 
 /**
  * Checks if the player is moving too fast.

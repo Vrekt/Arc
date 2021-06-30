@@ -1,6 +1,6 @@
 package arc.check.result;
 
-import arc.check.CheckSubType;
+import arc.check.types.CheckSubType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 

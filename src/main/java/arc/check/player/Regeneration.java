@@ -1,9 +1,8 @@
 package arc.check.player;
 
-import arc.Arc;
-import arc.check.Check;
-import arc.check.CheckType;
+import arc.check.implementations.MultiVersionCheck;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import arc.data.player.PlayerData;
 import bridge.Version;
 import org.bukkit.entity.Player;
@@ -11,18 +10,12 @@ import org.bukkit.entity.Player;
 /**
  * Checks if the player is regenerating health too fast.
  */
-public final class Regeneration extends Check {
+public final class Regeneration extends MultiVersionCheck {
 
     /**
-     * The min time it takes to regain health (1.8)
-     * The min time it takes to regain health (>1.8)
+     * The minimum time it takes to regenerate.
      */
-    private long legacyRegenerationTime, newRegenerationTime;
-
-    /**
-     * IF 1.8
-     */
-    private boolean useLegacy;
+    private long regenerationTime;
 
     public Regeneration() {
         super(CheckType.REGENERATION);
@@ -36,8 +29,13 @@ public final class Regeneration extends Check {
                 .kick(false)
                 .build();
 
-        addConfigurationValue("legacy-regeneration-time-ms", 3400);
-        addConfigurationValue("new-regeneration-time-ms", 450);
+        registerVersion(Version.VERSION_1_8);
+        registerVersion(Version.VERSION_1_12);
+        registerVersion(Version.VERSION_1_16);
+
+        addValueToVersion(Version.VERSION_1_8, "regeneration-time-minimum", 3400);
+        addValueToVersion(Version.VERSION_1_12, "regeneration-time-minimum", 450);
+        addValueToVersion(Version.VERSION_1_16, "regeneration-time-minimum", 450);
         if (enabled()) load();
     }
 
@@ -51,16 +49,13 @@ public final class Regeneration extends Check {
     public boolean check(Player player, PlayerData data) {
         if (exempt(player)) return false;
 
-        // the time from now to the last regain event.
-        final long time = System.currentTimeMillis() - data.lastHealthRegain();
-        final boolean failed = useLegacy ? time < legacyRegenerationTime : time < newRegenerationTime;
-
         // if its less than the minimum then flag.
-        if (failed) {
+        final long time = System.currentTimeMillis() - data.lastHealthRegain();
+        if (time < regenerationTime) {
             final CheckResult result = new CheckResult();
             result.setFailed("Regaining health too fast.")
                     .withParameter("time", time)
-                    .withParameter("min", useLegacy ? legacyRegenerationTime : newRegenerationTime);
+                    .withParameter("min", regenerationTime);
             return checkViolation(player, result);
         }
         return false;
@@ -73,8 +68,6 @@ public final class Regeneration extends Check {
 
     @Override
     public void load() {
-        useLegacy = Arc.version() == Version.VERSION_1_8;
-        legacyRegenerationTime = configuration.getLong("legacy-regeneration-time-ms");
-        newRegenerationTime = configuration.getLong("new-regeneration-time-ms");
+        regenerationTime = getVersionSection().getLong("regeneration-time-minimum");
     }
 }
