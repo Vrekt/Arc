@@ -44,13 +44,13 @@ public final class PlayerListener implements Listener {
      *
      * @param event the event
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     private void onRegain(EntityRegainHealthEvent event) {
         if (!regeneration.enabled()) return;
         if (!(event.getEntity() instanceof Player)) return;
 
         // only check if we have regained health from being satisfied.
-        if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
+        if (regeneration.enabled() && event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
             final Player player = (Player) event.getEntity();
             final PlayerData data = PlayerData.get(player);
             if (data.lastHealthRegain() != 0) {
@@ -68,7 +68,7 @@ public final class PlayerListener implements Listener {
      *
      * @param event the event
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     private void onBow(EntityShootBowEvent event) {
         if (!fastUse.enabled()) return;
 
@@ -94,7 +94,7 @@ public final class PlayerListener implements Listener {
      *
      * @param event the event
      */
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     private void onConsumeItem(PlayerItemConsumeEvent event) {
         final Player player = event.getPlayer();
         final PlayerData data = PlayerData.get(player);
@@ -114,16 +114,18 @@ public final class PlayerListener implements Listener {
     /**
      * Monitor when the player dies.
      * Add an exemption.
+     * <p>
+     * TODO: Maybe timeout if player doesn't respawn.
      *
      * @param event the event
      */
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     private void onDeath(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         Arc.getInstance().getExemptionManager().addExemption(player, ExemptionType.DEATH);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     private void onRespawn(PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         Arc.getInstance().getExemptionManager().removeExemption(player, ExemptionType.DEATH);

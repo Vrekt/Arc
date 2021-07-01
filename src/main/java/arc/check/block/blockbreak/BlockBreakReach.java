@@ -18,10 +18,9 @@ public final class BlockBreakReach extends AbstractBlockReachCheck {
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
-                .notifyEvery(1)
+                .notifyEvery(4)
                 .ban(false)
                 .kick(false)
                 .build();
     }
-
 }

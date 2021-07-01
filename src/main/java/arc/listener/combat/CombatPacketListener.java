@@ -51,7 +51,7 @@ public final class CombatPacketListener extends AbstractPacketListener {
 
     public CombatPacketListener() {
         criticals = Arc.getInstance().getCheckManager().getCheck(CheckType.CRITICALS);
-        reach = Arc.getInstance().getCheckManager().getCheck(CheckType.REACH);
+        reach = Arc.getInstance().getCheckManager().getCheck(CheckType.ATTACK_REACH);
         noSwing = Arc.getInstance().getCheckManager().getCheck(CheckType.NO_SWING);
         killAura = Arc.getInstance().getCheckManager().getCheck(CheckType.KILL_AURA);
     }

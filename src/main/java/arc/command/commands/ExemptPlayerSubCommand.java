@@ -47,15 +47,21 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
         final String check = arguments.length == 1 ? arguments[0] : arguments[1];
         if (check.equalsIgnoreCase("all")) {
             Arc.getInstance().getExemptionManager().addExemptionPermanently(who, CheckType.values());
-            sender.sendMessage(ChatColor.GREEN + (isMyself ? "You are " : "The player " + ChatColor.RED + who.getName() + ChatColor.GREEN + "is ") + "now exempt from all checks.");
+            sender.sendMessage((isMyself ? ChatColor.GREEN + "You are now exempt from all checks."
+                    : ChatColor.RED + who.getName() + ChatColor.GREEN + " is now exempt from all checks."));
         } else {
             final CheckType checkType = CheckType.getCheckTypeByName(check);
             if (checkType == null) {
                 sender.sendMessage(ChatColor.RED + "Check not found.");
                 return;
             }
+
             Arc.getInstance().getExemptionManager().addExemptionPermanently(who, checkType);
-            sender.sendMessage(ChatColor.GREEN + (isMyself ? "You are " : "The player " + ChatColor.RED + who.getName() + ChatColor.GREEN + "is ") + " now exempt from " + ChatColor.RED + checkType.name());
+            sender.sendMessage((isMyself ? ChatColor.GREEN + "You are now exempt from " + ChatColor.RED + checkType.getPrettyName()
+                    : ChatColor.RED + who.getName() + ChatColor.GREEN + " is now exempt from " + ChatColor.RED + checkType.getPrettyName()));
         }
+
+        sender.sendMessage((ChatColor.GOLD + "" + ChatColor.BOLD) + "WARNING: " + ChatColor.YELLOW
+                + "This will not persist over a server reload, plugin reload or server restart.");
     }
 }

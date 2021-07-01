@@ -1,5 +1,6 @@
 package arc.check;
 
+import arc.check.block.Nuker;
 import arc.check.block.blockbreak.BlockBreakReach;
 import arc.check.block.blockinteract.BlockInteractReach;
 import arc.check.block.blockplace.BlockPlaceReach;
@@ -51,6 +52,7 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new BlockBreakReach());
         add(new BlockPlaceReach());
         add(new BlockInteractReach());
+        add(new Nuker());
     }
 
     /**

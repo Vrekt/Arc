@@ -290,6 +290,7 @@ public abstract class Check extends Configurable {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player) {
+        if (player == null || !player.isOnline()) return true;
         return EXEMPTION_MANAGER.isPlayerExempt(player, checkType);
     }
 
@@ -301,6 +302,7 @@ public abstract class Check extends Configurable {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player, CheckSubType subType) {
+        if (player == null || !player.isOnline()) return true;
         return EXEMPTION_MANAGER.isPlayerExempt(player, subType);
     }
 
@@ -312,6 +314,7 @@ public abstract class Check extends Configurable {
      * @return {@code true} if so
      */
     protected boolean exempt(Player player, ExemptionType type) {
+        if (player == null || !player.isOnline()) return true;
         return EXEMPTION_MANAGER.isPlayerExempt(player, type);
     }
 

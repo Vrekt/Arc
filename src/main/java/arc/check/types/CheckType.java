@@ -57,7 +57,7 @@ public enum CheckType {
     /**
      * Checks if the player is attacking too far.
      */
-    REACH("AttackReach", "Reach (Attack)", CheckCategory.COMBAT),
+    ATTACK_REACH("AttackReach", "Reach (Attack)", CheckCategory.COMBAT),
 
     /**
      * Checks if the player isn't swinging their arm when attacking
@@ -82,7 +82,12 @@ public enum CheckType {
     /**
      * Block interact reach
      */
-    BLOCK_INTERACT_REACH("BlockInteractReach", "Reach (Block Interaction)", CheckCategory.BLOCK);
+    BLOCK_INTERACT_REACH("BlockInteractReach", "Reach (Block Interaction)", CheckCategory.BLOCK),
+
+    /**
+     * Nuker
+     */
+    NUKER("Nuker", CheckCategory.BLOCK);
 
     /**
      * The name

@@ -39,7 +39,7 @@ public abstract class AbstractBlockReachCheck extends Check {
      * @return the result.
      */
     public boolean check(Player player, Location origin, Location block) {
-        if (exempt(player)) return false;
+        if (!enabled() || exempt(player)) return false;
 
         final double y = origin.getY() + player.getEyeHeight();
         final double distance = MathUtil.distance(origin.getX(), y, origin.getZ(), block.getX() + 0.5, block.getY() + 0.5, block.getZ() + 0.5);

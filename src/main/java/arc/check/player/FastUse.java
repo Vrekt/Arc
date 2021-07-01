@@ -73,7 +73,7 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public boolean checkFastBow(Player player, PlayerData data) {
-        if (exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return false;
+        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return false;
 
         final long lastUse = data.lastBowUse();
         final long lastShot = data.lastBowShoot();

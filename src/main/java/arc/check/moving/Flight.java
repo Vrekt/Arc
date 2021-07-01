@@ -66,7 +66,7 @@ public final class Flight extends Check {
      * @param data   their data
      */
     public void check(Player player, MovingData data) {
-        if (!enabled() || exempt(player)) return;
+        if (exempt(player)) return;
 
         final CheckResult result = new CheckResult();
         final double vertical = data.vertical();

@@ -71,6 +71,7 @@ public final class Permissions {
      * @return {@code true} if so.
      */
     public static boolean canViewViolations(Player player) {
+        if (player == null || !player.isOnline()) return false;
         return player.hasPermission(ARC_VIOLATIONS);
     }
 
@@ -81,6 +82,7 @@ public final class Permissions {
      * @return {@code true} if so.
      */
     public static boolean canBypassAllChecks(Player player) {
+        if (player == null || !player.isOnline()) return true;
         return player.hasPermission(ARC_BYPASS);
     }
 
@@ -92,6 +94,7 @@ public final class Permissions {
      * @return {@code true} if so
      */
     public static boolean canBypassCategory(Player player, CheckCategory category) {
+        if (player == null || !player.isOnline()) return true;
         return player.hasPermission(ARC_BYPASS + "." + category.name().toLowerCase());
     }
 
@@ -103,6 +106,8 @@ public final class Permissions {
      * @return {@code true} if so.
      */
     public static boolean canBypassChecks(Player player, CheckType... checks) {
+        if (player == null || !player.isOnline()) return true;
+
         if (canBypassAllChecks(player)) return true;
 
         for (CheckType check : checks) {

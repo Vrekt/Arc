@@ -6,7 +6,6 @@ import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -16,7 +15,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
  */
 public final class PlayerConnectionListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     private void onPlayerJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         Arc.getInstance().getViolationManager().onPlayerJoin(player);
@@ -25,11 +24,12 @@ public final class PlayerConnectionListener implements Listener {
         initializePlayerData(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     private void onPlayerLeave(PlayerQuitEvent event) {
         final Player player = event.getPlayer();
         Arc.getInstance().getViolationManager().onPlayerLeave(player);
         Arc.getInstance().getExemptionManager().onPlayerLeave(player);
+        Arc.getInstance().getPunishmentManager().cancelKick(player);
         Data.removeAll(player);
     }
 

@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 2.3
+version: 2.3.1
 description: An anticheat for 1.8.8, 1.12.2 and 1.16.5
 author: Vrekt
 depend:
@@ -95,6 +95,8 @@ permissions:
             description: Allows the player to bypass the Block BlockPlaceReach check.
           arc.bypass.block.blockinteractreach:
             description: Allows the player to bypass the Block BlockInteractionReach check.
+          arc.bypass.block.nuker:
+            description: Allows the player to bypass the Nuker check.
 
   arc.violations:
     description: Allows the player to view player violations as they come in.

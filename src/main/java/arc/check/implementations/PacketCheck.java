@@ -40,7 +40,7 @@ public abstract class PacketCheck extends Check {
      */
     protected void registerPacketListener(PacketType packetType, Consumer<PacketEvent> consumer) {
         if (packetType.isServer()) {
-            final PacketAdapter serverAdapter = new PacketAdapter(Arc.getPlugin(), ListenerPriority.HIGHEST, packetType) {
+            final PacketAdapter serverAdapter = new PacketAdapter(Arc.getPlugin(), ListenerPriority.LOWEST, packetType) {
                 @Override
                 public void onPacketSending(PacketEvent event) {
                     if (!exempt(event.getPlayer())) {
@@ -52,7 +52,7 @@ public abstract class PacketCheck extends Check {
             listeners.add(serverAdapter);
             Arc.getInstance().getProtocolManager().addPacketListener(serverAdapter);
         } else {
-            final PacketAdapter clientAdapter = new PacketAdapter(Arc.getPlugin(), ListenerPriority.HIGHEST, packetType) {
+            final PacketAdapter clientAdapter = new PacketAdapter(Arc.getPlugin(), ListenerPriority.LOWEST, packetType) {
                 @Override
                 public void onPacketReceiving(PacketEvent event) {
                     if (!exempt(event.getPlayer())) {

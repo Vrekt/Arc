@@ -1,8 +1,8 @@
 package arc.check.combat;
 
-import arc.check.types.CheckType;
-import arc.check.implementations.PacketCheck;
+import arc.check.Check;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -10,7 +10,7 @@ import org.bukkit.potion.PotionEffectType;
 /**
  * Checks if the player is using criticals while impossible to do so.
  */
-public final class Criticals extends PacketCheck {
+public final class Criticals extends Check {
 
     /**
      * The minimum distance allowed.

@@ -120,6 +120,15 @@ public final class PunishmentManager extends Configurable implements Closeable {
     }
 
     /**
+     * Cancel a kick
+     *
+     * @param player the player
+     */
+    public void cancelKick(Player player) {
+        pendingPlayerKicks.remove(player);
+    }
+
+    /**
      * Ban a player
      *
      * @param player the player

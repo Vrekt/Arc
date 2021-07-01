@@ -1,8 +1,8 @@
 package arc.check.combat;
 
-import arc.check.types.CheckType;
-import arc.check.implementations.PacketCheck;
+import arc.check.Check;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
  * The default config is optimized to REDUCE false positives.
  * Its not strict what-so-ever.
  */
-public final class AttackReach extends PacketCheck {
+public final class AttackReach extends Check {
 
     /**
      * Max survival and creative distances.
@@ -34,7 +34,7 @@ public final class AttackReach extends PacketCheck {
     private boolean subtractPlayerVelocity, subtractEntityVelocity;
 
     public AttackReach() {
-        super(CheckType.REACH);
+        super(CheckType.ATTACK_REACH);
         enabled(true)
                 .cancel(true)
                 .cancelLevel(0)

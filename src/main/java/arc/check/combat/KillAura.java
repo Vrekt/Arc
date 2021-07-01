@@ -1,9 +1,9 @@
 package arc.check.combat;
 
+import arc.check.Check;
+import arc.check.result.CheckResult;
 import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
-import arc.check.implementations.PacketCheck;
-import arc.check.result.CheckResult;
 import arc.data.combat.CombatData;
 import arc.utility.entity.EntityAccess;
 import org.bukkit.Location;
@@ -16,7 +16,7 @@ import org.bukkit.entity.Player;
  * <p>
  * Current configuration is relaxed.
  */
-public final class KillAura extends PacketCheck {
+public final class KillAura extends Check {
 
     /**
      * Max yaw and pitch difference allowed.

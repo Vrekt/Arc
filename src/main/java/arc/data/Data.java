@@ -1,5 +1,6 @@
 package arc.data;
 
+import arc.data.block.BlockData;
 import arc.data.combat.CombatData;
 import arc.data.moving.MovingData;
 import arc.data.packet.PacketData;
@@ -21,6 +22,7 @@ public interface Data {
         MovingData.remove(player);
         PacketData.remove(player);
         PlayerData.remove(player);
+        BlockData.remove(player);
     }
 
 }
