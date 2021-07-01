@@ -68,6 +68,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
     * Breaking
     * Placing
     * Interaction
+  * Nuker
   * Still WIP
 
 *...All checks are still work in progress and subject to change*
