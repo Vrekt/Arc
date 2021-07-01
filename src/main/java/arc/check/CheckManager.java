@@ -1,12 +1,10 @@
 package arc.check;
 
 import arc.check.block.Nuker;
-import arc.check.block.blockbreak.BlockBreakReach;
-import arc.check.block.blockinteract.BlockInteractReach;
-import arc.check.block.blockplace.BlockPlaceReach;
+import arc.check.block.blockplace.NoSwing;
+import arc.check.block.blockplace.Reach;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
-import arc.check.combat.NoSwing;
 import arc.check.combat.AttackReach;
 import arc.check.moving.*;
 import arc.check.network.PayloadFrequency;
@@ -45,13 +43,16 @@ public final class CheckManager extends Configurable implements Closeable {
         add(new FastUse());
         add(new Jesus());
         add(new AttackReach());
-        add(new NoSwing());
+        add(new arc.check.combat.NoSwing());
         add(new KillAura());
         add(new Flight());
         add(new Speed());
-        add(new BlockBreakReach());
-        add(new BlockPlaceReach());
-        add(new BlockInteractReach());
+        add(new arc.check.block.blockbreak.Reach());
+        add(new arc.check.block.blockplace.Reach());
+        add(new arc.check.block.blockinteract.Reach());
+        add(new arc.check.block.blockbreak.NoSwing());
+        add(new arc.check.block.blockplace.NoSwing());
+        add(new arc.check.block.blockinteract.NoSwing());
         add(new Nuker());
     }
 

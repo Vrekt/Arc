@@ -72,17 +72,30 @@ public enum CheckType {
     /**
      * Block reach
      */
-    BLOCK_BREAK_REACH("BlockBreakReach", "Reach (Block Breaking)", CheckCategory.BLOCK),
+    BLOCK_BREAK_REACH("BlockBreakReach", "Block Break Reach", "Reach", CheckCategory.BLOCKBREAK),
 
     /**
      * Block place reach
      */
-    BLOCK_PLACE_REACH("BlockPlaceReach", "Reach (Block Placing)", CheckCategory.BLOCK),
+    BLOCK_PLACE_REACH("BlockPlaceReach", "Block Place Reach", "Reach", CheckCategory.BLOCKPLACE),
 
     /**
      * Block interact reach
      */
-    BLOCK_INTERACT_REACH("BlockInteractReach", "Reach (Block Interaction)", CheckCategory.BLOCK),
+    BLOCK_INTERACT_REACH("BlockInteractReach", "Block Interact Reach", "Reach", CheckCategory.BLOCKINTERACT),
+
+    /**
+     * Break no swing
+     */
+    BLOCK_BREAK_NO_SWING("BlockBreakNoSwing", "Block Break NoSwing", "NoSwing", CheckCategory.BLOCKBREAK),
+    /**
+     * Place no swing
+     */
+    BLOCK_PLACE_NO_SWING("BlockPlaceNoSwing", "Block Place NoSwing", "NoSwing", CheckCategory.BLOCKPLACE),
+    /**
+     * Interact no swing
+     */
+    BLOCK_INTERACT_NO_SWING("BlockInteractNoSwing", "Block Interact NoSwing", "NoSwing", CheckCategory.BLOCKINTERACT),
 
     /**
      * Nuker
@@ -92,8 +105,9 @@ public enum CheckType {
     /**
      * The name
      * Pretty name
+     * Permission name
      */
-    private final String name, prettyName;
+    private final String name, prettyName, permissionName;
 
     /**
      * The category
@@ -103,12 +117,21 @@ public enum CheckType {
     CheckType(String name, String prettyName, CheckCategory category) {
         this.name = name;
         this.prettyName = prettyName;
+        this.permissionName = name;
+        this.category = category;
+    }
+
+    CheckType(String name, String prettyName, String permissionName, CheckCategory category) {
+        this.name = name;
+        this.prettyName = prettyName;
+        this.permissionName = permissionName;
         this.category = category;
     }
 
     CheckType(String name, CheckCategory category) {
         this.name = name;
         this.prettyName = name;
+        this.permissionName = name;
         this.category = category;
     }
 
@@ -124,6 +147,13 @@ public enum CheckType {
      */
     public String getPrettyName() {
         return prettyName;
+    }
+
+    /**
+     * @return the permission name
+     */
+    public String getPermissionName() {
+        return permissionName;
     }
 
     /**

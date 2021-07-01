@@ -8,6 +8,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+/**
+ * Provides a general base for all block reach checks.
+ */
 public abstract class AbstractBlockReachCheck extends Check {
 
     /**

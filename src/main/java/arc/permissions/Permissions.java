@@ -106,15 +106,12 @@ public final class Permissions {
      * @return {@code true} if so.
      */
     public static boolean canBypassChecks(Player player, CheckType... checks) {
-        if (player == null || !player.isOnline()) return true;
-
-        if (canBypassAllChecks(player)) return true;
+        if (player == null || !player.isOnline() || canBypassAllChecks(player)) return true;
 
         for (CheckType check : checks) {
             if (canBypassCategory(player, check.category())) return true;
-            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getName().toLowerCase()))
+            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getPermissionName().toLowerCase()))
                 return true;
-
         }
         return false;
     }

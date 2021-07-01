@@ -25,6 +25,21 @@ public enum CheckCategory {
     /**
      * Checks blocks
      */
-    BLOCK
+    BLOCK,
+
+    /**
+     * Checks block breaking
+     */
+    BLOCKBREAK,
+
+    /**
+     * Checks block placing
+     */
+    BLOCKPLACE,
+
+    /**
+     * Checks block interactions
+     */
+    BLOCKINTERACT,
 
 }

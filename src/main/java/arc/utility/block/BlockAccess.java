@@ -18,6 +18,16 @@ public final class BlockAccess {
     private static final bridge.block.BlockAccess ACCESS = Arc.getBridge().getBlockAccess();
 
     /**
+     * Check if a block is interactable.
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    public static boolean isInteractable(Block block) {
+        return ACCESS.isInteractable(block);
+    }
+
+    /**
      * Check if the provided origin and modified X, Y, Z coordinates have a vertical modifier
      *
      * @param origin the origin

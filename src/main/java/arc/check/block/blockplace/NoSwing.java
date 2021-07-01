@@ -1,15 +1,15 @@
 package arc.check.block.blockplace;
 
-import arc.check.block.AbstractBlockReachCheck;
+import arc.check.block.AbstractBlockNoSwingCheck;
 import arc.check.types.CheckType;
 
 /**
- * Checks for block place reach.
+ * Block place NoSwing
  */
-public final class BlockPlaceReach extends AbstractBlockReachCheck {
+public final class NoSwing extends AbstractBlockNoSwingCheck {
 
-    public BlockPlaceReach() {
-        super(CheckType.BLOCK_PLACE_REACH);
+    public NoSwing() {
+        super(CheckType.BLOCK_PLACE_NO_SWING);
     }
 
     @Override
@@ -23,5 +23,4 @@ public final class BlockPlaceReach extends AbstractBlockReachCheck {
                 .kick(false)
                 .build();
     }
-
 }

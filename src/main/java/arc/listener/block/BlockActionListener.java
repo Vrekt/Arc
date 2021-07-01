@@ -2,10 +2,8 @@ package arc.listener.block;
 
 import arc.Arc;
 import arc.check.block.Nuker;
-import arc.check.block.blockbreak.BlockBreakReach;
-import arc.check.block.blockinteract.BlockInteractReach;
-import arc.check.block.blockplace.BlockPlaceReach;
 import arc.check.types.CheckType;
+import arc.utility.block.BlockAccess;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,17 +22,32 @@ public final class BlockActionListener implements Listener {
     /**
      * Break
      */
-    private final BlockBreakReach blockBreakReach;
+    private final arc.check.block.blockbreak.Reach blockBreakReach;
 
     /**
      * Place
      */
-    private final BlockPlaceReach blockPlaceReach;
+    private final arc.check.block.blockplace.Reach blockPlaceReach;
 
     /**
      * Interact
      */
-    private final BlockInteractReach blockInteractReach;
+    private final arc.check.block.blockinteract.Reach blockInteractReach;
+
+    /**
+     * Break NoSwing
+     */
+    private final arc.check.block.blockbreak.NoSwing blockBreakNoSwing;
+
+    /**
+     * Place NoSwing
+     */
+    private final arc.check.block.blockplace.NoSwing blockPlaceNoSwing;
+
+    /**
+     * Interact NoSwing
+     */
+    private final arc.check.block.blockinteract.NoSwing blockInteractNoSwing;
 
     /**
      * Nuker.
@@ -45,6 +58,9 @@ public final class BlockActionListener implements Listener {
         blockBreakReach = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_BREAK_REACH);
         blockPlaceReach = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_PLACE_REACH);
         blockInteractReach = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_INTERACT_REACH);
+        blockBreakNoSwing = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_BREAK_NO_SWING);
+        blockInteractNoSwing = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_INTERACT_NO_SWING);
+        blockPlaceNoSwing = Arc.getInstance().getCheckManager().getCheck(CheckType.BLOCK_PLACE_NO_SWING);
         nuker = Arc.getInstance().getCheckManager().getCheck(CheckType.NUKER);
     }
 
@@ -54,23 +70,25 @@ public final class BlockActionListener implements Listener {
         if (!nuker.isPacketCheck()) event.setCancelled(nuker.check(player));
         if (blockBreakReach.check(player, player.getLocation(), event.getBlock().getLocation()))
             event.setCancelled(true);
+        if (blockBreakNoSwing.check(player)) event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onPlace(BlockPlaceEvent event) {
         final Player player = event.getPlayer();
-
         if (blockPlaceReach.check(player, player.getLocation(), event.getBlock().getLocation()))
             event.setCancelled(true);
+        if (blockPlaceNoSwing.check(player)) event.setCancelled(true);
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() != null) {
+        if (event.getClickedBlock() != null
+                && BlockAccess.isInteractable(event.getClickedBlock())) {
             final Player player = event.getPlayer();
-
             if (blockInteractReach.check(player, player.getLocation(), event.getClickedBlock().getLocation()))
                 event.setCancelled(true);
+            if (blockInteractNoSwing.check(player)) event.setCancelled(true);
         }
     }
 

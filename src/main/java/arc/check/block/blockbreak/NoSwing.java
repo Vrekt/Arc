@@ -1,15 +1,14 @@
 package arc.check.block.blockbreak;
 
-import arc.check.block.AbstractBlockReachCheck;
+import arc.check.block.AbstractBlockNoSwingCheck;
 import arc.check.types.CheckType;
 
 /**
- * Checks for block breaking reach.
+ * Checks for NoSwing when breaking blocks.
  */
-public final class BlockBreakReach extends AbstractBlockReachCheck {
-
-    public BlockBreakReach() {
-        super(CheckType.BLOCK_BREAK_REACH);
+public final class NoSwing extends AbstractBlockNoSwingCheck {
+    public NoSwing() {
+        super(CheckType.BLOCK_BREAK_NO_SWING);
     }
 
     @Override

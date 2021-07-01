@@ -56,7 +56,7 @@ public final class PayloadFrequency extends PacketCheck {
 
         addConfigurationValue("max-packet-size-books", 4096);
         addConfigurationValue("max-packet-size-others", 32767);
-        addConfigurationValue("check-interval-milliseconds", 500);
+        addConfigurationValue("check-interval-milliseconds", 1000);
         addConfigurationValue("max-packets-per-interval", 1);
         addConfigurationValue("max-packet-size-kick", true);
         addConfigurationValue("max-packets-per-interval-kick", true);
@@ -161,15 +161,14 @@ public final class PayloadFrequency extends PacketCheck {
         maxPacketsPerIntervalKick = configuration.getBoolean("max-packets-per-interval-kick");
         channels = configuration.getList("channels");
 
-        final int checkInterval = configuration.getInt("check-interval-milliseconds");
-        final int interval = (checkInterval / 1000) * 20;
-
+        // PEMDAS!
+        final long checkInterval = configuration.getLong("check-interval-milliseconds") * 20 / 1000;
         registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
         schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (!exempt(player)) check(player, PacketData.get(player));
             }
-        }, interval, interval);
+        }, checkInterval, checkInterval);
     }
 
     @Override

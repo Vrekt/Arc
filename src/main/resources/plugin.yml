@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 2.3.1
+version: 2.3.2
 description: An anticheat for 1.8.8, 1.12.2 and 1.16.5
 author: Vrekt
 depend:
@@ -85,18 +85,33 @@ permissions:
                 description: Allows the player to bypass KillAura direction check.
               arc.bypass.combat.killaura.attackspeed:
                 description: Allows the player to bypass the KillAura attackspeed check.
+      arc.bypass.blockbreak:
+        description: Allows the player to bypass all block break checks.
+        children:
+          arc.bypass.blockbreak.reach:
+            description: Allows the player to bypass the block break reach check.
+          arc.bypass.blockbreak.noswing:
+            description: Allows the player to bypass the block break noswing check.
+      arc.bypass.blockplace:
+        description: Allows the player to bypass all block place checks.
+        children:
+          arc.bypass.blockplace.reach:
+            description: Allows the player to bypass the block place reach check.
+          arc.bypass.blockplace.noswing:
+            description: Allows the player to bypass the block place noswing check.
+      arc.bypass.blockinteract:
+        description: Allows the player to bypass all block interact checks.
+        children:
+          arc.bypass.blockinteract.reach:
+            description: Allows the player to bypass the block interact reach check.
+          arc.bypass.blockinteract.noswing:
+            description: Allows the player to bypass the block interact noswing check.
       arc.bypass.block:
         default: false
         description: Allows the player to bypass all block checks.
         children:
-          arc.bypass.block.blockbreakreach:
-            description: Allows the player to bypass the Block BlockBreakReach check.
-          arc.bypass.block.blockplacereach:
-            description: Allows the player to bypass the Block BlockPlaceReach check.
-          arc.bypass.block.blockinteractreach:
-            description: Allows the player to bypass the Block BlockInteractionReach check.
           arc.bypass.block.nuker:
-            description: Allows the player to bypass the Nuker check.
+            description: Allows the plaeyr to bypass the Nuker check.
 
   arc.violations:
     description: Allows the player to view player violations as they come in.

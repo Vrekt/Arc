@@ -280,6 +280,7 @@ public abstract class Check extends Configurable {
      * @param delay    initial delay
      */
     protected void schedule(Runnable runnable, long delay, long every) {
+        if (every == 0) throw new UnsupportedOperationException("Scheduled delay cannot be every tick.");
         scheduled = Bukkit.getScheduler().runTaskTimer(Arc.getPlugin(), runnable, delay, every);
     }
 

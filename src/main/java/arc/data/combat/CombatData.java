@@ -44,6 +44,11 @@ public final class CombatData implements Data {
     private long lastSwingTime, lastAttackReset, lastAttack, lastAttackNoSwing;
 
     /**
+     * Blocks
+     */
+    private long lastNoSwingOther;
+
+    /**
      * Total amount of attacks
      */
     private int totalAttacks;
@@ -99,5 +104,13 @@ public final class CombatData implements Data {
 
     public void lastAttackNoSwing(long lastAttackNoSwing) {
         this.lastAttackNoSwing = lastAttackNoSwing;
+    }
+
+    public long getLastNoSwingOther() {
+        return lastNoSwingOther;
+    }
+
+    public void setLastNoSwingOther(long lastNoSwingOther) {
+        this.lastNoSwingOther = lastNoSwingOther;
     }
 }

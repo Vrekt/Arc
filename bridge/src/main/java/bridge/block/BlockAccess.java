@@ -64,6 +64,14 @@ public interface BlockAccess {
     boolean isSlimeblock(Block block);
 
     /**
+     * Check if the block is interactable.
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isInteractable(Block block);
+
+    /**
      * Check if the provided {@code block} is considered to be ground, meaning you can stand on it.
      *
      * @param block the block

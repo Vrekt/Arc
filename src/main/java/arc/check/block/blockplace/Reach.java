@@ -1,15 +1,15 @@
-package arc.check.block.blockinteract;
+package arc.check.block.blockplace;
 
 import arc.check.block.AbstractBlockReachCheck;
 import arc.check.types.CheckType;
 
 /**
- * Check for interaction reach.
+ * Checks for block place reach.
  */
-public final class BlockInteractReach extends AbstractBlockReachCheck {
+public final class Reach extends AbstractBlockReachCheck {
 
-    public BlockInteractReach() {
-        super(CheckType.BLOCK_INTERACT_REACH);
+    public Reach() {
+        super(CheckType.BLOCK_PLACE_REACH);
     }
 
     @Override

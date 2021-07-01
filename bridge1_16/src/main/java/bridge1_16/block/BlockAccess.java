@@ -52,4 +52,8 @@ public final class BlockAccess implements bridge.block.BlockAccess {
         return block.getType() == Material.SLIME_BLOCK;
     }
 
+    @Override
+    public boolean isInteractable(Block block) {
+        return block.getType().isInteractable();
+    }
 }
