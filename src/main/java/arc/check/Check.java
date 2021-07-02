@@ -1,7 +1,6 @@
 package arc.check;
 
 import arc.Arc;
-import arc.check.result.CancelType;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
@@ -14,7 +13,6 @@ import arc.exemption.type.ExemptionType;
 import arc.utility.api.BukkitAccess;
 import arc.violation.ViolationManager;
 import arc.violation.result.ViolationResult;
-import bridge.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -27,12 +25,12 @@ import org.bukkit.scheduler.BukkitTask;
 public abstract class Check extends Configurable {
 
     /**
-     * Exemptions
+     * ExemptionHistory
      */
     private static final ExemptionManager EXEMPTION_MANAGER = Arc.getInstance().getExemptionManager();
 
     /**
-     * Violations
+     * ViolationHistory
      */
     private static final ViolationManager VIOLATION_MANAGER = Arc.getInstance().getViolationManager();
 
@@ -246,20 +244,25 @@ public abstract class Check extends Configurable {
     }
 
     /**
-     * Process the check result.
+     * Handle a check violation and reset the result after.
      *
-     * @param player the player
-     * @param result the result
-     * @param cancel the cancel location
-     * @param type   the type of cancel
+     * @param player   the player
+     * @param result   the result
+     * @param cancelTo the cancel To
+     * @return the result
      */
-    protected ViolationResult checkViolation(Player player, CheckResult result, Location cancel, CancelType type) {
+    protected boolean handleCheckViolationAndReset(Player player, CheckResult result, Location cancelTo) {
         if (result.failed()) {
             final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
-            if (vr.cancel()) result.cancelTo(cancel, type);
-            return vr;
+            if (vr.cancel()) {
+                player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+            result.reset();
+            return vr.cancel();
         }
-        return ViolationResult.EMPTY;
+
+        result.reset();
+        return false;
     }
 
     /**
@@ -317,20 +320,6 @@ public abstract class Check extends Configurable {
     protected boolean exempt(Player player, ExemptionType type) {
         if (player == null || !player.isOnline()) return true;
         return EXEMPTION_MANAGER.isPlayerExempt(player, type);
-    }
-
-    /**
-     * Disables this check if thr provided {@code version} is newer than current
-     *
-     * @param version the version
-     * @return {@code true} if the check is disabled
-     */
-    protected boolean disableIfNewerThan(Version version) {
-        if (Arc.getMCVersion().isNewerThan(version)) {
-            permanentlyDisabled = true;
-            return true;
-        }
-        return false;
     }
 
     @Override

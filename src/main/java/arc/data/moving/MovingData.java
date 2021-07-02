@@ -111,9 +111,8 @@ public final class MovingData implements Data {
      * The descending location for distance tracking.
      * The valid falling location for distance checking.
      * The last ladder location
-     * Global descending location that doesn't reset.
      */
-    private Location descendingLocation, validFallingLocation, ladderLocation, globalDescendingLocation;
+    private Location descendingLocation, validFallingLocation, ladderLocation;
 
     /**
      * If the player has failed no-fall.
@@ -145,6 +144,21 @@ public final class MovingData implements Data {
      * If we have slimeblock
      */
     private boolean hasSlimeblock;
+
+    /**
+     * Safe location to teleport to.
+     */
+    private Location safeLocation;
+
+    /**
+     * Last safe location update.
+     */
+    private long lastSafeUpdate;
+
+    /**
+     * If the safe location can be updated.
+     */
+    private boolean canSafeBeUpdated;
 
     public Location from() {
         return from;
@@ -558,11 +572,27 @@ public final class MovingData implements Data {
         this.hasSlimeblock = hasSlimeblock;
     }
 
-    public Location globalDescendingLocation() {
-        return globalDescendingLocation;
+    public Location getSafeLocation() {
+        return safeLocation;
     }
 
-    public void globalDescendingLocation(Location globalDescendingLocation) {
-        this.globalDescendingLocation = globalDescendingLocation;
+    public void setSafeLocation(Location safeLocation) {
+        this.safeLocation = safeLocation;
+    }
+
+    public boolean shouldSafeBeUpdated() {
+        return canSafeBeUpdated;
+    }
+
+    public void setCanSafeBeUpdated(boolean canSafeBeUpdated) {
+        this.canSafeBeUpdated = canSafeBeUpdated;
+    }
+
+    public long getLastSafeUpdate() {
+        return lastSafeUpdate;
+    }
+
+    public void setLastSafeUpdate(long lastSafeUpdate) {
+        this.lastSafeUpdate = lastSafeUpdate;
     }
 }

@@ -22,9 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ExemptionManager extends Configurable implements Closeable {
 
     /**
-     * Exemptions by player
+     * ExemptionHistory by player
      */
-    private final Map<UUID, Exemptions> exemptions = new ConcurrentHashMap<>();
+    private final Map<UUID, ExemptionHistory> exemptions = new ConcurrentHashMap<>();
 
     /**
      * if events should be used.
@@ -51,7 +51,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        exemptions.put(player.getUniqueId(), new Exemptions());
+        exemptions.put(player.getUniqueId(), new ExemptionHistory());
         doJoinExemptions(player);
     }
 
@@ -72,7 +72,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerLeave(Player player) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         this.exemptions.remove(player.getUniqueId());
         exemptions.clear();
     }
@@ -89,7 +89,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
         final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
         boolean exemptionsMapped = false;
 
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         if (exemptions != null) {
             exemptionsMapped = exemptions.isExempt(check);
         }
@@ -154,7 +154,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param duration the duration
      */
     public void addExemption(Player player, CheckType check, long duration) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         exemptions.addExemption(check, System.currentTimeMillis() + duration);
     }
 
@@ -165,7 +165,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
      * @param check  the check
      */
     public void addExemptionPermanently(Player player, CheckType... check) {
-        final Exemptions exemptions = this.exemptions.get(player.getUniqueId());
+        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
         for (CheckType checkType : check) {
             exemptions.addExemptionPermanently(checkType);
         }
@@ -217,7 +217,7 @@ public final class ExemptionManager extends Configurable implements Closeable {
 
     @Override
     public void close() {
-        exemptions.values().forEach(Exemptions::clear);
+        exemptions.values().forEach(ExemptionHistory::clear);
         exemptions.clear();
     }
 }

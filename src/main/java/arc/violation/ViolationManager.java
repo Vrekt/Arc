@@ -4,8 +4,8 @@ import arc.Arc;
 import arc.api.events.PlayerViolationEvent;
 import arc.api.events.PostPlayerViolationEvent;
 import arc.check.Check;
-import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
 import arc.permissions.Permissions;
@@ -18,10 +18,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 
 import java.io.Closeable;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -32,7 +32,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     /**
      * Violation history
      */
-    private final Map<UUID, Violations> history = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, ViolationHistory> history = new ConcurrentHashMap<>();
 
     /**
      * A list of players who can view violations/debug information
@@ -42,7 +42,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     /**
      * Keeps track of when to expire history
      */
-    private Cache<UUID, Violations> historyCache;
+    private Cache<UUID, ViolationHistory> historyCache;
 
     /**
      * The arc configuration.
@@ -75,12 +75,12 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @param player the player
      */
     public void onPlayerJoin(Player player) {
-        final Violations cached = historyCache.getIfPresent(player.getUniqueId());
+        final ViolationHistory cached = historyCache.getIfPresent(player.getUniqueId());
         if (cached != null) {
             historyCache.invalidate(player.getUniqueId());
             history.put(player.getUniqueId(), cached);
         } else {
-            history.put(player.getUniqueId(), new Violations());
+            history.put(player.getUniqueId(), new ViolationHistory());
         }
         if (Permissions.canViewViolations(player)) violationViewers.add(player);
     }
@@ -104,7 +104,7 @@ public final class ViolationManager extends Configurable implements Closeable {
      * @return the result
      */
     public ViolationResult violation(Player player, Check check, CheckResult result) {
-        final Violations violations = history.get(player.getUniqueId());
+        final ViolationHistory violations = history.get(player.getUniqueId());
         if (violations == null) return ViolationResult.EMPTY;
 
         final int level = violations.incrementViolationLevel(check.type());
@@ -112,7 +112,7 @@ public final class ViolationManager extends Configurable implements Closeable {
         // call our violation event.
         if (configuration.enableEventApi()) {
 
-            final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, result);
+            final PlayerViolationEvent event = new PlayerViolationEvent(player, check.type(), level, new CheckResult(result));
             Arc.triggerEvent(event);
             // if the event is cancelled, remove the violation level and return no result.
             if (event.isCancelled()) {

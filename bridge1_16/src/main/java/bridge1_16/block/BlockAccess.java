@@ -16,7 +16,13 @@ public final class BlockAccess implements bridge.block.BlockAccess {
                 || block.getState() instanceof Stairs
                 || block.getState() instanceof Gate
                 || isWall(block)
-                || block.getType() == Material.SNOW;
+                || block.getType() == Material.SNOW
+                || block.getType() == Material.SKELETON_SKULL
+                || block.getType() == Material.WITHER_SKELETON_SKULL
+                || block.getType() == Material.CREEPER_HEAD
+                || block.getType() == Material.DRAGON_HEAD
+                || block.getType() == Material.PLAYER_HEAD
+                || block.getType() == Material.ZOMBIE_HEAD;
     }
 
     @Override

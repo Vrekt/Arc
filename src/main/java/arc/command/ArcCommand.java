@@ -82,7 +82,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         final boolean violations = Arc.getInstance().getViolationManager().isViolationViewer(player);
         final ItemStack toggleViolationsItem = new ItemBuilder("NETHER_STAR")
                 .displayName(ChatColor.RED + "Toggle violations")
-                .lore(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))
+                .lore(ChatColor.GRAY + "ViolationHistory are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))
                 .build();
 
         // create reload config item.

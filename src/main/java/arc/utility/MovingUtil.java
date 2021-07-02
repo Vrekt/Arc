@@ -83,6 +83,11 @@ public final class MovingUtil {
 
         // calculate ground stuff.
         if (onGround) {
+            // set initial safe location if null.
+            if (data.getSafeLocation() == null) {
+                data.setSafeLocation(cloneTo);
+            }
+
             data.ground(cloneTo);
             // make sure ladder is reset once we touch ground again.
             data.ladderLocation(null);
@@ -113,6 +118,8 @@ public final class MovingUtil {
             data.hasSlimeblock(hasSlimeblock);
 
             data.onIce(false);
+
+            if (data.getSafeLocation() == null) data.setSafeLocation(from);
         }
 
         // calculate sprinting and sneaking times
@@ -138,7 +145,6 @@ public final class MovingUtil {
         // calculate ascending/descending
         final boolean ascending = distance > 0.0 && cloneTo.getY() > cloneFrom.getY();
         final boolean descending = distance > 0.0 && cloneTo.getY() < cloneFrom.getY();
-        final boolean justStartedDescending = !data.descending() && descending;
 
         data.ascending(ascending);
         data.descending(descending);
@@ -152,11 +158,6 @@ public final class MovingUtil {
             data.incrementDescendingTime();
         } else {
             data.descendingTime(0);
-        }
-
-        // set descending location just now.
-        if (justStartedDescending) {
-            data.globalDescendingLocation(cloneFrom);
         }
 
         // calculate climbing
