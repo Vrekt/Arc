@@ -52,6 +52,11 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * `Moving` checks
   * Flight
     * Contains multiple related checks but is still WIP.
+    * Ascending too high (Spider)
+    * Ascending too fast (Spider)
+    * HighJump
+    * Clipping through blocks
+    * FastLadder
   * NoFall
   * MorePackets
   * Jesus
