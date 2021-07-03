@@ -117,7 +117,8 @@ Although, most things within the code are very clear and documented.
   <summary>
     Full configuration
   </summary>
-  # The global kick message. Players will see this message when kicked.
+```
+   # The global kick message. Players will see this message when kicked.
 # Valid parameters:
 # - %check%
 global-kick-message: "&cYou have been kicked for %check%"
@@ -537,4 +538,5 @@ Nuker:
   max-break-packets-per-second: 50
   kick-if-threshold-reached: false
   packet-kick-threshold: 100
+```
 </details>
