@@ -52,6 +52,11 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * `Moving` checks
   * Flight
     * Contains multiple related checks but is still WIP.
+    * Ascending too high (Spider)
+    * Ascending too fast (Spider)
+    * HighJump
+    * Clipping through blocks
+    * FastLadder
   * NoFall
   * MorePackets
   * Jesus
@@ -103,3 +108,10 @@ Although, most things within the code are very clear and documented.
   * [API](https://github.com/Vrekt/Arc/wiki/API)
   * [Configuration](https://github.com/Vrekt/Arc/wiki/Configuration)
   * [Check Configuration](https://github.com/Vrekt/Arc/wiki/Check-configuration)
+  * [Configuration Preview](https://github.com/Vrekt/Arc/wiki/Configuration-Preview)
+ 
+
+# Preview
+Check out the default configuration file [here](https://github.com/Vrekt/Arc/wiki/Configuration-Preview).
+
+NOTE: Comments are not included once the configuration is written to the plugin directory.
