@@ -37,7 +37,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.3.3";
+    public static final String VERSION_STRING = "2.3.4";
 
     /**
      * If sync events should be used.
@@ -110,8 +110,7 @@ public final class Arc extends JavaPlugin {
 
         getLogger().info("Reading configuration...");
         saveDefaultConfig();
-        arcConfiguration.read(getConfig());
-        getLogger().info("Debug state is: " + arcConfiguration.enableDebugMessages());
+        readConfiguration();
 
         getLogger().info("Registering checks and listeners...");
         loadExternalPlugins();
@@ -127,7 +126,7 @@ public final class Arc extends JavaPlugin {
         getLogger().info("Registering base command...");
         verifyCommand();
 
-        getLogger().info("Saving configuration...");
+        getLogger().info("Saving file configuration...");
         saveConfig();
 
         getLogger().info("Ready!");
@@ -153,6 +152,23 @@ public final class Arc extends JavaPlugin {
         arc = null;
 
         getLogger().info("Goodbye.");
+    }
+
+    /**
+     * Read configuration and validate a few things.
+     */
+    private void readConfiguration() {
+        arcConfiguration.read(getConfig());
+
+        // check for lite bans
+        if (arcConfiguration.useLiteBans()
+                && getServer().getPluginManager().getPlugin("LiteBans") == null) {
+            getLogger().severe("Failed to find LiteBans in the plugin directory, LiteBans support will be disabled.");
+            arcConfiguration.setUseLiteBans(false);
+            return;
+        }
+
+        getLogger().info("Using " + (arcConfiguration.useLiteBans() ? "liteBans" : "bukkit") + " for punishment.");
     }
 
     /**
@@ -219,7 +235,7 @@ public final class Arc extends JavaPlugin {
             }
 
             useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
-            getLogger().info("Initialized Arc for: " + Bukkit.getVersion());
+            getLogger().info("Initialized Arc for Minecraft " + Bukkit.getMinecraftVersion());
             return true;
         }
     }

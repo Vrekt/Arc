@@ -2,6 +2,7 @@ package arc.check.moving;
 
 import arc.check.Check;
 import arc.check.result.CheckResult;
+import arc.check.timing.CheckTimings;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.utility.api.BukkitAccess;
@@ -76,6 +77,7 @@ public final class Flight extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
 
+        startTiming(player);
         final CheckResult result = new CheckResult();
 
         // from, to, ground and safe location(s)
@@ -127,6 +129,7 @@ public final class Flight extends Check {
         }
 
         debug(player, "Vertical: " + vertical);
+        stopTiming(player);
     }
 
     /**
@@ -238,7 +241,6 @@ public final class Flight extends Check {
      */
     private boolean hasSolidBlockBetween(double min, double max, World world, Location origin) {
         for (double y = min; y <= max + 1; y++) {
-            System.out.println("Checking at " + y);
             if (BlockAccess.isConsideredGround(world.getBlockAt(
                     origin.getBlockX(),
                     NumberConversions.floor(y),
@@ -325,5 +327,7 @@ public final class Flight extends Check {
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
         verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
         safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
+
+        CheckTimings.registerTiming(checkType);
     }
 }

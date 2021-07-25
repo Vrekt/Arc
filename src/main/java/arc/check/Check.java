@@ -2,6 +2,7 @@ package arc.check;
 
 import arc.Arc;
 import arc.check.result.CheckResult;
+import arc.check.timing.CheckTimings;
 import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
@@ -25,12 +26,12 @@ import org.bukkit.scheduler.BukkitTask;
 public abstract class Check extends Configurable {
 
     /**
-     * ExemptionHistory
+     * Exemption
      */
     private static final ExemptionManager EXEMPTION_MANAGER = Arc.getInstance().getExemptionManager();
 
     /**
-     * ViolationHistory
+     * Violation
      */
     private static final ViolationManager VIOLATION_MANAGER = Arc.getInstance().getViolationManager();
 
@@ -42,7 +43,7 @@ public abstract class Check extends Configurable {
     /**
      * The check type
      */
-    private final CheckType checkType;
+    protected final CheckType checkType;
 
     /**
      * The configuration builder;
@@ -320,6 +321,24 @@ public abstract class Check extends Configurable {
     protected boolean exempt(Player player, ExemptionType type) {
         if (player == null || !player.isOnline()) return true;
         return EXEMPTION_MANAGER.isPlayerExempt(player, type);
+    }
+
+    /**
+     * Start timing the player
+     *
+     * @param player the player
+     */
+    protected void startTiming(Player player) {
+        CheckTimings.startTiming(checkType, player.getUniqueId());
+    }
+
+    /**
+     * Stop timing the player
+     *
+     * @param player the player
+     */
+    protected void stopTiming(Player player) {
+        CheckTimings.stopTiming(checkType, player.getUniqueId());
     }
 
     @Override

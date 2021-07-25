@@ -1,8 +1,9 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
+import arc.check.timing.CheckTimings;
+import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
@@ -64,6 +65,7 @@ public final class Jesus extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
 
+        startTiming(player);
         final Location to = data.to();
         final boolean liquid = data.inLiquid();
         // reset data if in liquid
@@ -155,6 +157,7 @@ public final class Jesus extends Check {
             }
         }
 
+        stopTiming(player);
     }
 
     @Override
@@ -170,5 +173,7 @@ public final class Jesus extends Check {
         maxNoDistanceChangeAllowed = configuration.getInt("max-no-distance-change-allowed");
         ascendingMinDistanceRequired = configuration.getDouble("ascending-min-distance-required");
         ascendingMinDifferenceDistance = configuration.getDouble("ascending-min-difference-distance");
+
+        CheckTimings.registerTiming(checkType);
     }
 }

@@ -4,7 +4,6 @@ import arc.Arc;
 import arc.command.commands.*;
 import arc.inventory.InventoryCreator;
 import arc.inventory.ItemBuilder;
-import arc.permissions.Permissions;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -23,29 +22,37 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
      * Initialize
      */
     public ArcCommand() {
-        // initialize sub commands
+        initializeSubCommands();
+        populateCommandHelp();
+    }
+
+    /**
+     * Initialize sub commands
+     */
+    private void initializeSubCommands() {
         addSubCommand("violations", new ToggleViolationsSubCommand());
         addSubCommand("reload", new ReloadConfigSubCommand());
         addSubCommand("timings", new TimingsSubCommand());
         addSubCommand("cancelban", new CancelBanSubCommand());
         addSubCommand("exempt", new ExemptPlayerSubCommand());
         addSubCommand("debug", new DebugSubCommand());
+    }
 
-        // initialize help message.
-        final String prefix = Arc.getInstance().getArcConfiguration().prefix();
-        helpLine(prefix + ChatColor.DARK_AQUA + " /arc - " + ChatColor.GRAY + "Opens the inventory UI if you are a player.");
-        helpLine(prefix + ChatColor.DARK_AQUA + " /arc help - " + ChatColor.GRAY + "Shows this message");
-        helpLine(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS, prefix + ChatColor.DARK_AQUA + " /arc violations - " + ChatColor.GRAY + "Toggle violations on or off.");
-        helpLine(Permissions.ARC_COMMANDS_RELOAD_CONFIG, prefix + ChatColor.DARK_AQUA + " /arc reload - " + ChatColor.GRAY + "Reloads the configuration.");
-        helpLine(Permissions.ARC_COMMANDS_TIMINGS, prefix + ChatColor.DARK_AQUA + " /arc timings - " + ChatColor.GRAY + "View timings and TPS information.");
-        helpLine(Permissions.ARC_COMMANDS_CANCEL_BAN, prefix + ChatColor.DARK_AQUA + " /arc cancelban <player> - " + ChatColor.GRAY + "Cancel a pending player ban.");
-        helpLine(Permissions.ARC_COMMANDS_EXEMPT, prefix + ChatColor.DARK_AQUA + "/arc exempt <player> <check|all> - " + ChatColor.GRAY + "Exempt a player from a check or all checks.");
-        helpLine(Permissions.ARC_COMMANDS_DEBUG, prefix + ChatColor.DARK_AQUA + "/arc debug - " + ChatColor.GRAY + "Toggle debug messages.");
+    /**
+     * Populate the command help line(s)
+     */
+    private void populateCommandHelp() {
+        addHelpLine(ChatColor.DARK_AQUA + "/arc - " + ChatColor.GRAY + "Opens the inventory UI if you are a player.");
+        subCommands.values()
+                .forEach((command) ->
+                        addHelpLine(command.getPermission(), ChatColor.DARK_AQUA + command.getCommand() + " - "
+                                + ChatColor.GRAY + command.getDescription()));
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (!checkBasePermissions(sender)) return true;
+
         final boolean isPlayer = sender instanceof Player;
         if (args.length == 0 && isPlayer) {
             // display inventory
@@ -82,7 +89,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         final boolean violations = Arc.getInstance().getViolationManager().isViolationViewer(player);
         final ItemStack toggleViolationsItem = new ItemBuilder("NETHER_STAR")
                 .displayName(ChatColor.RED + "Toggle violations")
-                .lore(ChatColor.GRAY + "ViolationHistory are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))
+                .lore(ChatColor.GRAY + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off."))
                 .build();
 
         // create reload config item.
@@ -102,7 +109,7 @@ public final class ArcCommand extends ArcBaseCommand implements CommandExecutor 
         creator.initialIndex(20)
                 .item(toggleViolationsItem, 2, item -> executeSubCommandInventory(player, "violations", item, creator))
                 .item(reloadConfigItem, 2, item -> executeSubCommand(player, "reload", null))
-                .item(timingsItem, 2, item -> executeSubCommand(player, "timings", null))
+                .item(timingsItem, 2, item -> executeSubCommandInventory(player, "timings", item, creator))
                 .fillEmptySlots(emptySlotItem)
                 .show(player);
         return true;

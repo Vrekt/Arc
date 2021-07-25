@@ -1,8 +1,9 @@
 package arc.check.moving;
 
 import arc.check.Check;
-import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
+import arc.check.timing.CheckTimings;
+import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.exemption.type.ExemptionType;
 import arc.utility.math.MathUtil;
@@ -68,6 +69,7 @@ public final class NoFall extends Check {
 
         // ensure we are descending, not on ground, not climbing, no vehicle and not in liquid.
         if (data.descending() && !data.climbing() && !player.isInsideVehicle()) {
+            startTiming(player);
 
             // check if we are descending from a ladder first.
             final boolean comingFromLadder = data.ladderLocation() != null && data.to().getY() < data.ladderLocation().getY();
@@ -106,6 +108,7 @@ public final class NoFall extends Check {
                     }
                 }
             }
+            stopTiming(player);
         }
     }
 
@@ -165,5 +168,7 @@ public final class NoFall extends Check {
         expectedFallDistanceTolerance = configuration.getDouble("expected-fall-distance-tolerance");
         invalidGroundMovesAllowed = configuration.getInt("invalid-ground-moves-allowed");
         distanceFallenThreshold = configuration.getDouble("distance-fallen-threshold");
+
+        CheckTimings.registerTiming(checkType);
     }
 }

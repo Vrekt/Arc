@@ -31,7 +31,17 @@ public enum Placeholders {
     /**
      * Ban type
      */
-    TYPE("%type%");
+    TYPE("%type%"),
+
+    /**
+     * Ban length
+     */
+    LENGTH("%length%"),
+
+    /**
+     * Ban reason
+     */
+    REASON("%reason%");
 
     /**
      * The placeholder

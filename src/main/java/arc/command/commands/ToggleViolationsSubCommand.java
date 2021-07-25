@@ -3,7 +3,6 @@ package arc.command.commands;
 import arc.Arc;
 import arc.inventory.InventoryCreator;
 import arc.permissions.Permissions;
-import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,6 +18,10 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
 
     public ToggleViolationsSubCommand() {
         super(Permissions.ARC_COMMANDS_TOGGLE_VIOLATIONS);
+
+        setCommand("/arc violations");
+        setUsage("/arc violations");
+        setDescription("Allows you to toggle violation messages.");
     }
 
     @Override
@@ -30,18 +33,18 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
 
         final Player player = (Player) sender;
         final boolean state = toggleState(player);
-        ChatUtil.sendMessage(player, ChatColor.GRAY + "ViolationHistory are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
+        sendMessage(player, ChatColor.DARK_AQUA + "Violations are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
     }
 
     @Override
-    public void executeFromInventory(ItemStack item, InventoryCreator inventory, Player player) {
+    public void executeInventory(ItemStack item, InventoryCreator inventory, Player player) {
         final ItemStack modified = item.clone();
         final boolean violations = Arc.getInstance().getViolationManager().toggleViolationsViewer(player);
 
         final ItemMeta meta = modified.getItemMeta();
         if (meta != null) {
             // TODO @Deprecated
-            meta.setLore(Collections.singletonList(ChatColor.GRAY + "ViolationHistory are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off.")));
+            meta.setLore(Collections.singletonList(ChatColor.DARK_AQUA + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off.")));
         }
         modified.setItemMeta(meta);
         inventory.replace(item, modified);

@@ -3,7 +3,6 @@ package arc.command.commands;
 import arc.Arc;
 import arc.check.types.CheckType;
 import arc.permissions.Permissions;
-import arc.utility.chat.ChatUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -16,12 +15,16 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
 
     public ExemptPlayerSubCommand() {
         super(Permissions.ARC_COMMANDS_EXEMPT);
+
+        setCommand("/arc exempt (player) (checkName or all)");
+        setUsage("/arc exempt (player) (checkName or all)");
+        setDescription("Allows you to exempt players manually.");
     }
 
     @Override
     public void execute(CommandSender sender, String[] arguments) {
         if (arguments.length == 0) {
-            ChatUtil.sendMessage(sender, ChatColor.RED + "Usage: /arc exempt <player> <check|all>");
+            printUsage(sender);
             return;
         }
 
@@ -30,7 +33,7 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
 
         if (arguments.length == 1) {
             if (!isPlayer(sender)) {
-                sender.sendMessage(ChatColor.RED + "You must be a player to exempt yourself.");
+                sendErrorMessage(sender, "You must be a player to exempt yourself.");
                 return;
             }
 
@@ -39,7 +42,7 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
         } else {
             who = Bukkit.getPlayer(arguments[0]);
             if (who == null) {
-                sender.sendMessage(ChatColor.RED + "Player not found.");
+                sendErrorMessage(sender, ChatColor.RED + "Player not found.");
                 return;
             }
         }
@@ -47,21 +50,21 @@ public final class ExemptPlayerSubCommand extends ArcSubCommand {
         final String check = arguments.length == 1 ? arguments[0] : arguments[1];
         if (check.equalsIgnoreCase("all")) {
             Arc.getInstance().getExemptionManager().addExemptionPermanently(who, CheckType.values());
-            sender.sendMessage((isMyself ? ChatColor.GREEN + "You are now exempt from all checks."
-                    : ChatColor.RED + who.getName() + ChatColor.GREEN + " is now exempt from all checks."));
+            sendMessage(sender, (isMyself ? ChatColor.DARK_AQUA + "You are now exempt from all checks."
+                    : ChatColor.GRAY + who.getName() + ChatColor.DARK_AQUA + " is now exempt from all checks."));
         } else {
             final CheckType checkType = CheckType.getCheckTypeByName(check);
             if (checkType == null) {
-                sender.sendMessage(ChatColor.RED + "Check not found.");
+                sendErrorMessage(sender, "Check not found.");
                 return;
             }
 
             Arc.getInstance().getExemptionManager().addExemptionPermanently(who, checkType);
-            sender.sendMessage((isMyself ? ChatColor.GREEN + "You are now exempt from " + ChatColor.RED + checkType.getPrettyName()
-                    : ChatColor.RED + who.getName() + ChatColor.GREEN + " is now exempt from " + ChatColor.RED + checkType.getPrettyName()));
+            sendMessage(sender, (isMyself ? ChatColor.DARK_AQUA + "You are now exempt from " + ChatColor.GRAY + checkType.getPrettyName()
+                    : ChatColor.GRAY + who.getName() + ChatColor.DARK_AQUA + " is now exempt from " + ChatColor.GRAY + checkType.getPrettyName()));
         }
 
-        sender.sendMessage((ChatColor.GOLD + "" + ChatColor.BOLD) + "WARNING: " + ChatColor.YELLOW
+        sendMessage(sender, (ChatColor.GOLD + "" + ChatColor.BOLD) + "WARNING: " + ChatColor.YELLOW
                 + "This will not persist over a server reload, plugin reload or server restart.");
     }
 }

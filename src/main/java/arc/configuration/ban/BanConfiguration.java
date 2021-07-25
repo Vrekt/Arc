@@ -2,9 +2,10 @@ package arc.configuration.ban;
 
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
-import arc.configuration.values.ConfigurationValues;
 import arc.configuration.types.BanLengthType;
 import arc.configuration.types.ConfigurationString;
+import arc.configuration.values.ConfigurationSetting;
+import arc.punishment.litebans.LiteBansCommand;
 import org.bukkit.BanList;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -54,16 +55,22 @@ public final class BanConfiguration extends Configurable {
      */
     private ConfigurationString globalViolationsBanMessage;
 
+    /**
+     * Lite bans command
+     */
+    private String liteBansCommand;
+
     @Override
     public void read(FileConfiguration configuration) {
-        globalBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_BAN_MESSAGE)));
-        globalBanDelay = getInteger(configuration, ConfigurationValues.GLOBAL_BAN_DELAY);
-        globalBanType = getBanListType(configuration, ConfigurationValues.GLOBAL_BAN_TYPE);
-        globalBanLengthType = getBanLengthType(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH_TYPE);
-        globalBanLength = getInteger(configuration, ConfigurationValues.GLOBAL_BAN_LENGTH);
-        globalBroadcastBan = getBoolean(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN);
-        globalBroadcastBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_BROADCAST_BAN_MESSAGE)));
-        globalViolationsBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.GLOBAL_VIOLATIONS_BAN_MESSAGE)));
+        globalBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_BAN_MESSAGE)));
+        globalBanDelay = getInteger(configuration, ConfigurationSetting.GLOBAL_BAN_DELAY);
+        globalBanType = getBanListType(configuration, ConfigurationSetting.GLOBAL_BAN_TYPE);
+        globalBanLengthType = getBanLengthType(configuration, ConfigurationSetting.GLOBAL_BAN_LENGTH_TYPE);
+        globalBanLength = getInteger(configuration, ConfigurationSetting.GLOBAL_BAN_LENGTH);
+        globalBroadcastBan = getBoolean(configuration, ConfigurationSetting.GLOBAL_BROADCAST_BAN);
+        globalBroadcastBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_BROADCAST_BAN_MESSAGE)));
+        globalViolationsBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_VIOLATIONS_BAN_MESSAGE)));
+        liteBansCommand = getString(configuration, ConfigurationSetting.LITE_BANS_COMMAND);
     }
 
     @Override
@@ -126,4 +133,12 @@ public final class BanConfiguration extends Configurable {
     public ConfigurationString globalViolationsBanMessage() {
         return new ConfigurationString(globalViolationsBanMessage);
     }
+
+    /**
+     * @return the lite ban command
+     */
+    public LiteBansCommand getLiteBansCommand() {
+        return new LiteBansCommand(liteBansCommand);
+    }
+
 }

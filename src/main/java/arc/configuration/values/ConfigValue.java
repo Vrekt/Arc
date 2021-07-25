@@ -6,7 +6,7 @@ import org.bukkit.BanList;
 /**
  * A basic configuration value
  */
-public final class ConfigurationValue<T> {
+public final class ConfigValue<T> {
 
     /**
      * The value name
@@ -24,7 +24,7 @@ public final class ConfigurationValue<T> {
      * @param name the name
      * @param type the type
      */
-    public ConfigurationValue(String name, T type) {
+    public ConfigValue(String name, T type) {
         this.name = name;
         this.type = type;
     }

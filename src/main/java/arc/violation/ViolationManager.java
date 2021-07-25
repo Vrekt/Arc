@@ -149,7 +149,8 @@ public final class ViolationManager extends Configurable implements Closeable {
         if (check.configuration().shouldCancel(level)) violationResult.addResult(ViolationResult.Result.CANCEL);
 
         // ban the player if this check should ban
-        if (check.configuration().shouldBan(level) && !punishmentManager.hasPendingBan(player)) {
+        if (check.configuration().shouldBan(level)
+                && !punishmentManager.hasPendingBan(player)) {
             violationResult.addResult(ViolationResult.Result.BAN);
             punishmentManager.banPlayer(player, check);
         }

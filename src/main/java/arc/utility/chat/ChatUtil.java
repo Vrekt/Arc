@@ -13,7 +13,7 @@ public final class ChatUtil {
     /**
      * Prefix.
      */
-    private static final String PREFIX = Arc.getInstance().getArcConfiguration().prefix() + " ";
+    private static final String PREFIX = Arc.getInstance().getArcConfiguration().getPrefix() + " ";
 
     /**
      * Send a message

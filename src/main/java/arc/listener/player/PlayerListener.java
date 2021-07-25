@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -33,6 +34,8 @@ public final class PlayerListener implements Listener {
      */
     private final FastUse fastUse;
 
+    private long last = System.currentTimeMillis();
+
     public PlayerListener() {
         regeneration = Arc.getInstance().getCheckManager().getCheck(CheckType.REGENERATION);
         fastUse = Arc.getInstance().getCheckManager().getCheck(CheckType.FAST_USE);
@@ -46,8 +49,7 @@ public final class PlayerListener implements Listener {
      */
     @EventHandler
     private void onRegain(EntityRegainHealthEvent event) {
-        if (!regeneration.enabled()) return;
-        if (!(event.getEntity() instanceof Player)) return;
+        if (!regeneration.enabled() || !(event.getEntity() instanceof Player)) return;
 
         // only check if we have regained health from being satisfied.
         if (regeneration.enabled() && event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
@@ -129,6 +131,17 @@ public final class PlayerListener implements Listener {
     private void onRespawn(PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         Arc.getInstance().getExemptionManager().removeExemption(player, ExemptionType.DEATH);
+    }
+
+    /**
+     * Highest priority, run after everything else, to avoid locked chests and regions.
+     *
+     * @param event e
+     */
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    private void onClick(InventoryClickEvent event) {
+        final long delta = System.currentTimeMillis() - last;
+        last = System.currentTimeMillis();
     }
 
 }

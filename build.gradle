@@ -16,9 +16,10 @@ repositories {
 }
 
 dependencies {
+    // Paper.
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
-    implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.65.Final'
 
+    // Compile each project, while ignoring their respective spigot version.
     compile(project(':bridge')) {
         transitive = false
     }
@@ -31,5 +32,8 @@ dependencies {
     compile(project(':bridge1_16')) {
         transitive = false
     }
+
+    // Protocol lib and its depends.
+    implementation group: 'io.netty', name: 'netty-buffer', version: '4.1.65.Final'
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.6.0"
 }

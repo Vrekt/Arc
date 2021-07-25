@@ -10,9 +10,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,17 +21,12 @@ public abstract class ArcBaseCommand {
     /**
      * Map of sub-commands.
      */
-    private final Map<String, ArcSubCommand> subCommands = new HashMap<>();
+    protected final Map<String, ArcSubCommand> subCommands = new HashMap<>();
 
     /**
      * Map of help-lines
      */
     private final Map<String, String> helpLines = new HashMap<>();
-
-    /**
-     * Help-lines without permissions
-     */
-    private final List<String> singularHelpLines = new ArrayList<>();
 
     /**
      * Add a sub command
@@ -51,17 +44,17 @@ public abstract class ArcBaseCommand {
      * @param permission the permission
      * @param line       the line
      */
-    protected void helpLine(String permission, String line) {
-        helpLines.put(permission, line);
+    protected void addHelpLine(String permission, String line) {
+        helpLines.put(permission, Arc.getInstance().getArcConfiguration().getPrefix() + line);
     }
 
     /**
-     * Add a help line without permissions
+     * Add a help line that doesn't require a permission.
      *
      * @param line the line
      */
-    protected void helpLine(String line) {
-        singularHelpLines.add(line);
+    protected void addHelpLine(String line) {
+        helpLines.put(Permissions.ARC_COMMANDS_BASE, Arc.getInstance().getArcConfiguration().getPrefix() + line);
     }
 
     /**
@@ -102,7 +95,7 @@ public abstract class ArcBaseCommand {
     protected void executeSubCommandInventory(Player player, String command, ItemStack item, InventoryCreator inventory) {
         final ArcSubCommand subCommand = subCommands.get(command);
         if (player.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(player)) {
-            subCommand.executeFromInventory(item, inventory, player);
+            subCommand.executeInventory(item, inventory, player);
         } else {
             ChatUtil.sendMessage(player, ChatColor.RED + "You do not have permission to do this.");
         }
@@ -141,10 +134,6 @@ public abstract class ArcBaseCommand {
      */
     protected boolean printHelpLines(CommandSender sender) {
         final StringBuilder builder = new StringBuilder();
-        singularHelpLines.forEach(line -> {
-            builder.append(line);
-            builder.append("\n");
-        });
         helpLines.forEach((permission, line) -> {
             if (sender.hasPermission(permission)) {
                 builder.append(line);

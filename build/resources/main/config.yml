@@ -48,7 +48,7 @@ global-broadcast-ban: false
 # - %check% - The check name
 # - %time% - The time banned for
 # - %type% - Days, Years, Permanent
-# Example: Skiddin(%player% was banned for Speed(%check%) for 30(%time%) days(%type%)
+# Example: Skiddin(%player%) was banned for Speed(%check%) for 30(%time%) days(%type%)
 global-broadcast-ban-message: "%prefix% &c%player% was banned for %check% for %time% %type%"
 
 # The message to send to players with the permission `arc.violations`
@@ -90,3 +90,17 @@ enable-event-api: true
 
 # If debug messages are enabled:
 debug-messages: false
+
+# If AdvancedBan plugin should be used for banning/kicking.
+use-advanced-ban: false
+
+# If LiteBans plugin should be used for banning/kicking.
+use-lite-bans: false
+
+# The lite bans command to execute.
+# For example: /ban Player -s 7d cheating
+# %player% - the player
+# Any liteban flag you may want, for example -s
+# %length% - the length of the ban
+# %reason% - the reason
+lite-bans-command: "%player% -p %length% %reason%"

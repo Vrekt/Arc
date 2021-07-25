@@ -2,7 +2,6 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.permissions.Permissions;
-import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -13,17 +12,21 @@ public final class ReloadConfigSubCommand extends ArcSubCommand {
 
     public ReloadConfigSubCommand() {
         super(Permissions.ARC_COMMANDS_RELOAD_CONFIG);
+
+        setCommand("/arc reload");
+        setUsage("/arc reload");
+        setDescription("Allows you to view timings information.");
     }
 
     @Override
     public void execute(CommandSender sender, String[] arguments) {
-        ChatUtil.sendMessage(sender, ChatColor.RED + "Reloading....");
+        sendMessage(sender, ChatColor.DARK_AQUA + "Reloading....");
         try {
             Arc.getInstance().getArcConfiguration().reloadConfiguration();
-            ChatUtil.sendMessage(sender, ChatColor.GREEN + "Configuration reloaded.");
+            sendMessage(sender, ChatColor.DARK_AQUA + "Configuration reloaded.");
         } catch (Exception any) {
             any.printStackTrace();
-            ChatUtil.sendMessage(sender, ChatColor.RED + "Any internal error occurred, it has been printed to console.");
+            sendErrorMessage(sender, "Any internal error occurred, it has been printed to console.");
         }
     }
 }

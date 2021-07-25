@@ -18,12 +18,74 @@ public abstract class ArcSubCommand {
     private final String permission;
 
     /**
+     * The command string, for example: /arc cancelban
+     * The description of the command
+     * The usage of this command
+     */
+    private String command, description, usage;
+
+    /**
      * The permission required.
      *
      * @param permission permission
      */
     public ArcSubCommand(String permission) {
         this.permission = permission;
+    }
+
+    /**
+     * Set the command
+     *
+     * @param command the command
+     */
+    public void setCommand(String command) {
+        this.command = command;
+    }
+
+    /**
+     * Set the description message
+     *
+     * @param description description
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * Set the usage message
+     *
+     * @param usage usage
+     */
+    public void setUsage(String usage) {
+        this.usage = usage;
+    }
+
+    /**
+     * @return the permission
+     */
+    public String getPermission() {
+        return permission;
+    }
+
+    /**
+     * @return the command
+     */
+    public String getCommand() {
+        return command;
+    }
+
+    /**
+     * @return the description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the usage
+     */
+    public String getUsage() {
+        return usage;
     }
 
     /**
@@ -51,8 +113,8 @@ public abstract class ArcSubCommand {
      * @param inventory the inventory
      * @param player    the player
      */
-    public void executeFromInventory(ItemStack item, InventoryCreator inventory, Player player) {
-
+    public void executeInventory(ItemStack item, InventoryCreator inventory, Player player) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -72,6 +134,35 @@ public abstract class ArcSubCommand {
      */
     protected void printNoPlayer(CommandSender sender) {
         ChatUtil.sendMessage(sender, ChatColor.RED + "You must be a player to do this.");
+    }
+
+    /**
+     * Print usage
+     *
+     * @param sender the sender
+     */
+    protected void printUsage(CommandSender sender) {
+        ChatUtil.sendMessage(sender, ChatColor.RED + "Usage: " + getUsage());
+    }
+
+    /**
+     * Send a message
+     *
+     * @param sender  the sender
+     * @param message the message
+     */
+    protected void sendMessage(CommandSender sender, String message) {
+        ChatUtil.sendMessage(sender, message);
+    }
+
+    /**
+     * Send an error message
+     *
+     * @param sender  the sender
+     * @param message the message
+     */
+    protected void sendErrorMessage(CommandSender sender, String message) {
+        ChatUtil.sendMessage(sender, ChatColor.RED + message);
     }
 
 }

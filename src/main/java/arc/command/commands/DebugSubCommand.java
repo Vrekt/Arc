@@ -1,9 +1,8 @@
 package arc.command.commands;
 
 import arc.Arc;
-import arc.configuration.values.ConfigurationValues;
+import arc.configuration.values.ConfigurationSetting;
 import arc.permissions.Permissions;
-import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -14,6 +13,10 @@ public final class DebugSubCommand extends ArcSubCommand {
 
     public DebugSubCommand() {
         super(Permissions.ARC_COMMANDS_DEBUG);
+
+        setCommand("/arc debug");
+        setUsage("/arc debug");
+        setDescription("Allows you to toggle debug messaging.");
     }
 
     @Override
@@ -23,7 +26,7 @@ public final class DebugSubCommand extends ArcSubCommand {
         Arc.getInstance().getArcConfiguration().setDebugMessagesState(state);
 
         // save config state.
-        Arc.getInstance().getArcConfiguration().fileConfiguration().set(ConfigurationValues.DEBUG_MESSAGES.valueName(), state);
-        ChatUtil.sendMessage(sender, ChatColor.GRAY + "Debug messages are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
+        Arc.getInstance().getArcConfiguration().fileConfiguration().set(ConfigurationSetting.DEBUG_MESSAGES.valueName(), state);
+        sendMessage(sender, ChatColor.DARK_AQUA + "Debug messages are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
     }
 }

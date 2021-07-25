@@ -4,7 +4,7 @@ import arc.Arc;
 import arc.configuration.ban.BanConfiguration;
 import arc.configuration.kick.KickConfiguration;
 import arc.configuration.types.ConfigurationString;
-import arc.configuration.values.ConfigurationValues;
+import arc.configuration.values.ConfigurationSetting;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -29,6 +29,11 @@ public final class ArcConfiguration extends Configurable {
      * If debug messages are enabled.
      */
     private boolean enableCheckTimings, enableTpsHelper, enableEventApi, debugMessages;
+
+    /**
+     * Ban plugin support
+     */
+    private boolean useLiteBans;
 
     /**
      * TPS helper limit
@@ -56,15 +61,20 @@ public final class ArcConfiguration extends Configurable {
         kickConfiguration.read(configuration);
         banConfiguration.read(configuration);
 
-        enableCheckTimings = getBoolean(configuration, ConfigurationValues.ENABLE_CHECK_TIMINGS);
-        enableTpsHelper = getBoolean(configuration, ConfigurationValues.ENABLE_TPS_HELPER);
-        tpsHelperLimit = getInteger(configuration, ConfigurationValues.TPS_HELPER_LIMIT);
-        violationNotifyMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.VIOLATION_NOTIFY_MESSAGE)));
-        commandNoPermissionMessage = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.ARC_COMMAND_NO_PERMISSION_MESSAGE));
-        prefix = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationValues.ARC_PREFIX));
-        violationDataTimeout = getInteger(configuration, ConfigurationValues.VIOLATION_DATA_TIMEOUT);
-        enableEventApi = getBoolean(configuration, ConfigurationValues.ENABLE_EVENT_API);
-        debugMessages = getBoolean(configuration, ConfigurationValues.DEBUG_MESSAGES);
+        enableCheckTimings = getBoolean(configuration, ConfigurationSetting.ENABLE_CHECK_TIMINGS);
+        enableTpsHelper = getBoolean(configuration, ConfigurationSetting.ENABLE_TPS_HELPER);
+        tpsHelperLimit = getInteger(configuration, ConfigurationSetting.TPS_HELPER_LIMIT);
+        violationNotifyMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.VIOLATION_NOTIFY_MESSAGE)));
+        commandNoPermissionMessage = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.ARC_COMMAND_NO_PERMISSION_MESSAGE));
+        prefix = ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.ARC_PREFIX));
+        violationDataTimeout = getInteger(configuration, ConfigurationSetting.VIOLATION_DATA_TIMEOUT);
+        enableEventApi = getBoolean(configuration, ConfigurationSetting.ENABLE_EVENT_API);
+        debugMessages = getBoolean(configuration, ConfigurationSetting.DEBUG_MESSAGES);
+        useLiteBans = getBoolean(configuration, ConfigurationSetting.USE_LITE_BANS);
+
+        if(useLiteBans) {
+            Arc.getPlugin().getLogger().info("Arc will be using LiteBans to punish players.");
+        }
     }
 
     /**
@@ -119,6 +129,22 @@ public final class ArcConfiguration extends Configurable {
     }
 
     /**
+     * @return if the LiteBans plugin should be used for punishment.
+     */
+    public boolean useLiteBans() {
+        return useLiteBans;
+    }
+
+    /**
+     * Set use lite bans
+     *
+     * @param useLiteBans the lite bans
+     */
+    public void setUseLiteBans(boolean useLiteBans) {
+        this.useLiteBans = useLiteBans;
+    }
+
+    /**
      * @return TPS helper limit
      */
     public int tpsHelperLimit() {
@@ -149,7 +175,7 @@ public final class ArcConfiguration extends Configurable {
     /**
      * @return the prefix
      */
-    public String prefix() {
+    public String getPrefix() {
         return prefix;
     }
 

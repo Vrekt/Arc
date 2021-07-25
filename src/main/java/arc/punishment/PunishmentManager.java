@@ -1,7 +1,8 @@
 package arc.punishment;
 
 import arc.Arc;
-import arc.api.events.PlayerBanEvent;
+import arc.api.events.PlayerPendingBanEvent;
+import arc.api.events.PlayerPendingKickEvent;
 import arc.check.Check;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
@@ -51,8 +52,9 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
     /**
      * Event related
+     * Ban plugin support.
      */
-    private boolean enableEventApi;
+    private boolean enableEventApi, useLiteBans;
 
     /**
      * Initialize
@@ -77,7 +79,8 @@ public final class PunishmentManager extends Configurable implements Closeable {
         this.banConfiguration = configuration.banConfiguration();
         this.kickConfiguration = configuration.kickConfiguration();
 
-        enableEventApi = Arc.getInstance().getArcConfiguration().enableEventApi();
+        enableEventApi = configuration.enableEventApi();
+        useLiteBans = configuration.useLiteBans();
     }
 
     /**
@@ -135,20 +138,42 @@ public final class PunishmentManager extends Configurable implements Closeable {
      * @param check  the check
      */
     public void banPlayer(Player player, Check check) {
+        if (useLiteBans) {
+            banPlayerUsingLiteBans(player, check);
+        } else {
+            banPlayerNormal(player, check);
+        }
+    }
+
+    /**
+     * Ban a player using lite bans.
+     *
+     * @param player the player
+     * @param check  the check
+     */
+    private void banPlayerUsingLiteBans(Player player, Check check) {
         pendingPlayerBans.add(player);
 
         // get the date needed to ban the player.
         final int length = banConfiguration.globalBanLength();
         final BanLengthType lengthType = banConfiguration.globalBanLengthType();
 
-        Date date = null;
-        switch (lengthType) {
-            case DAYS:
-                date = DateUtils.addDays(new Date(), length);
-                break;
-            case YEARS:
-                date = DateUtils.addYears(new Date(), length);
-                break;
+        // get ban date.
+        final Date date = lengthType == BanLengthType.PERM ? null
+                : lengthType == BanLengthType.DAYS ? DateUtils.addDays(new Date(), length)
+                : DateUtils.addYears(new Date(), length);
+
+        if (enableEventApi) {
+            final PlayerPendingBanEvent event = new PlayerPendingBanEvent(player, check, date, banConfiguration.globalBanDelay(), useLiteBans);
+            Arc.triggerEvent(event);
+
+            if (event.isCancelled()) {
+                pendingPlayerBans.remove(player);
+                return;
+            }
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> banPlayerUsingLiteBans(player, check, lengthType, length), event.getDelay() * 20L);
+        } else {
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> banPlayerUsingLiteBans(player, check, lengthType, length), banConfiguration.globalBanDelay() * 20L);
         }
 
         // build the message to send to violation viewers, then send it.
@@ -159,12 +184,28 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .time(banConfiguration.globalBanDelay())
                 .value();
         BukkitAccess.broadcast(violation, Permissions.ARC_VIOLATIONS);
+    }
 
-        // schedule the player ban
-        final Date finalDate = date;
+
+    /**
+     * Ban a player normally.
+     *
+     * @param player the player
+     * @param check  the check
+     */
+    private void banPlayerNormal(Player player, Check check) {
+        pendingPlayerBans.add(player);
+
+        // get the date needed to ban the player.
+        final int length = banConfiguration.globalBanLength();
+        final BanLengthType lengthType = banConfiguration.globalBanLengthType();
+
+        final Date date = lengthType == BanLengthType.PERM ? null
+                : lengthType == BanLengthType.DAYS ? DateUtils.addDays(new Date(), length)
+                : DateUtils.addYears(new Date(), length);
 
         if (enableEventApi) {
-            final PlayerBanEvent event = new PlayerBanEvent(player, check, finalDate, banConfiguration.globalBanDelay());
+            final PlayerPendingBanEvent event = new PlayerPendingBanEvent(player, check, date, banConfiguration.globalBanDelay(), useLiteBans);
             Arc.triggerEvent(event);
 
             if (event.isCancelled()) {
@@ -172,12 +213,20 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 return;
             }
 
-            final Date eventDate = event.date();
-            final int eventDelay = event.delay();
-            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> ban(player, check, eventDate, length), eventDelay * 20L);
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> banPlayerNormal(player, check, event.getDate(), length), event.getDelay() * 20L);
         } else {
-            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> ban(player, check, finalDate, length), banConfiguration.globalBanDelay() * 20L);
+            Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> banPlayerNormal(player, check, date, length), banConfiguration.globalBanDelay() * 20L);
         }
+
+        // build the message to send to violation viewers, then send it.
+        final String violation = banConfiguration.globalViolationsBanMessage()
+                .player(player)
+                .check(check, null)
+                .prefix()
+                .time(banConfiguration.globalBanDelay())
+                .value();
+
+        BukkitAccess.broadcast(violation, Permissions.ARC_VIOLATIONS);
     }
 
     /**
@@ -188,9 +237,10 @@ public final class PunishmentManager extends Configurable implements Closeable {
      * @param date   the ban date
      * @param time   the ban time, days, years, etc
      */
-    private void ban(Player player, Check check, Date date, int time) {
+    private void banPlayerNormal(Player player, Check check, Date date, int time) {
         if (!hasPendingBan(player.getName())) return;
         final BanList.Type type = banConfiguration.globalBanType();
+
         if (type == BanList.Type.IP && player.getAddress() == null) {
             Arc.getPlugin().getLogger().warning("Failed to ban player " + player.getName());
             pendingPlayerBans.remove(player);
@@ -227,7 +277,61 @@ public final class PunishmentManager extends Configurable implements Closeable {
             final String broadcast = configMessage.type().value();
             BukkitAccess.broadcast(broadcast);
         }
+    }
 
+    /**
+     * Ban a player use lite bans
+     *
+     * @param player        the player
+     * @param check         the check
+     * @param banLengthType the length type
+     * @param length        the length
+     */
+    private void banPlayerUsingLiteBans(Player player, Check check, BanLengthType banLengthType, int length) {
+        if (!hasPendingBan(player.getName())) return;
+
+        final BanList.Type type = banConfiguration.globalBanType();
+        if (type == BanList.Type.IP && player.getAddress() == null) {
+            Arc.getPlugin().getLogger().warning("Failed to ban player " + player.getName());
+            pendingPlayerBans.remove(player);
+            return;
+        }
+
+        final String playerBan = type == BanList.Type.IP ? player.getAddress().getHostName() : player.getName();
+        final String message = banConfiguration.globalBanMessage()
+                .check(check, null)
+                .value();
+
+        // Do not forget the space!
+        final String command = banConfiguration.getLiteBansCommand()
+                .command(type == BanList.Type.IP ? "/ipban " : "/ban ")
+                .playerOrIpAddress(playerBan)
+                .reason(message)
+                .length(banLengthType, length)
+                .toString();
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        pendingPlayerBans.remove(player);
+
+        // broadcast the ban
+        if (banConfiguration.globalBroadcastBan()) {
+            final boolean hasTime = banLengthType != BanLengthType.PERM;
+            ConfigurationString configMessage = banConfiguration.globalBroadcastBanMessage()
+                    .player(player)
+                    .check(check, null)
+                    .prefix();
+
+            // replace the time placeholder
+            if (hasTime) {
+                configMessage.time(length);
+            } else {
+                configMessage.replace(Placeholders.TIME, "");
+            }
+
+            // broadcast
+            final String broadcast = configMessage.type().value();
+            BukkitAccess.broadcast(broadcast);
+        }
     }
 
     /**
@@ -244,14 +348,28 @@ public final class PunishmentManager extends Configurable implements Closeable {
                 .prefix()
                 .time(kickConfiguration.globalKickDelay())
                 .value();
+
+        long timeDelay = kickConfiguration.globalKickDelay() * 20L;
+        if (enableEventApi) {
+            final PlayerPendingKickEvent event = new PlayerPendingKickEvent(player, check, timeDelay);
+            Arc.triggerEvent(event);
+
+            if (event.isCancelled()) {
+                pendingPlayerKicks.remove(player);
+                return;
+            }
+
+            timeDelay = event.getDelay();
+        }
+
         BukkitAccess.broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
         Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> {
             final String message = kickConfiguration.globalKickMessage()
                     .check(check, null)
                     .value();
-            BukkitAccess.kickPlayer(player, message);
             pendingPlayerKicks.remove(player);
-        }, kickConfiguration.globalKickDelay() * 20L);
+            BukkitAccess.kickPlayer(player, message);
+        }, timeDelay);
     }
 
     @Override

@@ -9,9 +9,9 @@ import org.bukkit.event.player.PlayerEvent;
 import java.util.Date;
 
 /**
- * An event for when a player gets banned for a check.
+ * An event for when a player will be banned in X amount of time for a check.
  */
-public final class PlayerBanEvent extends PlayerEvent implements Cancellable {
+public final class PlayerPendingBanEvent extends PlayerEvent implements Cancellable {
 
     /**
      * Handler list
@@ -31,19 +31,25 @@ public final class PlayerBanEvent extends PlayerEvent implements Cancellable {
     /**
      * The delay
      */
-    private int delay;
+    private long delay;
+
+    /**
+     * If Arc will use lite bans.
+     */
+    private boolean willUseLiteBans;
 
     /**
      * If this event is cancelled.
      */
     private boolean cancelled;
 
-    public PlayerBanEvent(Player who, Check check, Date date, int delay) {
+    public PlayerPendingBanEvent(Player who, Check check, Date date, long delay, boolean willUseLiteBans) {
         super(who);
 
         this.check = check;
         this.date = date;
         this.delay = delay;
+        this.willUseLiteBans = willUseLiteBans;
     }
 
     @Override
@@ -54,19 +60,22 @@ public final class PlayerBanEvent extends PlayerEvent implements Cancellable {
     /**
      * @return the check banned for
      */
-    public Check check() {
+    public Check getCheck() {
         return check;
     }
 
     /**
+     * This field will be ignored if {@code willUseLiteBans} is {@code true}
+     *
      * @return the date
      */
-    public Date date() {
+    public Date getDate() {
         return date;
     }
 
     /**
      * Change the ban date.
+     * This field will be ignored if {@code willUseLiteBans} is {@code true}
      *
      * @param date the date
      */
@@ -77,7 +86,7 @@ public final class PlayerBanEvent extends PlayerEvent implements Cancellable {
     /**
      * @return the ban delay
      */
-    public int delay() {
+    public long getDelay() {
         return delay;
     }
 
@@ -86,15 +95,21 @@ public final class PlayerBanEvent extends PlayerEvent implements Cancellable {
      *
      * @param delay the delay
      */
-    public void setDelay(int delay) {
+    public void setDelay(long delay) {
         this.delay = delay;
+    }
+
+    /**
+     * @return if arc will use lite bans
+     */
+    public boolean willUseLiteBans() {
+        return willUseLiteBans;
     }
 
     @Override
     public void setCancelled(boolean cancelled) {
         this.cancelled = cancelled;
     }
-
 
     @Override
     public HandlerList getHandlers() {
