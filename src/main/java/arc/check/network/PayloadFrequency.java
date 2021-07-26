@@ -43,7 +43,7 @@ public final class PayloadFrequency extends PacketCheck {
     public PayloadFrequency() {
         super(CheckType.PAYLOAD_FREQUENCY);
 
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -62,7 +62,7 @@ public final class PayloadFrequency extends PacketCheck {
         addConfigurationValue("max-packets-per-interval-kick", true);
         addConfigurationValue("channels", Lists.newArrayList("MC|BSign", "MC|BEdit"));
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

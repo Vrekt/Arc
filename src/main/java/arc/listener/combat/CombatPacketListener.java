@@ -9,6 +9,7 @@ import arc.check.combat.AttackReach;
 import arc.data.combat.CombatData;
 import arc.data.packet.PacketData;
 import arc.listener.AbstractPacketListener;
+import arc.world.WorldManager;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
@@ -66,16 +67,18 @@ public final class CombatPacketListener extends AbstractPacketListener {
         if (packet.getType() == EnumWrappers.EntityUseAction.ATTACK) {
             // the player attacked an entity, run checks.
             final Player player = event.getPlayer();
+            if (!WorldManager.isEnabledInWorld(player)) return;
+
             final Entity entity = packet.getTarget(player.getWorld());
             if (entity instanceof LivingEntity) {
 
                 boolean checkKillAura = false, checkCriticals = false, checkReach = false, checkNoSwing = false;
                 final CombatData data = CombatData.get(player);
 
-                if (killAura.enabled()) checkKillAura = killAura.check(player, entity, data);
-                if (reach.enabled()) checkReach = reach.check(player, entity);
-                if (noSwing.enabled()) checkNoSwing = noSwing.check(player, data);
-                if (criticals.enabled()) checkCriticals = criticals.check(player);
+                if (killAura.isEnabled()) checkKillAura = killAura.check(player, entity, data);
+                if (reach.isEnabled()) checkReach = reach.check(player, entity);
+                if (noSwing.isEnabled()) checkNoSwing = noSwing.check(player, data);
+                if (criticals.isEnabled()) checkCriticals = criticals.check(player);
 
                 if (checkKillAura || checkCriticals || checkReach || checkNoSwing) event.setCancelled(true);
             }

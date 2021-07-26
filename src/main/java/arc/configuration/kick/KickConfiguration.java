@@ -1,7 +1,9 @@
 package arc.configuration.kick;
 
+import arc.Arc;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
+import arc.configuration.ConfigurationSettingReader;
 import arc.configuration.values.ConfigurationSetting;
 import arc.configuration.types.ConfigurationString;
 import org.bukkit.ChatColor;
@@ -10,7 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 /**
  * The kick configuration
  */
-public final class KickConfiguration extends Configurable {
+public final class KickConfiguration extends ConfigurationSettingReader implements Configurable {
 
     /**
      * The global kick message.
@@ -28,15 +30,15 @@ public final class KickConfiguration extends Configurable {
     private int globalKickDelay;
 
     @Override
-    public void read(FileConfiguration configuration) {
+    public void readFromFile(FileConfiguration configuration) {
         this.globalKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_KICK_MESSAGE)));
         this.globalViolationsKickMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_VIOLATIONS_KICK_MESSAGE)));
         this.globalKickDelay = getInteger(configuration, ConfigurationSetting.GLOBAL_KICK_DELAY);
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        read(configuration.fileConfiguration());
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        readFromFile(Arc.getInstance().getConfig());
     }
 
     /**

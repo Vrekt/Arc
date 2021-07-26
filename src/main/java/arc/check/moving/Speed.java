@@ -38,7 +38,7 @@ public final class Speed extends Check {
 
     public Speed() {
         super(CheckType.SPEED);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -57,7 +57,7 @@ public final class Speed extends Check {
         addConfigurationValue("sneak-time-delay-ice", 20);
         addConfigurationValue("sneak-time-delay", 15);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     @Override

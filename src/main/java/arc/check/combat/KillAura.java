@@ -35,7 +35,7 @@ public final class KillAura extends Check {
 
     public KillAura() {
         super(CheckType.KILL_AURA);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -52,7 +52,7 @@ public final class KillAura extends Check {
         addConfigurationValue(CheckSubType.KILL_AURA_ATTACK_SPEED, "max-attacks-per-second", 20);
         addConfigurationValue(CheckSubType.KILL_AURA_ATTACK_SPEED, "min-attack-delta", 35);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

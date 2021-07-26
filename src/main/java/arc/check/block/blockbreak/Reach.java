@@ -13,7 +13,7 @@ public final class Reach extends AbstractBlockReachCheck {
 
     @Override
     protected void buildCheckConfiguration() {
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)

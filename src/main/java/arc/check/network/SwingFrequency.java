@@ -25,7 +25,7 @@ public final class SwingFrequency extends PacketCheck {
 
     public SwingFrequency() {
         super(CheckType.SWING_FREQUENCY);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -39,7 +39,7 @@ public final class SwingFrequency extends PacketCheck {
         addConfigurationValue("max-packets-per-second", 50);
         addConfigurationValue("kick-if-threshold-reached", false);
         addConfigurationValue("packet-kick-threshold", 100);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

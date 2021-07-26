@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.data.Data;
 import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
+import arc.world.WorldManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +23,7 @@ public final class PlayerConnectionListener implements Listener {
         Arc.getInstance().getExemptionManager().onPlayerJoin(player);
 
         initializePlayerData(player);
+        if (WorldManager.isEnabledWorld(player.getWorld())) WorldManager.setPlayerInEnabledWorld(player);
     }
 
     @EventHandler

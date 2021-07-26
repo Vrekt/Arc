@@ -5,11 +5,14 @@ import arc.check.result.CheckResult;
 import arc.check.timing.CheckTimings;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
+import arc.utility.MovingUtil;
 import arc.utility.api.BukkitAccess;
 import arc.utility.block.BlockAccess;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
@@ -40,12 +43,13 @@ public final class Flight extends Check {
     /**
      * The max ascend time
      * The amount to add to {@code maxAscendTime} when the player has jump boost.
+     * Max time allowed to be hovering.
      */
-    private int maxAscendTime, jumpBoostAscendAmplifier;
+    private int maxAscendTime, jumpBoostAscendAmplifier, maxInAirHoverTime;
 
     public Flight() {
         super(CheckType.FLIGHT);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -65,7 +69,8 @@ public final class Flight extends Check {
         addConfigurationValue("slime-block-distance-fallen-threshold", 0);
         addConfigurationValue("vertical-clip-vertical-minimum", 0.99);
         addConfigurationValue("safe-location-update-distance-threshold", 1.99);
-        if (enabled()) load();
+        addConfigurationValue("max-in-air-hover-time", 6);
+        if (isEnabled()) load();
     }
 
     /**
@@ -130,6 +135,45 @@ public final class Flight extends Check {
 
         debug(player, "Vertical: " + vertical);
         stopTiming(player);
+    }
+
+    /**
+     * Check the player when they haven't moved in awhile.
+     * <p>
+     * As of right now this is mostly a hover check.
+     * <p>
+     * TODO: Might not need a temporary data set.
+     *
+     * @param player the player
+     * @param data   the data
+     */
+    public void checkNoMovement(Player player, MovingData data) {
+        if (exempt(player)) return;
+
+        final MovingData temp = MovingData.retrieveTemporary();
+        MovingUtil.calculateMovement(temp, data.to(), player.getLocation());
+
+        int inAirTime = data.getInAirTime();
+        if (!temp.onGround()) {
+            data.setInAirTime(data.getInAirTime() + 1);
+            inAirTime++;
+        } else {
+            data.setInAirTime(0);
+        }
+
+        if (!temp.onGround() && temp.vertical() == 0.0) {
+            // player is hovering
+            if (inAirTime >= maxInAirHoverTime) {
+                // flag player, hovering too long.
+                final CheckResult result = new CheckResult();
+                result.setFailed("Hovering off the ground for too long")
+                        .withParameter("inAirTime", inAirTime)
+                        .withParameter("max", maxInAirHoverTime);
+
+                handleCheckViolation(player, result, data.ground());
+            }
+        }
+
     }
 
     /**
@@ -205,11 +249,11 @@ public final class Flight extends Check {
     private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location from, Location to, double vertical) {
         if (vertical >= verticalClipMinimum) {
             // safe
-            final double min1 = Math.min(safe.getY(), to.getY()) - 1;
+            final double min1 = Math.min(safe.getY(), to.getY());
             final double max1 = Math.max(safe.getY(), to.getY()) + 1;
 
             // from
-            final double min2 = Math.min(from.getY(), to.getY()) - 1;
+            final double min2 = Math.min(from.getY(), to.getY());
             final double max2 = Math.max(from.getY(), to.getY()) + 1;
 
             if (hasSolidBlockBetween(min1, max1, player.getWorld(), safe)) {
@@ -244,7 +288,16 @@ public final class Flight extends Check {
             if (BlockAccess.isConsideredGround(world.getBlockAt(
                     origin.getBlockX(),
                     NumberConversions.floor(y),
-                    origin.getBlockZ()))) return true;
+                    origin.getBlockZ()))) {
+                final Block b = world.getBlockAt(
+                        origin.getBlockX(),
+                        NumberConversions.floor(y),
+                        origin.getBlockZ());
+
+                System.out.println(b.getType());
+                b.setType(Material.STONE);
+                return true;
+            }
         }
         return false;
     }
@@ -327,6 +380,7 @@ public final class Flight extends Check {
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
         verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
         safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
+        maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
 
         CheckTimings.registerTiming(checkType);
     }

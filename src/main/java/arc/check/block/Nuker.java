@@ -49,7 +49,7 @@ public final class Nuker extends PacketCheck {
     public Nuker() {
         super(CheckType.NUKER);
 
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -71,7 +71,7 @@ public final class Nuker extends PacketCheck {
         addConfigurationValue("kick-if-threshold-reached", false);
         addConfigurationValue("packet-kick-threshold", 100);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**
@@ -81,7 +81,7 @@ public final class Nuker extends PacketCheck {
      * @return the result
      */
     public boolean check(Player player) {
-        if (!enabled() || exempt(player) || creativeOnly && player.getGameMode() != GameMode.CREATIVE) return false;
+        if (!isEnabled() || exempt(player) || creativeOnly && player.getGameMode() != GameMode.CREATIVE) return false;
 
         final CheckResult result = new CheckResult();
         final long now = System.currentTimeMillis();

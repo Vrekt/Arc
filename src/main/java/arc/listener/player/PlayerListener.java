@@ -6,6 +6,7 @@ import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
 import arc.data.player.PlayerData;
 import arc.exemption.type.ExemptionType;
+import arc.world.WorldManager;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -49,11 +51,15 @@ public final class PlayerListener implements Listener {
      */
     @EventHandler
     private void onRegain(EntityRegainHealthEvent event) {
-        if (!regeneration.enabled() || !(event.getEntity() instanceof Player)) return;
+        if (!(event.getEntity() instanceof Player)) return;
 
         // only check if we have regained health from being satisfied.
-        if (regeneration.enabled() && event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {
+        if (event.getRegainReason()
+                == EntityRegainHealthEvent.RegainReason.SATIATED) {
             final Player player = (Player) event.getEntity();
+            if (!WorldManager.isEnabledInWorld(player)
+                    || !regeneration.isEnabled()) return;
+
             final PlayerData data = PlayerData.get(player);
             if (data.lastHealthRegain() != 0) {
                 final boolean check = regeneration.check(player, data);
@@ -72,11 +78,11 @@ public final class PlayerListener implements Listener {
      */
     @EventHandler
     private void onBow(EntityShootBowEvent event) {
-        if (!fastUse.enabled()) return;
-
         if (event.getEntity() instanceof Player
                 && event.getProjectile() instanceof Arrow) {
             final Player player = (Player) event.getEntity();
+            if (!WorldManager.isEnabledInWorld(player) || !fastUse.isEnabled()) return;
+
             final PlayerData data = PlayerData.get(player);
             if (data.lastBowShoot() == 0) {
                 data.lastBowShoot(System.currentTimeMillis());
@@ -131,6 +137,17 @@ public final class PlayerListener implements Listener {
     private void onRespawn(PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
         Arc.getInstance().getExemptionManager().removeExemption(player, ExemptionType.DEATH);
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    private void onWorldChange(PlayerChangedWorldEvent event) {
+        final Player player = event.getPlayer();
+
+        if (WorldManager.isEnabledWorld(player.getWorld())) {
+            WorldManager.setPlayerInEnabledWorld(player);
+        } else {
+            WorldManager.removePlayerInEnabledWorld(player);
+        }
     }
 
     /**

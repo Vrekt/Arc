@@ -5,10 +5,12 @@ import arc.configuration.values.ConfigurationSetting;
 import org.bukkit.BanList;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.List;
+
 /**
- * Allows easy reading and setting missing values
+ * A extendable utility for reading values, which will be set if non-existent.
  */
-public abstract class ConfigurableReader {
+public abstract class ConfigurationSettingReader {
 
     /**
      * Get a string
@@ -18,9 +20,9 @@ public abstract class ConfigurableReader {
      * @return the string
      */
     protected String getString(FileConfiguration configuration, ConfigurationSetting value) {
-        final String str = configuration.getString(value.valueName(), value.stringValue());
+        final String str = configuration.getString(value.valueName(), value.asString());
         if (!configuration.contains(value.valueName())) {
-            configuration.set(value.valueName(), value.stringValue());
+            configuration.set(value.valueName(), value.asString());
         }
         return str;
     }
@@ -33,9 +35,9 @@ public abstract class ConfigurableReader {
      * @return the int
      */
     protected int getInteger(FileConfiguration configuration, ConfigurationSetting value) {
-        final int number = configuration.getInt(value.valueName(), value.intValue());
+        final int number = configuration.getInt(value.valueName(), value.asInt());
         if (!configuration.contains(value.valueName())) {
-            configuration.set(value.valueName(), value.intValue());
+            configuration.set(value.valueName(), value.asInt());
         }
         return number;
     }
@@ -51,8 +53,8 @@ public abstract class ConfigurableReader {
         final String raw = configuration.getString(value.valueName());
         if (raw == null || (!raw.equalsIgnoreCase("IP")
                 && !raw.equalsIgnoreCase("NAME"))) {
-            configuration.set(value.valueName(), value.banListTypeValue().name());
-            return value.banListTypeValue();
+            configuration.set(value.valueName(), value.asBanListType().name());
+            return value.asBanListType();
         }
 
         return BanList.Type.valueOf(raw);
@@ -68,8 +70,8 @@ public abstract class ConfigurableReader {
     protected BanLengthType getBanLengthType(FileConfiguration configuration, ConfigurationSetting value) {
         final String raw = configuration.getString(value.valueName());
         if (raw == null) {
-            configuration.set(value.valueName(), value.banLengthTypeValue().name());
-            return value.banLengthTypeValue();
+            configuration.set(value.valueName(), value.asBanLengthType().name());
+            return value.asBanLengthType();
         }
         return BanLengthType.parse(raw);
     }
@@ -82,12 +84,28 @@ public abstract class ConfigurableReader {
      * @return the boolean
      */
     protected boolean getBoolean(FileConfiguration configuration, ConfigurationSetting value) {
-        final boolean b = configuration.getBoolean(value.valueName(), value.booleanValue());
+        final boolean b = configuration.getBoolean(value.valueName(), value.asBoolean());
 
         if (!configuration.contains(value.valueName())) {
-            configuration.set(value.valueName(), value.booleanValue());
+            configuration.set(value.valueName(), value.asBoolean());
         }
         return b;
+    }
+
+    /**
+     * Get a string list
+     *
+     * @param configuration the configuration
+     * @param value         the value
+     * @return the list
+     */
+    @SuppressWarnings("unchecked")
+    protected List<String> getStringList(FileConfiguration configuration, ConfigurationSetting value) {
+        final List<String> list = (List<String>) configuration.getList(value.valueName(), value.asList());
+        if (!configuration.contains(value.valueName())) {
+            configuration.set(value.valueName(), list);
+        }
+        return list;
     }
 
 }

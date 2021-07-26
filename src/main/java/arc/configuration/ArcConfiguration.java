@@ -8,10 +8,13 @@ import arc.configuration.values.ConfigurationSetting;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * The arc configuration
  */
-public final class ArcConfiguration extends Configurable {
+public final class ArcConfiguration extends ConfigurationSettingReader implements Configurable {
 
     /**
      * Handles ban configuration values
@@ -56,10 +59,15 @@ public final class ArcConfiguration extends Configurable {
      */
     private String prefix;
 
+    /**
+     * List of worlds enabled in
+     */
+    private final List<String> worldsEnabledIn = new ArrayList<>();
+
     @Override
-    public void read(FileConfiguration configuration) {
-        kickConfiguration.read(configuration);
-        banConfiguration.read(configuration);
+    public void readFromFile(FileConfiguration configuration) {
+        kickConfiguration.readFromFile(configuration);
+        banConfiguration.readFromFile(configuration);
 
         enableCheckTimings = getBoolean(configuration, ConfigurationSetting.ENABLE_CHECK_TIMINGS);
         enableTpsHelper = getBoolean(configuration, ConfigurationSetting.ENABLE_TPS_HELPER);
@@ -71,23 +79,20 @@ public final class ArcConfiguration extends Configurable {
         enableEventApi = getBoolean(configuration, ConfigurationSetting.ENABLE_EVENT_API);
         debugMessages = getBoolean(configuration, ConfigurationSetting.DEBUG_MESSAGES);
         useLiteBans = getBoolean(configuration, ConfigurationSetting.USE_LITE_BANS);
-
-        if(useLiteBans) {
-            Arc.getPlugin().getLogger().info("Arc will be using LiteBans to punish players.");
-        }
+        worldsEnabledIn.addAll(getStringList(configuration, ConfigurationSetting.ENABLED_WORLDS));
     }
 
     /**
      * @return the ban configuration
      */
-    public BanConfiguration banConfiguration() {
+    public BanConfiguration getBanConfiguration() {
         return banConfiguration;
     }
 
     /**
      * @return the kick configuration
      */
-    public KickConfiguration kickConfiguration() {
+    public KickConfiguration getKickConfiguration() {
         return kickConfiguration;
     }
 
@@ -161,14 +166,14 @@ public final class ArcConfiguration extends Configurable {
     /**
      * @return violation notify message
      */
-    public ConfigurationString violationNotifyMessage() {
+    public ConfigurationString getViolationMessage() {
         return new ConfigurationString(violationNotifyMessage);
     }
 
     /**
      * @return command no permission message
      */
-    public String commandNoPermissionMessage() {
+    public String getNoPermissionMessage() {
         return commandNoPermissionMessage;
     }
 
@@ -180,25 +185,23 @@ public final class ArcConfiguration extends Configurable {
     }
 
     /**
-     * @return the {@link FileConfiguration} from {@link Arc}
+     * @return get worlds list
      */
-    public FileConfiguration fileConfiguration() {
-        return Arc.getPlugin().getConfig();
+    public List<String> getWorldsEnabledIn() {
+        return worldsEnabledIn;
     }
 
     /**
-     * Reload the configuration
+     * Reload the configuration and all configurable components.
      */
-    public void reloadConfiguration() {
+    public void reloadConfigurationAndComponents() {
         Arc.getPlugin().reloadConfig();
 
-        final FileConfiguration configuration = Arc.getPlugin().getConfig();
-        read(configuration);
-
-        Arc.getInstance().getCheckManager().reload(this);
-        Arc.getInstance().getViolationManager().reload(this);
-        Arc.getInstance().getExemptionManager().reload(this);
-        Arc.getInstance().getPunishmentManager().reload(this);
+        this.readFromFile(Arc.getPlugin().getConfig());
+        Arc.getInstance().getCheckManager().reloadConfiguration(this);
+        Arc.getInstance().getViolationManager().reloadConfiguration(this);
+        Arc.getInstance().getExemptionManager().reloadConfiguration(this);
+        Arc.getInstance().getPunishmentManager().reloadConfiguration(this);
     }
 
 }

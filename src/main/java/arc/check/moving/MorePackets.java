@@ -27,7 +27,7 @@ public final class MorePackets extends Check {
 
     public MorePackets() {
         super(CheckType.MORE_PACKETS);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -43,7 +43,7 @@ public final class MorePackets extends Check {
         addConfigurationValue("kick-if-threshold-reached", true);
         addConfigurationValue("packet-kick-threshold", 50);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

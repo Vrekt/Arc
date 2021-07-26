@@ -23,7 +23,7 @@ import org.bukkit.scheduler.BukkitTask;
 /**
  * Represents a check.
  */
-public abstract class Check extends Configurable {
+public abstract class Check implements Configurable {
 
     /**
      * Exemption
@@ -91,7 +91,7 @@ public abstract class Check extends Configurable {
      * @param enabled enabled
      * @return this
      */
-    public Check enabled(boolean enabled) {
+    public Check isEnabled(boolean enabled) {
         builder.enabled(enabled);
         return this;
     }
@@ -267,6 +267,26 @@ public abstract class Check extends Configurable {
     }
 
     /**
+     * Handle a check violation.
+     *
+     * @param player   the player
+     * @param result   the result
+     * @param cancelTo the cancel To
+     * @return the result
+     */
+    protected boolean handleCheckViolation(Player player, CheckResult result, Location cancelTo) {
+        if (result.failed()) {
+            final ViolationResult vr = VIOLATION_MANAGER.violation(player, this, result);
+            if (vr.cancel()) {
+                player.teleport(cancelTo, PlayerTeleportEvent.TeleportCause.PLUGIN);
+            }
+            return vr.cancel();
+        }
+
+        return false;
+    }
+
+    /**
      * Set back the player
      *
      * @param player the player
@@ -342,11 +362,11 @@ public abstract class Check extends Configurable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         if (permanentlyDisabled) return;
         unload();
 
-        this.configuration.reload(configuration);
+        this.configuration.reloadConfiguration(configuration);
         if (this.configuration.enabled()) {
             reloadConfig();
         }
@@ -371,7 +391,7 @@ public abstract class Check extends Configurable {
     /**
      * @return {@code true} if the check is enabled.
      */
-    public boolean enabled() {
+    public boolean isEnabled() {
         return !permanentlyDisabled && configuration.enabled();
     }
 

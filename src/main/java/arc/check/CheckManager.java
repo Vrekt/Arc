@@ -1,11 +1,9 @@
 package arc.check;
 
 import arc.check.block.Nuker;
-import arc.check.block.blockplace.NoSwing;
-import arc.check.block.blockplace.Reach;
+import arc.check.combat.AttackReach;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
-import arc.check.combat.AttackReach;
 import arc.check.moving.*;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
@@ -23,7 +21,7 @@ import java.util.Set;
 /**
  * A check manager
  */
-public final class CheckManager extends Configurable implements Closeable {
+public final class CheckManager implements Configurable, Closeable {
 
     /**
      * All the checks
@@ -33,7 +31,7 @@ public final class CheckManager extends Configurable implements Closeable {
     /**
      * Populate the check map.
      */
-    public void initialize() {
+    public void initializeAllChecks() {
         add(new Criticals());
         add(new MorePackets());
         add(new NoFall());
@@ -65,11 +63,6 @@ public final class CheckManager extends Configurable implements Closeable {
         checks.add(check);
     }
 
-    @Override
-    public void reload(ArcConfiguration configuration) {
-        checks.forEach(check -> check.reload(configuration));
-    }
-
     /**
      * Get a check
      *
@@ -94,8 +87,14 @@ public final class CheckManager extends Configurable implements Closeable {
     }
 
     @Override
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        checks.forEach(check -> check.reloadConfiguration(configuration));
+    }
+
+    @Override
     public void close() {
         checks.forEach(Check::unload);
         checks.clear();
     }
+
 }

@@ -11,10 +11,12 @@ import arc.listener.combat.CombatPacketListener;
 import arc.listener.connection.PlayerConnectionListener;
 import arc.listener.moving.MovingEventListener;
 import arc.listener.moving.MovingPacketListener;
+import arc.listener.moving.task.MovingTaskListener;
 import arc.listener.player.PlayerListener;
 import arc.punishment.PunishmentManager;
 import arc.utility.MovingUtil;
 import arc.violation.ViolationManager;
+import arc.world.WorldManager;
 import bridge.Bridge;
 import bridge.Version;
 import bridge1_12.Bridge1_12;
@@ -37,7 +39,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.3.4";
+    public static final String VERSION_STRING = "2.4";
 
     /**
      * If sync events should be used.
@@ -115,10 +117,10 @@ public final class Arc extends JavaPlugin {
         getLogger().info("Registering checks and listeners...");
         loadExternalPlugins();
 
-        checkManager.initialize();
+        checkManager.initializeAllChecks();
         violationManager.initialize(arcConfiguration, punishmentManager);
-        punishmentManager.initialize(arcConfiguration);
-        exemptionManager.initialize(arcConfiguration);
+        punishmentManager.loadConfiguration(arcConfiguration);
+        exemptionManager.loadConfiguration(arcConfiguration);
 
         loadOnlinePlayers();
         registerListeners();
@@ -158,7 +160,7 @@ public final class Arc extends JavaPlugin {
      * Read configuration and validate a few things.
      */
     private void readConfiguration() {
-        arcConfiguration.read(getConfig());
+        arcConfiguration.readFromFile(getConfig());
 
         // check for lite bans
         if (arcConfiguration.useLiteBans()
@@ -182,6 +184,7 @@ public final class Arc extends JavaPlugin {
 
         new MovingPacketListener().register(protocolManager);
         new CombatPacketListener().register(protocolManager);
+        new MovingTaskListener();
     }
 
     /**
@@ -235,7 +238,7 @@ public final class Arc extends JavaPlugin {
             }
 
             useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
-            getLogger().info("Initialized Arc for Minecraft " + Bukkit.getMinecraftVersion());
+            getLogger().info("Initialized Arc for Minecraft " + Bukkit.getVersion());
             return true;
         }
     }
@@ -272,6 +275,8 @@ public final class Arc extends JavaPlugin {
                 .forEach(player -> {
                     violationManager.onPlayerJoin(player);
                     exemptionManager.onPlayerJoin(player);
+
+                    if (WorldManager.isEnabledWorld(player.getWorld())) WorldManager.setPlayerInEnabledWorld(player);
 
                     // calculate initial data.
                     final MovingData data = MovingData.get(player);

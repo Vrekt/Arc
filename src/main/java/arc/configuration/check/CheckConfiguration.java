@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * A check configuration format.
  */
-public final class CheckConfiguration extends Configurable {
+public final class CheckConfiguration implements Configurable {
 
     /**
      * The check for this configuration.
@@ -57,11 +57,13 @@ public final class CheckConfiguration extends Configurable {
     public CheckConfiguration(CheckType check, ConfigurationSection section) {
         this.check = check;
         this.section = section;
-        read(null);
+
+
+        readFromFile(null);
     }
 
     @Override
-    public void read(FileConfiguration configuration) {
+    public void readFromFile(FileConfiguration configuration) {
         // retrieve booleans
         enabled = section.getBoolean("enabled");
         cancel = section.getBoolean("cancel");
@@ -93,9 +95,9 @@ public final class CheckConfiguration extends Configurable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        this.section = configuration.fileConfiguration().getConfigurationSection(check.getName());
-        read(null);
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        this.section = Arc.getPlugin().getConfig().getConfigurationSection(check.getName());
+        readFromFile(null);
     }
 
     /**

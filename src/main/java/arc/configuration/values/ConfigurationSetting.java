@@ -3,6 +3,9 @@ package arc.configuration.values;
 import arc.configuration.types.BanLengthType;
 import org.bukkit.BanList;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * A map of configuration values
  */
@@ -28,7 +31,8 @@ public enum ConfigurationSetting {
     ENABLE_EVENT_API(new ConfigValue<>("enable-event-api", true)),
     DEBUG_MESSAGES(new ConfigValue<>("debug-messages", false)),
     USE_LITE_BANS(new ConfigValue<>("use-lite-bans", false)),
-    LITE_BANS_COMMAND(new ConfigValue<>("lite-bans-command", "%player% -s %length% %reason%"));
+    LITE_BANS_COMMAND(new ConfigValue<>("lite-bans-command", "%player% -s %length% %reason%")),
+    ENABLED_WORLDS(new ConfigValue<>("enabled-worlds", Arrays.asList("world", "world_the_nether", "world_the_end")));
 
     /**
      * The value
@@ -49,36 +53,43 @@ public enum ConfigurationSetting {
     /**
      * @return the string value
      */
-    public String stringValue() {
-        return value.stringValue();
+    public String asString() {
+        return value.asString();
     }
 
     /**
      * @return the boolean value
      */
-    public boolean booleanValue() {
-        return value.booleanValue();
+    public boolean asBoolean() {
+        return value.asBoolean();
     }
 
     /**
      * @return the int value
      */
-    public int intValue() {
-        return value.intValue();
+    public int asInt() {
+        return value.asInt();
     }
 
     /**
      * @return the ban list type value
      */
-    public BanList.Type banListTypeValue() {
-        return value.banListTypeValue();
+    public BanList.Type asBanListType() {
+        return value.asBanListType();
     }
 
     /**
      * @return the ban length type value
      */
-    public BanLengthType banLengthTypeValue() {
-        return value.banLengthTypeValue();
+    public BanLengthType asBanLengthType() {
+        return value.asBanLengthType();
+    }
+
+    /**
+     * @return the list type value
+     */
+    public List<String> asList() {
+        return value.asList();
     }
 
 }

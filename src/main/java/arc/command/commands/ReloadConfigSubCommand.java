@@ -22,7 +22,7 @@ public final class ReloadConfigSubCommand extends ArcSubCommand {
     public void execute(CommandSender sender, String[] arguments) {
         sendMessage(sender, ChatColor.DARK_AQUA + "Reloading....");
         try {
-            Arc.getInstance().getArcConfiguration().reloadConfiguration();
+            Arc.getInstance().getArcConfiguration().reloadConfigurationAndComponents();
             sendMessage(sender, ChatColor.DARK_AQUA + "Configuration reloaded.");
         } catch (Exception any) {
             any.printStackTrace();

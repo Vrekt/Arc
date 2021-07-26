@@ -25,10 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Handles punishment
- * TODO: Popular ban plugin support
  * TODO: Offline support
  */
-public final class PunishmentManager extends Configurable implements Closeable {
+public final class PunishmentManager implements Configurable, Closeable {
 
     /**
      * A set of players who have pending bans.
@@ -56,28 +55,20 @@ public final class PunishmentManager extends Configurable implements Closeable {
      */
     private boolean enableEventApi, useLiteBans;
 
-    /**
-     * Initialize
-     *
-     * @param configuration the arc config
-     */
-    public void initialize(ArcConfiguration configuration) {
-        read(configuration);
+    @Override
+    public void loadConfiguration(ArcConfiguration configuration) {
+        readFromArc(configuration);
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        read(configuration);
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        readFromArc(configuration);
     }
 
-    /**
-     * Read
-     *
-     * @param configuration the arc config
-     */
-    private void read(ArcConfiguration configuration) {
-        this.banConfiguration = configuration.banConfiguration();
-        this.kickConfiguration = configuration.kickConfiguration();
+    @Override
+    public void readFromArc(ArcConfiguration configuration) {
+        this.banConfiguration = configuration.getBanConfiguration();
+        this.kickConfiguration = configuration.getKickConfiguration();
 
         enableEventApi = configuration.enableEventApi();
         useLiteBans = configuration.useLiteBans();
@@ -254,7 +245,7 @@ public final class PunishmentManager extends Configurable implements Closeable {
 
         // ban the player and kick them
         Bukkit.getBanList(type).addBan(playerBan, message, date, message);
-        BukkitAccess.kickPlayer(player, message);
+        if (player.isOnline()) BukkitAccess.kickPlayer(player, message);
 
         pendingPlayerBans.remove(player);
 

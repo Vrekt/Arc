@@ -36,7 +36,7 @@ public final class Jesus extends Check {
 
     public Jesus() {
         super(CheckType.JESUS);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -53,7 +53,7 @@ public final class Jesus extends Check {
         addConfigurationValue("ascending-min-distance-required", 0.12);
         addConfigurationValue("ascending-min-difference-distance", 0.05);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

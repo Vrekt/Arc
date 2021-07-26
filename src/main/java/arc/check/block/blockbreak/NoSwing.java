@@ -13,7 +13,7 @@ public final class NoSwing extends AbstractBlockNoSwingCheck {
 
     @Override
     protected void buildCheckConfiguration() {
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)

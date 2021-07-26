@@ -32,7 +32,7 @@ public final class NoFall extends Check {
 
     public NoFall() {
         super(CheckType.NOFALL);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -44,7 +44,7 @@ public final class NoFall extends Check {
         addConfigurationValue("expected-fall-distance-tolerance", 1.0);
         addConfigurationValue("invalid-ground-moves-allowed", 50);
         addConfigurationValue("distance-fallen-threshold", 2.5);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

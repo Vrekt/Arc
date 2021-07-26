@@ -34,7 +34,7 @@ public abstract class AbstractBlockNoSwingCheck extends MultiVersionCheck {
         addValueToVersion(Version.VERSION_1_8, "swing-time", 100);
         addValueToVersion(Version.VERSION_1_12, "swing-time", 1000);
         addValueToVersion(Version.VERSION_1_16, "swing-time", 1000);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**
@@ -92,7 +92,7 @@ public abstract class AbstractBlockNoSwingCheck extends MultiVersionCheck {
      * @param player the player
      */
     public boolean check(Player player) {
-        if (!enabled() || exempt(player)) return false;
+        if (!isEnabled() || exempt(player)) return false;
         return version.check(player, CombatData.get(player));
     }
 

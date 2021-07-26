@@ -26,7 +26,7 @@ public final class DebugSubCommand extends ArcSubCommand {
         Arc.getInstance().getArcConfiguration().setDebugMessagesState(state);
 
         // save config state.
-        Arc.getInstance().getArcConfiguration().fileConfiguration().set(ConfigurationSetting.DEBUG_MESSAGES.valueName(), state);
+        Arc.getPlugin().getConfig().set(ConfigurationSetting.DEBUG_MESSAGES.valueName(), state);
         sendMessage(sender, ChatColor.DARK_AQUA + "Debug messages are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
     }
 }

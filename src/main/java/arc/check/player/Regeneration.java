@@ -20,7 +20,7 @@ public final class Regeneration extends MultiVersionCheck {
     public Regeneration() {
         super(CheckType.REGENERATION);
 
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -36,7 +36,7 @@ public final class Regeneration extends MultiVersionCheck {
         addValueToVersion(Version.VERSION_1_8, "regeneration-time-minimum", 3400);
         addValueToVersion(Version.VERSION_1_12, "regeneration-time-minimum", 450);
         addValueToVersion(Version.VERSION_1_16, "regeneration-time-minimum", 450);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

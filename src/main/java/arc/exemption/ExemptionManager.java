@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Manages player exemptions
  */
-public final class ExemptionManager extends Configurable implements Closeable {
+public final class ExemptionManager implements Configurable, Closeable {
 
     /**
      * ExemptionHistory by player
@@ -31,17 +31,13 @@ public final class ExemptionManager extends Configurable implements Closeable {
      */
     private boolean useEvents;
 
-    /**
-     * Initialize
-     *
-     * @param configuration the config
-     */
-    public void initialize(ArcConfiguration configuration) {
+    @Override
+    public void loadConfiguration(ArcConfiguration configuration) {
         useEvents = configuration.enableEventApi();
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         useEvents = configuration.enableEventApi();
     }
 

@@ -29,7 +29,7 @@ public final class FastUse extends PacketCheck {
 
     public FastUse() {
         super(CheckType.FAST_USE);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -43,7 +43,7 @@ public final class FastUse extends PacketCheck {
         addConfigurationValue(CheckSubType.FAST_USE_FAST_BOW, "delta-shot-min", 200);
         addConfigurationValue(CheckSubType.FAST_USE_FAST_CONSUME, "consume-time-ms", 1400);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**
@@ -73,7 +73,7 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public boolean checkFastBow(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return false;
+        if (!isEnabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return false;
 
         final long lastUse = data.lastBowUse();
         final long lastShot = data.lastBowShoot();
@@ -103,7 +103,7 @@ public final class FastUse extends PacketCheck {
      * @return the result
      */
     public boolean checkFastConsume(Player player, PlayerData data) {
-        if (!enabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_CONSUME)) return false;
+        if (!isEnabled() || exempt(player) || exempt(player, CheckSubType.FAST_USE_FAST_CONSUME)) return false;
 
         // the time it took to consume the item
         final long delta = System.currentTimeMillis() - data.consumeStartTime();

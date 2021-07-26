@@ -40,6 +40,13 @@ public final class MovingData implements Data {
     }
 
     /**
+     * @return temporary moving data
+     */
+    public static MovingData retrieveTemporary() {
+        return new MovingData();
+    }
+
+    /**
      * From movement
      * To movement
      * the ground location
@@ -83,8 +90,9 @@ public final class MovingData implements Data {
      * The time we have been on ground
      * The time we have been descending
      * The time we have been ascending
+     * The time in air
      */
-    private int onGroundTime, descendingTime, ascendingTime;
+    private int onGroundTime, descendingTime, ascendingTime, inAirTime;
 
     /**
      * Sneaking time and sprint time
@@ -594,5 +602,13 @@ public final class MovingData implements Data {
 
     public void setLastSafeUpdate(long lastSafeUpdate) {
         this.lastSafeUpdate = lastSafeUpdate;
+    }
+
+    public int getInAirTime() {
+        return inAirTime;
+    }
+
+    public void setInAirTime(int inAirTime) {
+        this.inAirTime = MathUtil.clampInt(inAirTime, 0, 100);
     }
 }

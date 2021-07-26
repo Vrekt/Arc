@@ -110,8 +110,10 @@ public final class MovingUtil {
                 if (!wasOnIce) data.incrementOffIceTime();
             }
 
+            data.setInAirTime(0);
         } else {
             data.onGroundTime(0);
+            data.setInAirTime(data.getInAirTime() + 1);
 
             // extra modifier
             final boolean hasSlimeblock = BlockAccess.isSlimeblock(to.getBlock().getRelative(0, -2, 0));
@@ -176,7 +178,6 @@ public final class MovingUtil {
         final boolean inLiquid = MovingUtil.isInOrOnLiquid(cloneTo);
         data.inLiquid(inLiquid);
         data.lastMovingUpdate(now);
-
     }
 
 }

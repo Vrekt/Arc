@@ -1,7 +1,9 @@
 package arc.configuration.ban;
 
+import arc.Arc;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
+import arc.configuration.ConfigurationSettingReader;
 import arc.configuration.types.BanLengthType;
 import arc.configuration.types.ConfigurationString;
 import arc.configuration.values.ConfigurationSetting;
@@ -13,7 +15,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 /**
  * The ban configuration
  */
-public final class BanConfiguration extends Configurable {
+public final class BanConfiguration extends ConfigurationSettingReader implements Configurable {
 
     /**
      * The global ban message
@@ -61,7 +63,7 @@ public final class BanConfiguration extends Configurable {
     private String liteBansCommand;
 
     @Override
-    public void read(FileConfiguration configuration) {
+    public void readFromFile(FileConfiguration configuration) {
         globalBanMessage = new ConfigurationString(ChatColor.translateAlternateColorCodes('&', getString(configuration, ConfigurationSetting.GLOBAL_BAN_MESSAGE)));
         globalBanDelay = getInteger(configuration, ConfigurationSetting.GLOBAL_BAN_DELAY);
         globalBanType = getBanListType(configuration, ConfigurationSetting.GLOBAL_BAN_TYPE);
@@ -74,8 +76,8 @@ public final class BanConfiguration extends Configurable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
-        read(configuration.fileConfiguration());
+    public void reloadConfiguration(ArcConfiguration configuration) {
+        readFromFile(Arc.getPlugin().getConfig());
     }
 
     /**

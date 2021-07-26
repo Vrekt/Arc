@@ -35,7 +35,7 @@ public final class AttackReach extends Check {
 
     public AttackReach() {
         super(CheckType.ATTACK_REACH);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -51,7 +51,7 @@ public final class AttackReach extends Check {
         addConfigurationValue("default-eye-height", 1.75);
         addConfigurationValue("subtract-player-velocity", true);
         addConfigurationValue("subtract-entity-velocity", true);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

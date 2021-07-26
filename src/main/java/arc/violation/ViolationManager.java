@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Manages violations
  */
-public final class ViolationManager extends Configurable implements Closeable {
+public final class ViolationManager implements Configurable, Closeable {
 
     /**
      * Violation history
@@ -131,7 +131,7 @@ public final class ViolationManager extends Configurable implements Closeable {
             violationResult.addResult(ViolationResult.Result.NOTIFY);
             // replace the place holders within the message
 
-            final String violationMessage = configuration.violationNotifyMessage()
+            final String violationMessage = configuration.getViolationMessage()
                     .player(player)
                     .check(check, result.hasSubType() ? "(" + result.subType().prettyName() + ")" : null)
                     .level(level)
@@ -208,7 +208,7 @@ public final class ViolationManager extends Configurable implements Closeable {
     }
 
     @Override
-    public void reload(ArcConfiguration configuration) {
+    public void reloadConfiguration(ArcConfiguration configuration) {
         this.configuration = configuration;
 
         historyCache.invalidateAll();

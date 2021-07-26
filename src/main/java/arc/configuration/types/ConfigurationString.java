@@ -100,7 +100,7 @@ public final class ConfigurationString {
      * @return this
      */
     public ConfigurationString type() {
-        value = StringUtils.replace(value, Placeholders.TYPE.placeholder(), Arc.getInstance().getArcConfiguration().banConfiguration().globalBanLengthType().prettyName());
+        value = StringUtils.replace(value, Placeholders.TYPE.placeholder(), Arc.getInstance().getArcConfiguration().getBanConfiguration().globalBanLengthType().prettyName());
         return this;
     }
 

@@ -29,7 +29,7 @@ public final class NoSwing extends MultiVersionCheck {
     public NoSwing() {
         super(CheckType.NO_SWING);
 
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -45,7 +45,7 @@ public final class NoSwing extends MultiVersionCheck {
         addValueToVersion(Version.VERSION_1_8, "swing-time", 100);
         addValueToVersion(Version.VERSION_1_12, "swing-time", 1000);
         addValueToVersion(Version.VERSION_1_16, "swing-time", 1000);
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

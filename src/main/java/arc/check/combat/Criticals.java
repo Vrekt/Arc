@@ -25,7 +25,7 @@ public final class Criticals extends Check {
 
     public Criticals() {
         super(CheckType.CRITICALS);
-        enabled(true)
+        isEnabled(true)
                 .cancel(true)
                 .cancelLevel(0)
                 .notify(true)
@@ -39,7 +39,7 @@ public final class Criticals extends Check {
         addConfigurationValue("max-similar-movement-allowed", 3);
         addConfigurationValue("min-similar-movement-difference", 0.05);
 
-        if (enabled()) load();
+        if (isEnabled()) load();
     }
 
     /**

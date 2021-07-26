@@ -1,13 +1,14 @@
 package arc.listener.moving;
 
 import arc.Arc;
-import arc.check.types.CheckType;
 import arc.check.moving.Flight;
 import arc.check.moving.Jesus;
 import arc.check.moving.NoFall;
 import arc.check.moving.Speed;
+import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.utility.MovingUtil;
+import arc.world.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -52,6 +53,8 @@ public final class MovingEventListener implements Listener {
         if (event.getFrom().getWorld() != event.getTo().getWorld()) return;
 
         Player player = event.getPlayer();
+        if (!WorldManager.isEnabledInWorld(player)) return;
+
         MovingData data = MovingData.get(player);
 
         Location from = event.getFrom();
@@ -64,7 +67,6 @@ public final class MovingEventListener implements Listener {
             // run checks
             runChecks(player, data);
         }
-
 
         // check if we have moved but only from block to another block.
         boolean hasMovedByBlock = from.getBlockX() != to.getBlockX() || from.getBlockY() != to.getBlockY()
@@ -81,11 +83,11 @@ public final class MovingEventListener implements Listener {
      * @param data   their data
      */
     private void runChecks(Player player, MovingData data) {
-        if (flight.enabled()) {
+        if (flight.isEnabled()) {
             flight.check(player, data);
         }
 
-        if (noFall.enabled()) {
+        if (noFall.isEnabled()) {
             noFall.check(player, data);
         }
     }
@@ -97,6 +99,6 @@ public final class MovingEventListener implements Listener {
      * @param data   their data
      */
     private void runBlockChecks(Player player, MovingData data) {
-        if (jesus.enabled()) jesus.check(player, data);
+        if (jesus.isEnabled()) jesus.check(player, data);
     }
 }
