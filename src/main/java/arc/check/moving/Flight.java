@@ -10,9 +10,7 @@ import arc.utility.api.BukkitAccess;
 import arc.utility.block.BlockAccess;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
@@ -288,17 +286,9 @@ public final class Flight extends Check {
             if (BlockAccess.isConsideredGround(world.getBlockAt(
                     origin.getBlockX(),
                     NumberConversions.floor(y),
-                    origin.getBlockZ()))) {
-                final Block b = world.getBlockAt(
-                        origin.getBlockX(),
-                        NumberConversions.floor(y),
-                        origin.getBlockZ());
-
-                System.out.println(b.getType());
-                b.setType(Material.STONE);
-                return true;
-            }
+                    origin.getBlockZ()))) return true;
         }
+
         return false;
     }
 
