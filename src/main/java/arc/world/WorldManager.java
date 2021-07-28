@@ -57,4 +57,11 @@ public final class WorldManager {
         PLAYERS_IN_ENABLED_WORLD.remove(player.getUniqueId());
     }
 
+    /**
+     * Shutdown
+     */
+    public static void shutdown() {
+        PLAYERS_IN_ENABLED_WORLD.clear();
+    }
+
 }

@@ -55,6 +55,7 @@ public final class CheckTimings {
      */
     public static void startTiming(CheckType theCheck, UUID identifier) {
         if (!ENABLED) return;
+        purge(theCheck);
 
         STARTED_TIMINGS.get(theCheck).put(identifier, System.nanoTime());
     }
@@ -67,6 +68,7 @@ public final class CheckTimings {
      */
     public static void stopTiming(CheckType theCheck, UUID identifier) {
         if (!ENABLED) return;
+        purge(theCheck);
 
         final long start = STARTED_TIMINGS.get(theCheck).getOrDefault(identifier, -1L);
         if (start == -1) return;
@@ -75,6 +77,20 @@ public final class CheckTimings {
         TIMINGS.get(theCheck).add(diff);
     }
 
+    /**
+     * Purge entries
+     *
+     * @param theCheck the check
+     */
+    private static void purge(CheckType theCheck) {
+        if (STARTED_TIMINGS.get(theCheck).size() >= 100000) {
+            STARTED_TIMINGS.get(theCheck).clear();
+        }
+
+        if (TIMINGS.get(theCheck).size() >= 100000) {
+            TIMINGS.get(theCheck).clear();
+        }
+    }
 
     /**
      * Get the average timing for the check
@@ -98,4 +114,13 @@ public final class CheckTimings {
     public static ConcurrentMap<CheckType, Set<Long>> getAllTimings() {
         return TIMINGS;
     }
+
+    /**
+     * Shutdown
+     */
+    public static void shutdown() {
+        STARTED_TIMINGS.clear();
+        TIMINGS.clear();
+    }
+
 }

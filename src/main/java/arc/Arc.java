@@ -1,6 +1,7 @@
 package arc;
 
 import arc.check.CheckManager;
+import arc.check.timing.CheckTimings;
 import arc.command.ArcCommand;
 import arc.configuration.ArcConfiguration;
 import arc.data.Data;
@@ -39,7 +40,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.4";
+    public static final String VERSION_STRING = "2.4.1.1";
 
     /**
      * If sync events should be used.
@@ -148,6 +149,8 @@ public final class Arc extends JavaPlugin {
         violationManager.close();
         checkManager.close();
         punishmentManager.close();
+        WorldManager.shutdown();
+        CheckTimings.shutdown();
 
         getLogger().info("Removing player data...");
         Bukkit.getOnlinePlayers().forEach(Data::removeAll);
