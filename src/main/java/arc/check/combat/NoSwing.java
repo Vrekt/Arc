@@ -1,7 +1,7 @@
 package arc.check.combat;
 
-import arc.check.compatibility.CheckVersion;
-import arc.check.implementations.MultiVersionCheck;
+import arc.Arc;
+import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.combat.CombatData;
@@ -15,16 +15,12 @@ import org.bukkit.entity.Player;
  * TODO: Schedule timer after an attack to check if we received a swing packet then.
  * TODO: But depending on attack speed, could be bypassed, so maybe check swing packets == attack packets
  */
-public final class NoSwing extends MultiVersionCheck {
-    /**
-     * The minimum swing time allowed.
-     */
-    private long swingTime;
+public final class NoSwing extends Check {
 
     /**
-     * The current version to check.
+     * The max swing time allowed.
      */
-    private CheckVersion<CombatData> version;
+    private long swingTime;
 
     public NoSwing() {
         super(CheckType.NO_SWING);
@@ -38,13 +34,8 @@ public final class NoSwing extends MultiVersionCheck {
                 .kick(false)
                 .build();
 
-        registerVersion(Version.VERSION_1_8);
-        registerVersion(Version.VERSION_1_12);
-        registerVersion(Version.VERSION_1_16);
-
-        addValueToVersion(Version.VERSION_1_8, "swing-time", 100);
-        addValueToVersion(Version.VERSION_1_12, "swing-time", 1000);
-        addValueToVersion(Version.VERSION_1_16, "swing-time", 1000);
+        addConfigurationValue("max-swing-time-old", 100);
+        addConfigurationValue("max-swing-time-new", 1000);
         if (isEnabled()) load();
     }
 
@@ -57,7 +48,7 @@ public final class NoSwing extends MultiVersionCheck {
      */
     private boolean checkLegacyNoSwing(Player player, CombatData data) {
         final long delta = System.currentTimeMillis() - data.lastSwingTime();
-        if (delta > swingTime) {
+        if (delta >= swingTime) {
             final CheckResult result = new CheckResult();
             result.setFailed("No swing animation within time")
                     .withParameter("delta", delta)
@@ -100,7 +91,8 @@ public final class NoSwing extends MultiVersionCheck {
      */
     public boolean check(Player player, CombatData data) {
         if (exempt(player)) return false;
-        return version.check(player, data);
+        return Arc.getMCVersion() == Version.VERSION_1_8 ? checkLegacyNoSwing(player, data)
+                : checkNewNoSwing(player, data);
     }
 
     @Override
@@ -110,7 +102,7 @@ public final class NoSwing extends MultiVersionCheck {
 
     @Override
     public void load() {
-        version = VERSION == Version.VERSION_1_8 ? this::checkLegacyNoSwing : this::checkNewNoSwing;
-        swingTime = getVersionSection().getLong("swing-time");
+        swingTime = Arc.getMCVersion() == Version.VERSION_1_8 ? configuration.getLong("max-swing-time-old")
+                : configuration.getLong("max-swing-time-new");
     }
 }

@@ -5,6 +5,8 @@ import arc.check.result.CheckResult;
 import arc.check.timing.CheckTimings;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
+import arc.utility.MovingAccess;
+import arc.utility.api.BukkitAccess;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -65,6 +67,12 @@ public final class Jesus extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
 
+        // ignore elytra movements for now.
+        // TODO: Maybe change in future, depending
+        if (BukkitAccess.isFlyingWithElytra(player)) {
+            return;
+        }
+
         startTiming(player);
         final Location to = data.to();
         final boolean liquid = data.inLiquid();
@@ -75,7 +83,7 @@ public final class Jesus extends Check {
             data.noDistanceChanges(0);
         }
 
-        if (liquid && !data.onGround() && !player.isInsideVehicle()) {
+        if (liquid && !data.onGround() && !player.isInsideVehicle() && !MovingAccess.isOnBoat(player)) {
             // retrieve whats needed to check.
             final CheckResult result = new CheckResult();
             final boolean clientGround = data.clientOnGround();

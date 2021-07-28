@@ -1,7 +1,6 @@
-package arc.check.implementations;
+package arc.check;
 
 import arc.Arc;
-import arc.check.Check;
 import arc.check.types.CheckType;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;

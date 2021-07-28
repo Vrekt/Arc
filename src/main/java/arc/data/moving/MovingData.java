@@ -105,6 +105,11 @@ public final class MovingData implements Data {
     private int sneakTime, sprintTime, onIceTime, offIceTime, invalidGround, liquidTime, climbTime;
 
     /**
+     * Out of liquid time
+     */
+    private int outOfLiquidTime;
+
+    /**
      * The current and last vertical distance
      */
     private double vertical, lastVertical;
@@ -514,6 +519,14 @@ public final class MovingData implements Data {
 
     public void liquidTime(int liquidTime) {
         this.liquidTime = MathUtil.clampInt(liquidTime, 0, 100);
+    }
+
+    public int getOutOfLiquidTime() {
+        return outOfLiquidTime;
+    }
+
+    public void setOutOfLiquidTime(int outOfLiquidTime) {
+        this.outOfLiquidTime = MathUtil.clampInt(outOfLiquidTime, 0, 100);
     }
 
     public Location waterLocation() {

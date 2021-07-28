@@ -5,6 +5,7 @@ import arc.check.combat.AttackReach;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.moving.*;
+import arc.check.moving.Flight;
 import arc.check.network.PayloadFrequency;
 import arc.check.network.SwingFrequency;
 import arc.check.player.FastUse;

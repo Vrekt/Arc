@@ -1,7 +1,7 @@
 package arc.check.block;
 
 import arc.Arc;
-import arc.check.implementations.PacketCheck;
+import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.block.BlockData;

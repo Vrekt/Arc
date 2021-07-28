@@ -63,4 +63,12 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
         return player.getPotionEffect(type);
     }
 
+    /**
+     * TODO
+     */
+    @Override
+    public boolean isFlyingWithElytra(Player player) {
+        return player.isGliding();
+    }
+
 }

@@ -1,16 +1,19 @@
 package arc.check.moving;
 
+import arc.Arc;
 import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.timing.CheckTimings;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
-import arc.utility.MovingUtil;
+import arc.utility.MovingAccess;
 import arc.utility.api.BukkitAccess;
 import arc.utility.block.BlockAccess;
 import arc.utility.math.MathUtil;
+import bridge.Version;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
@@ -35,15 +38,29 @@ public final class Flight extends Check {
     /**
      * The minimum distance required to move to check vclip.
      * The minimum distance required to update the players safe location.
+     * <p>
+     * Minimum speed boat can fall
+     * If player score is greater than this value (the player speed doesn't match expected), flag.
      */
-    private double verticalClipMinimum, safeDistanceUpdateThreshold;
+    private double verticalClipMinimum, safeDistanceUpdateThreshold, minBoatDescendSpeed, boatDescendingScoreMin;
 
     /**
      * The max ascend time
      * The amount to add to {@code maxAscendTime} when the player has jump boost.
      * Max time allowed to be hovering.
+     * <p>
+     * The time to wait being out of liquid before checking boat fly
+     * Minimum time to wait before checking boat descending
      */
-    private int maxAscendTime, jumpBoostAscendAmplifier, maxInAirHoverTime;
+    private int maxAscendTime, jumpBoostAscendAmplifier, maxInAirHoverTime, boatFlyOutOfLiquidTime, boatDescendingTime;
+
+    /**
+     * If the player should be kicked from the boat on flag.
+     * If the player should be teleported to the ground.
+     */
+    private boolean kickPlayerFromBoat, teleportAfterKickFromBoat;
+
+    private final boolean isLegacy;
 
     public Flight() {
         super(CheckType.FLIGHT);
@@ -68,6 +85,16 @@ public final class Flight extends Check {
         addConfigurationValue("vertical-clip-vertical-minimum", 0.99);
         addConfigurationValue("safe-location-update-distance-threshold", 1.99);
         addConfigurationValue("max-in-air-hover-time", 6);
+
+        addConfigurationValue("boat-fly-out-of-liquid-time", 5);
+        addConfigurationValue("kick-player-from-boat", true);
+        addConfigurationValue("teleport-player-after-kicked-from-boat", true);
+        addConfigurationValue("min-boat-descend-speed", 0.11);
+        addConfigurationValue("min-boat-descending-time", 5);
+        addConfigurationValue("boat-descending-score-min", 0.15);
+
+        isLegacy = Arc.getMCVersion() == Version.VERSION_1_8;
+
         if (isEnabled()) load();
     }
 
@@ -80,20 +107,19 @@ public final class Flight extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
 
-        startTiming(player);
-        final CheckResult result = new CheckResult();
+        // TODO: Elytra support later, for now ignore gliding players.
+        if (BukkitAccess.isFlyingWithElytra(player)) {
+            return;
+        }
 
-        // from, to, ground and safe location(s)
+        final CheckResult result = new CheckResult();
         final Location from = data.from();
         final Location to = data.to();
         final Location ground = data.ground();
         final Location safe = data.getSafeLocation();
 
-        final long now = System.currentTimeMillis();
         final double vertical = data.vertical();
-
-        // initially, update any moving data we may need.
-        updateMovingData(data, safe, to, now);
+        startTiming(player);
 
         // check if the player is on skulls, slabs, stairs, fences, gates, beds, etc.
         final boolean hasVerticalModifier = BlockAccess.hasVerticalModifierAt(to, to.getWorld(), 0.3, -0.1, 0.3)
@@ -126,10 +152,13 @@ public final class Flight extends Check {
         }
 
         // update safe location if not failed and on ground.
-        if (!result.hasFailedBefore() && data.onGround()) {
+        if (!result.hasFailedBefore()
+                && data.onGround()) {
             data.setSafeLocation(to);
             data.setLastSafeUpdate(System.currentTimeMillis());
         }
+
+        if (!isLegacy) runNonLegacyChecks(player, data, ground, from, to, vertical, data.ascendingTime(), result);
 
         debug(player, "Vertical: " + vertical);
         stopTiming(player);
@@ -148,9 +177,13 @@ public final class Flight extends Check {
     public void checkNoMovement(Player player, MovingData data) {
         if (exempt(player)) return;
 
+        // don't wanna update the current player moving data set
+        // in-case it causes issues else-where, so for now use a temporary one
+        // to retrieve stuff we need right now
         final MovingData temp = MovingData.retrieveTemporary();
-        MovingUtil.calculateMovement(temp, data.to(), player.getLocation());
+        MovingAccess.updatePlayerMovingData(temp, data.to(), player.getLocation());
 
+        // update in-air time here since we're not moving or calculating movement.
         int inAirTime = data.getInAirTime();
         if (!temp.onGround()) {
             data.setInAirTime(data.getInAirTime() + 1);
@@ -159,9 +192,12 @@ public final class Flight extends Check {
             data.setInAirTime(0);
         }
 
-        if (!temp.onGround() && temp.vertical() == 0.0) {
+        if (!temp.onGround() && temp.vertical() == 0.0 && !MovingAccess.isOnBoat(player)) {
             // player is hovering
             if (inAirTime >= maxInAirHoverTime) {
+
+                player.sendMessage("BOAT: " + MovingAccess.isOnBoat(player));
+
                 // flag player, hovering too long.
                 final CheckResult result = new CheckResult();
                 result.setFailed("Hovering off the ground for too long")
@@ -172,6 +208,95 @@ public final class Flight extends Check {
             }
         }
 
+    }
+
+    /**
+     * Run checks are meant for versions newer than 1.8
+     *
+     * @param player        the player
+     * @param data          their data
+     * @param ground        ground location
+     * @param from          the from
+     * @param to            movedTo
+     * @param vertical      vertical
+     * @param ascendingTime ascendingTime
+     * @param result        result
+     */
+    private void runNonLegacyChecks(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
+        if (player.isInsideVehicle() && player.getVehicle() instanceof Boat)
+            checkEntityMovement(player, data, ground, from, to, vertical, ascendingTime, result);
+    }
+
+    /**
+     * Checks entity related movement.
+     * <p>
+     * Meant to block boat fly in 1.9+ newer versions.
+     *
+     * @param player        the player
+     * @param data          their data
+     * @param ground        ground location
+     * @param from          the from
+     * @param to            movedTo
+     * @param vertical      vertical
+     * @param ascendingTime ascendingTime
+     * @param result        result
+     */
+    private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
+        // attempt to find liquid in a large range.
+        final boolean findAnyLiquid = data.inLiquid() || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
+
+        final int outOfLiquidTime = findAnyLiquid ? 0 : data.getOutOfLiquidTime() + 1;
+        data.setOutOfLiquidTime(outOfLiquidTime);
+        // no liquid and we haven't been in any in awhile, check.
+        if (!findAnyLiquid
+                && outOfLiquidTime >= boatFlyOutOfLiquidTime) {
+            // +2 ascending time to be extra safe
+            if (data.ascending() && ascendingTime >= 2) {
+                // not possible, flag.
+                result.setFailed("Ascending while in a boat")
+                        .withParameter("outOfLiquidTime", outOfLiquidTime)
+                        .withParameter("max", boatFlyOutOfLiquidTime)
+                        .withParameter("ascendingTime", ascendingTime)
+                        .withParameter("max", 2);
+
+                if (kickPlayerFromBoat) player.leaveVehicle();
+                handleCheckViolationAndReset(player, result, teleportAfterKickFromBoat ? ground : null);
+            }
+
+            // check if player is falling too slow in boat.
+            final Boat boat = (Boat) player.getVehicle();
+            if (boat != null) {
+                final boolean boatOnGround = MovingAccess.onGround(boat.getLocation());
+
+                // ensure we are descending for a decent amount of time first.
+                if (data.descending() && data.descendingTime() >= boatDescendingTime && !boatOnGround) {
+                    if (vertical < minBoatDescendSpeed) {
+                        // too slow regardless, flag
+                        result.setFailed("descending too slow in a boat")
+                                .withParameter("vertical", vertical)
+                                .withParameter("min", minBoatDescendSpeed);
+
+                        if (kickPlayerFromBoat) player.leaveVehicle();
+                        handleCheckViolationAndReset(player, result, teleportAfterKickFromBoat ? ground : null);
+                    } else {
+                        final double expected = MathUtil.vertical(from, to) - 0.1;
+                        final double score = Math.abs(vertical - expected);
+
+                        if (score >= boatDescendingScoreMin) {
+                            // player falling too slow.
+                            result.setFailed("descending too slow in a boat")
+                                    .withParameter("vertical", vertical)
+                                    .withParameter("expected", expected)
+                                    .withParameter("score", score)
+                                    .withParameter("min", boatDescendingScoreMin);
+
+                            if (kickPlayerFromBoat) player.leaveVehicle();
+                            handleCheckViolationAndReset(player, result, teleportAfterKickFromBoat ? ground : null);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -331,28 +456,6 @@ public final class Flight extends Check {
         return current;
     }
 
-    /**
-     * Update moving data before checking flight.
-     * <p>
-     * Currently will update if safe locations can be set or not.
-     * <p>
-     *
-     * @param data the data
-     * @param safe the safe location
-     * @param to   the to location
-     * @param time the current time
-     */
-    private void updateMovingData(MovingData data, Location safe, Location to, long time) {
-        if ((time - data.getLastSafeUpdate() >= 1500)) {
-            final double distance = MathUtil.distance(safe, to);
-            if (distance >= safeDistanceUpdateThreshold && data.onGround()) {
-                // TODO: Needs fixing.
-            }
-        }
-
-        data.climbTime(data.hasClimbable() ? data.climbTime() + 1 : 0);
-    }
-
     @Override
     public void reloadConfig() {
         load();
@@ -371,6 +474,12 @@ public final class Flight extends Check {
         verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
         safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
+        boatFlyOutOfLiquidTime = configuration.getInt("boat-fly-out-of-liquid-time");
+        kickPlayerFromBoat = configuration.getBoolean("kick-player-from-boat");
+        teleportAfterKickFromBoat = configuration.getBoolean("teleport-player-after-kicked-from-boat");
+        minBoatDescendSpeed = configuration.getDouble("min-boat-descend-speed");
+        boatDescendingTime = configuration.getInt("min-boat-descending-time");
+        boatDescendingScoreMin = configuration.getDouble("boat-descending-score-min");
 
         CheckTimings.registerTiming(checkType);
     }

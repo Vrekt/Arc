@@ -3,7 +3,7 @@ package arc.listener.connection;
 import arc.Arc;
 import arc.data.Data;
 import arc.data.moving.MovingData;
-import arc.utility.MovingUtil;
+import arc.utility.MovingAccess;
 import arc.world.WorldManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -42,7 +42,7 @@ public final class PlayerConnectionListener implements Listener {
      */
     private void initializePlayerData(Player player) {
         final MovingData data = MovingData.get(player);
-        MovingUtil.calculateMovement(data, player.getLocation(), player.getLocation());
+        MovingAccess.updatePlayerMovingData(data, player.getLocation(), player.getLocation());
     }
 
 }

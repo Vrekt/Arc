@@ -1,7 +1,7 @@
 package arc.check.block;
 
-import arc.check.compatibility.CheckVersion;
-import arc.check.implementations.MultiVersionCheck;
+import arc.Arc;
+import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.combat.CombatData;
@@ -11,29 +11,20 @@ import org.bukkit.entity.Player;
 /**
  * Provides a general base for block no swing checks.
  */
-public abstract class AbstractBlockNoSwingCheck extends MultiVersionCheck {
+public abstract class AbstractBlockNoSwingCheck extends Check {
 
     /**
      * The minimum swing time allowed.
      */
     private long swingTime;
 
-    /**
-     * The current version to check.
-     */
-    private CheckVersion<CombatData> version;
-
     public AbstractBlockNoSwingCheck(CheckType checkType) {
         super(checkType);
 
         buildCheckConfiguration();
-        registerVersion(Version.VERSION_1_8);
-        registerVersion(Version.VERSION_1_12);
-        registerVersion(Version.VERSION_1_16);
 
-        addValueToVersion(Version.VERSION_1_8, "swing-time", 100);
-        addValueToVersion(Version.VERSION_1_12, "swing-time", 1000);
-        addValueToVersion(Version.VERSION_1_16, "swing-time", 1000);
+        addConfigurationValue("swing-time-old", 100);
+        addConfigurationValue("swing-time-new", 1000);
         if (isEnabled()) load();
     }
 
@@ -93,7 +84,8 @@ public abstract class AbstractBlockNoSwingCheck extends MultiVersionCheck {
      */
     public boolean check(Player player) {
         if (!isEnabled() || exempt(player)) return false;
-        return version.check(player, CombatData.get(player));
+        final CombatData data = CombatData.get(player);
+        return Arc.getMCVersion() == Version.VERSION_1_8 ? checkLegacyNoSwing(player, data) : checkNewNoSwing(player, data);
     }
 
     @Override
@@ -103,7 +95,7 @@ public abstract class AbstractBlockNoSwingCheck extends MultiVersionCheck {
 
     @Override
     public void load() {
-        version = VERSION == Version.VERSION_1_8 ? this::checkLegacyNoSwing : this::checkNewNoSwing;
-        swingTime = getVersionSection().getLong("swing-time");
+        swingTime = Arc.getMCVersion() == Version.VERSION_1_8 ?
+                configuration.getLong("swing-time-old") : configuration.getLong("swing-time-new");
     }
 }

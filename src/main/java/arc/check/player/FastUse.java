@@ -3,7 +3,7 @@ package arc.check.player;
 import arc.bridge.packets.BridgePlayClientBlockPlace;
 import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
-import arc.check.implementations.PacketCheck;
+import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.player.PlayerData;
 import com.comphenix.protocol.PacketType;

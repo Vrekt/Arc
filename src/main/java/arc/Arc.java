@@ -14,7 +14,7 @@ import arc.listener.moving.MovingPacketListener;
 import arc.listener.moving.task.MovingTaskListener;
 import arc.listener.player.PlayerListener;
 import arc.punishment.PunishmentManager;
-import arc.utility.MovingUtil;
+import arc.utility.MovingAccess;
 import arc.violation.ViolationManager;
 import arc.world.WorldManager;
 import bridge.Bridge;
@@ -280,7 +280,7 @@ public final class Arc extends JavaPlugin {
 
                     // calculate initial data.
                     final MovingData data = MovingData.get(player);
-                    MovingUtil.calculateMovement(data, player.getLocation(), player.getLocation());
+                    MovingAccess.updatePlayerMovingData(data, player.getLocation(), player.getLocation());
                 });
     }
 

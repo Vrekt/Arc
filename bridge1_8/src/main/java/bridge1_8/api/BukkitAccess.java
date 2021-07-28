@@ -118,4 +118,9 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
                 .findAny()
                 .orElse(null);
     }
+
+    @Override
+    public boolean isFlyingWithElytra(Player player) {
+        return false;
+    }
 }

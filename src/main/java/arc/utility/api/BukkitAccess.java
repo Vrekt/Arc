@@ -109,4 +109,12 @@ public final class BukkitAccess {
     public static PotionEffect getPotionEffect(Player player, PotionEffectType type) {
         return ACCESS.getPotionEffect(player, type);
     }
+
+    /**
+     * TODO
+     */
+    public static boolean isFlyingWithElytra(Player player) {
+        return ACCESS.isFlyingWithElytra(player);
+    }
+
 }

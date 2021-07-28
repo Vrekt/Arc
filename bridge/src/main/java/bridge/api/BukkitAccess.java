@@ -89,4 +89,12 @@ public interface BukkitAccess {
      */
     PotionEffect getPotionEffect(Player player, PotionEffectType type);
 
+    /**
+     * Check if the player is flying with Elytra.
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    boolean isFlyingWithElytra(Player player);
+
 }

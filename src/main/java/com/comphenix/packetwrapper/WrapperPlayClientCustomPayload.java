@@ -24,7 +24,7 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-public final class WrapperPlayClientCustomPayload extends AbstractPacket {
+public class WrapperPlayClientCustomPayload extends AbstractPacket {
     public static final PacketType TYPE = PacketType.Play.Client.CUSTOM_PAYLOAD;
 
     public WrapperPlayClientCustomPayload(PacketContainer packet) {

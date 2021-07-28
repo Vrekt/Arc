@@ -2,7 +2,7 @@ package arc.check.network;
 
 import arc.Arc;
 import arc.check.types.CheckType;
-import arc.check.implementations.PacketCheck;
+import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.data.packet.PacketData;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;

@@ -1,6 +1,7 @@
 package arc.check.player;
 
-import arc.check.implementations.MultiVersionCheck;
+import arc.Arc;
+import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.player.PlayerData;
@@ -10,7 +11,7 @@ import org.bukkit.entity.Player;
 /**
  * Checks if the player is regenerating health too fast.
  */
-public final class Regeneration extends MultiVersionCheck {
+public final class Regeneration extends Check {
 
     /**
      * The minimum time it takes to regenerate.
@@ -29,13 +30,8 @@ public final class Regeneration extends MultiVersionCheck {
                 .kick(false)
                 .build();
 
-        registerVersion(Version.VERSION_1_8);
-        registerVersion(Version.VERSION_1_12);
-        registerVersion(Version.VERSION_1_16);
-
-        addValueToVersion(Version.VERSION_1_8, "regeneration-time-minimum", 3400);
-        addValueToVersion(Version.VERSION_1_12, "regeneration-time-minimum", 450);
-        addValueToVersion(Version.VERSION_1_16, "regeneration-time-minimum", 450);
+        addConfigurationValue("regeneration-time-minimum-old", 3400);
+        addConfigurationValue("regeneration-time-minimum-new", 450);
         if (isEnabled()) load();
     }
 
@@ -68,6 +64,7 @@ public final class Regeneration extends MultiVersionCheck {
 
     @Override
     public void load() {
-        regenerationTime = getVersionSection().getLong("regeneration-time-minimum");
+        regenerationTime = Arc.getMCVersion() == Version.VERSION_1_8 ? configuration.getLong("regeneration-time-minimum-old")
+                : configuration.getLong("regeneration-time-minimum-new");
     }
 }

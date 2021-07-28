@@ -7,7 +7,7 @@ import arc.check.moving.NoFall;
 import arc.check.moving.Speed;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
-import arc.utility.MovingUtil;
+import arc.utility.MovingAccess;
 import arc.world.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -63,7 +63,7 @@ public final class MovingEventListener implements Listener {
         // check if we have moved.
         boolean hasMoved = from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ();
         if (hasMoved) {
-            MovingUtil.calculateMovement(data, from, to);
+            MovingAccess.updatePlayerMovingData(data, from, to);
             // run checks
             runChecks(player, data);
         }
