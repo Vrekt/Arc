@@ -98,7 +98,6 @@ public final class Flight extends Check {
         addConfigurationValue("jump-boost-ascend-amplifier", 3);
         addConfigurationValue("ground-distance-threshold", 1.25);
         addConfigurationValue("ground-distance-horizontal-cap", 0.50);
-        addConfigurationValue("slime-block-distance-fallen-threshold", 0);
         addConfigurationValue("vertical-clip-vertical-minimum", 0.99);
         addConfigurationValue("safe-location-update-distance-threshold", 1.99);
         addConfigurationValue("max-in-air-hover-time", 6);
@@ -333,13 +332,14 @@ public final class Flight extends Check {
     private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
 
+            // check ground distance.
+            final double distance = MathUtil.vertical(ground, to);
+
             final boolean hasSlimeblock = data.hasSlimeblock();
-            if (hasSlimeblock && vertical > 0.42) {
+            if (hasSlimeblock && vertical > 0.42 && distance > 3f) {
                 data.setHasSlimeBlockLaunch(true);
             }
 
-            // check ground distance.
-            final double distance = MathUtil.vertical(ground, to);
             if (distance >= groundDistanceThreshold) {
                 // high off ground (hopefully) check.
                 // make sure we are within the limits of the ground.

@@ -86,13 +86,10 @@ arc-prefix: "&8[&cArc&8]"
 violation-data-timeout: 30
 
 # If the event API should be enabled.
-enable-event-api: true
+enable-event-api: false
 
-# If debug messages are enabled:
+# If debug messages are enabled.
 debug-messages: false
-
-# If AdvancedBan plugin should be used for banning/kicking.
-use-advanced-ban: false
 
 # If LiteBans plugin should be used for banning/kicking.
 use-lite-bans: false
@@ -104,3 +101,9 @@ use-lite-bans: false
 # %length% - the length of the ban
 # %reason% - the reason
 lite-bans-command: "%player% -p %length% %reason%"
+
+# The worlds Arc is enabled in
+enabled-worlds:
+  - world
+  - world_the_nether
+  - world_the_end
