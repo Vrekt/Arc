@@ -57,7 +57,7 @@ public enum CheckType {
     /**
      * Checks if the player is attacking too far.
      */
-    ATTACK_REACH("AttackReach", "Reach (Attack)", CheckCategory.COMBAT),
+    ATTACK_REACH("Reach", "Reach (Attack)", CheckCategory.COMBAT),
 
     /**
      * Checks if the player isn't swinging their arm when attacking
@@ -136,13 +136,6 @@ public enum CheckType {
     }
 
     /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * @return the pretty name
      */
     public String getPrettyName() {
@@ -157,9 +150,16 @@ public enum CheckType {
     }
 
     /**
+     * @return the configuration name
+     */
+    public String getConfigurationName() {
+        return name.toLowerCase();
+    }
+
+    /**
      * @return the category
      */
-    public CheckCategory category() {
+    public CheckCategory getCategory() {
         return category;
     }
 
@@ -171,7 +171,7 @@ public enum CheckType {
      */
     public static CheckType getCheckTypeByName(String name) {
         for (CheckType value : values()) {
-            if (value.getName().equalsIgnoreCase(name)) {
+            if (value.getPrettyName().equalsIgnoreCase(name)) {
                 return value;
             }
         }

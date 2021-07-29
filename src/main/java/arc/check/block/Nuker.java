@@ -194,6 +194,5 @@ public final class Nuker extends PacketCheck {
         if (packetCheck) {
             registerPacketListener(PacketType.Play.Client.BLOCK_DIG, event -> event.setCancelled(check(event.getPlayer())));
         }
-
     }
 }

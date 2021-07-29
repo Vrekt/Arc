@@ -125,7 +125,12 @@ public final class MovingData implements Data {
      * The valid falling location for distance checking.
      * The last ladder location
      */
-    private Location descendingLocation, validFallingLocation, ladderLocation;
+    private Location noFallDescendingLocation, validFallingLocation, ladderLocation;
+
+    /**
+     * Descending start.
+     */
+    private Location flightDescendingLocation;
 
     /**
      * If the player has failed no-fall.
@@ -172,6 +177,11 @@ public final class MovingData implements Data {
      * If the safe location can be updated.
      */
     private boolean canSafeBeUpdated;
+
+    /**
+     * IF the player was launched by a slimeblock.
+     */
+    private boolean hasSlimeBlockLaunch;
 
     public Location from() {
         return from;
@@ -466,11 +476,11 @@ public final class MovingData implements Data {
     }
 
     public Location descendingLocation() {
-        return descendingLocation;
+        return noFallDescendingLocation;
     }
 
     public void descendingLocation(Location descendingLocation) {
-        this.descendingLocation = descendingLocation;
+        this.noFallDescendingLocation = descendingLocation;
     }
 
     public Location ladderLocation() {
@@ -623,5 +633,21 @@ public final class MovingData implements Data {
 
     public void setInAirTime(int inAirTime) {
         this.inAirTime = MathUtil.clampInt(inAirTime, 0, 100);
+    }
+
+    public boolean hasSlimeBlockLaunch() {
+        return hasSlimeBlockLaunch;
+    }
+
+    public void setHasSlimeBlockLaunch(boolean hasSlimeBlockLaunch) {
+        this.hasSlimeBlockLaunch = hasSlimeBlockLaunch;
+    }
+
+    public Location getFlightDescendingLocation() {
+        return flightDescendingLocation;
+    }
+
+    public void setFlightDescendingLocation(Location flightDescendingLocation) {
+        this.flightDescendingLocation = flightDescendingLocation;
     }
 }

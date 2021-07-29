@@ -1,7 +1,7 @@
 package arc.check;
 
 import arc.check.block.Nuker;
-import arc.check.combat.AttackReach;
+import arc.check.combat.Reach;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.moving.*;
@@ -41,7 +41,7 @@ public final class CheckManager implements Configurable, Closeable {
         add(new Regeneration());
         add(new FastUse());
         add(new Jesus());
-        add(new AttackReach());
+        add(new Reach());
         add(new arc.check.combat.NoSwing());
         add(new KillAura());
         add(new Flight());
@@ -77,7 +77,7 @@ public final class CheckManager implements Configurable, Closeable {
                 .stream()
                 .filter(c -> c.type() == check)
                 .findAny()
-                .orElseThrow(() -> new NoSuchElementException("Could not find check " + check.getName()));
+                .orElseThrow(() -> new NoSuchElementException("Could not find check " + check.getPrettyName()));
     }
 
     /**

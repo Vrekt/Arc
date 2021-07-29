@@ -4,9 +4,11 @@ import arc.Arc;
 import arc.check.types.CheckType;
 import arc.check.player.FastUse;
 import arc.check.player.Regeneration;
+import arc.data.moving.MovingData;
 import arc.data.player.PlayerData;
 import arc.exemption.type.ExemptionType;
 import arc.world.WorldManager;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,10 +18,7 @@ import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.player.*;
 
 /**
  * Listens for player related events
@@ -159,6 +158,23 @@ public final class PlayerListener implements Listener {
     private void onClick(InventoryClickEvent event) {
         final long delta = System.currentTimeMillis() - last;
         last = System.currentTimeMillis();
+    }
+
+    /**
+     * Handle changing from creative -> survival for movement checks.
+     *
+     * @param event the event
+     */
+    @EventHandler
+    private void onGameModeChange(PlayerGameModeChangeEvent event) {
+        final Player player = event.getPlayer();
+
+        if (event.getNewGameMode() == GameMode.SURVIVAL
+                && player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+            final MovingData data = MovingData.get(player);
+
+            data.setInAirTime(0);
+        }
     }
 
 }

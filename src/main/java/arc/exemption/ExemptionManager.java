@@ -100,7 +100,9 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, CheckSubType subType) {
-        final boolean permission = player.hasPermission(Permissions.ARC_BYPASS + "." + subType.from().category().name().toLowerCase() + "." + subType.from().getName() + "." + subType.getName());
+        final boolean permission = player.hasPermission(Permissions.ARC_BYPASS + "."
+                + subType.getCheck().getCategory().name().toLowerCase() + "."
+                + subType.getCheck().getPermissionName() + "." + subType.getName());
         return isExemptFireEvent(player, null, subType, permission);
     }
 

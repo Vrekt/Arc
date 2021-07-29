@@ -123,6 +123,22 @@ public final class BlockAccess {
     }
 
     /**
+     * Check if the modified location has slimeblock
+     *
+     * @param origin the origin
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the result
+     */
+    public static boolean hasSlimeblockAt(Location origin, World world, double x, double y, double z) {
+        if (hasSlimeblockAt0(origin, world, x, y, z)) return true;
+        if (hasSlimeblockAt0(origin, world, x, y, -z)) return true;
+        if (hasSlimeblockAt0(origin, world, -x, y, z)) return true;
+        return hasSlimeblockAt0(origin, world, -x, y, -z);
+    }
+
+    /**
      * Check if the modified location has a vertical modifier block.
      *
      * @param origin the origin
@@ -189,6 +205,20 @@ public final class BlockAccess {
      */
     private static boolean hasIceAt0(Location origin, World world, double x, double y, double z) {
         return ACCESS.isIce(world.getBlockAt(NumberConversions.floor(origin.getX() + x),
+                NumberConversions.floor(origin.getY() + y), NumberConversions.floor(origin.getZ() + z)));
+    }
+
+    /**
+     * Check if the modified location has slime-block
+     *
+     * @param origin the origin
+     * @param x      the modified X
+     * @param y      the modified Y
+     * @param z      the modified Z
+     * @return the result
+     */
+    private static boolean hasSlimeblockAt0(Location origin, World world, double x, double y, double z) {
+        return ACCESS.isSlimeblock(world.getBlockAt(NumberConversions.floor(origin.getX() + x),
                 NumberConversions.floor(origin.getY() + y), NumberConversions.floor(origin.getZ() + z)));
     }
 

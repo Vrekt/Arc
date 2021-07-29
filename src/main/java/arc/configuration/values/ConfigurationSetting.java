@@ -7,7 +7,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * A map of configuration values
+ * A map of all default configuration settings with the Arc configuration.
+ *
+ * Does not include anything related to checks
  */
 public enum ConfigurationSetting {
     GLOBAL_KICK_MESSAGE(new ConfigValue<>("global-kick-message", "&cYou have been kicked for %check%")),

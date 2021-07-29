@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.timing.CheckTimings;
+import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.utility.MovingAccess;
@@ -13,6 +14,7 @@ import arc.utility.math.MathUtil;
 import bridge.Version;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
@@ -45,6 +47,11 @@ public final class Flight extends Check {
     private double verticalClipMinimum, safeDistanceUpdateThreshold, minBoatDescendSpeed, boatDescendingScoreMin;
 
     /**
+     * The max difference allowed between a=(vertical speed - expected) then, (vertical speed - a)
+     */
+    private double slimeblockMaxScoreDiff;
+
+    /**
      * The max ascend time
      * The amount to add to {@code maxAscendTime} when the player has jump boost.
      * Max time allowed to be hovering.
@@ -73,6 +80,16 @@ public final class Flight extends Check {
                 .kick(false)
                 .build();
 
+        isLegacy = Arc.getMCVersion() == Version.VERSION_1_8;
+        writeGeneralConfiguration();
+        writeBoatFlyConfiguration();
+        if (isEnabled()) load();
+    }
+
+    /**
+     * Write general configuration values
+     */
+    private void writeGeneralConfiguration() {
         addConfigurationValue("max-jump-distance", 0.42);
         addConfigurationValue("max-climbing-speed-up", 0.12);
         addConfigurationValue("max-climbing-speed-down", 0.151);
@@ -85,17 +102,20 @@ public final class Flight extends Check {
         addConfigurationValue("vertical-clip-vertical-minimum", 0.99);
         addConfigurationValue("safe-location-update-distance-threshold", 1.99);
         addConfigurationValue("max-in-air-hover-time", 6);
+        addConfigurationValue("slimeblock-max-score-difference", 0.42);
+    }
 
-        addConfigurationValue("boat-fly-out-of-liquid-time", 5);
-        addConfigurationValue("kick-player-from-boat", true);
-        addConfigurationValue("teleport-player-after-kicked-from-boat", true);
-        addConfigurationValue("min-boat-descend-speed", 0.11);
-        addConfigurationValue("min-boat-descending-time", 5);
-        addConfigurationValue("boat-descending-score-min", 0.15);
-
-        isLegacy = Arc.getMCVersion() == Version.VERSION_1_8;
-
-        if (isEnabled()) load();
+    /**
+     * Write boat fly configuration
+     */
+    private void writeBoatFlyConfiguration() {
+        createSubTypeSections(CheckSubType.FLIGHT_BOATFLY);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-fly-out-of-liquid-time", 5);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "kick-player-from-boat", true);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "teleport-player-after-kicked-from-boat", true);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "min-boat-descend-speed", 0.11);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "min-boat-descending-time", 5);
+        addConfigurationValue(CheckSubType.FLIGHT_BOATFLY, "boat-descending-score-min", 0.15);
     }
 
     /**
@@ -120,6 +140,8 @@ public final class Flight extends Check {
 
         final double vertical = data.vertical();
         startTiming(player);
+
+        updateRelevantMovingData(player, data);
 
         // check if the player is on skulls, slabs, stairs, fences, gates, beds, etc.
         final boolean hasVerticalModifier = BlockAccess.hasVerticalModifierAt(to, to.getWorld(), 0.3, -0.1, 0.3)
@@ -195,9 +217,6 @@ public final class Flight extends Check {
         if (!temp.onGround() && temp.vertical() == 0.0 && !MovingAccess.isOnBoat(player)) {
             // player is hovering
             if (inAirTime >= maxInAirHoverTime) {
-
-                player.sendMessage("BOAT: " + MovingAccess.isOnBoat(player));
-
                 // flag player, hovering too long.
                 final CheckResult result = new CheckResult();
                 result.setFailed("Hovering off the ground for too long")
@@ -313,6 +332,12 @@ public final class Flight extends Check {
      */
     private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
+
+            final boolean hasSlimeblock = data.hasSlimeblock();
+            if (hasSlimeblock && vertical > 0.42) {
+                data.setHasSlimeBlockLaunch(true);
+            }
+
             // check ground distance.
             final double distance = MathUtil.vertical(ground, to);
             if (distance >= groundDistanceThreshold) {
@@ -320,7 +345,7 @@ public final class Flight extends Check {
                 // make sure we are within the limits of the ground.
                 // we don't want a flag when the player is wildly jumping around.
                 final double hDist = MathUtil.horizontal(ground, to);
-                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap) {
+                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap && !data.hasSlimeBlockLaunch()) {
                     result.setFailed("Vertical distance from ground greater than allowed within limits.")
                             .withParameter("distance", distance)
                             .withParameter("threshold", groundDistanceThreshold)
@@ -330,13 +355,48 @@ public final class Flight extends Check {
                 }
             }
 
-            // TODO: check if we have launch from a slime-block.
             // ensure we didn't walk up a block that modifies your vertical
             final double maxJumpHeight = getJumpHeight(player);
 
+            if (hasSlimeblock) {
+                // player was launched, set state
+                final boolean launched = data.hasSlimeBlockLaunch();
+                if (launched) {
+                    // get rough estimate of player fall distance
+                    final double fallen = MathUtil.vertical(data.getFlightDescendingLocation() == null ? from
+                            : data.getFlightDescendingLocation(), from);
+                    if (data.getFlightDescendingLocation() != null) {
+                        // decrease the modifier if we fall from a significant height, +
+                        // to prevent one time abuse
+                        final double modifier = fallen > 15 ? 0.11D : 0.18d;
+                        final double rough = 0.4D + fallen * modifier;
+                        final double diff = Math.abs(vertical - rough);
+                        final double score = vertical - diff;
+                        if (score >= slimeblockMaxScoreDiff) {
+                            result.setFailed("Bounced too high from a slimeblock")
+                                    .withParameter("vertical", vertical)
+                                    .withParameter("rough", rough)
+                                    .withParameter("diff", diff)
+                                    .withParameter("score", score)
+                                    .withParameter("max", slimeblockMaxScoreDiff);
+                            handleCheckViolationAndReset(player, result, ground);
+                        }
+                    }
+
+                    // player is jumping really high with no velocity
+                    if (distance <= 1f && vertical > maxJumpHeight && fallen <= 1f) {
+                        result.setFailed("Vertical greater than max jump height on slimeblock")
+                                .withParameter("groundDistance", distance)
+                                .withParameter("vertical", vertical)
+                                .withParameter("max", maxJumpHeight);
+                        handleCheckViolationAndReset(player, result, ground);
+                    }
+                }
+            }
+
             // go back to where we were.
             // maybe ground later.
-            if (vertical > maxJumpHeight) {
+            if (vertical > maxJumpHeight && !data.hasSlimeBlockLaunch()) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);
@@ -348,7 +408,7 @@ public final class Flight extends Check {
             final int modifier = player.hasPotionEffect(PotionEffectType.JUMP)
                     ? BukkitAccess.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier()
                     + jumpBoostAscendAmplifier : 0;
-            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable()) {
+            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable() && !data.hasSlimeBlockLaunch()) {
                 result.setFailed("Ascending for too long")
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
@@ -456,6 +516,28 @@ public final class Flight extends Check {
         return current;
     }
 
+    /**
+     * Update moving data for check
+     *
+     * @param player the player
+     * @param data   their data
+     */
+    private void updateRelevantMovingData(Player player, MovingData data) {
+        if (data.onGround()) {
+            if (!data.hasSlimeblock()
+                    && data.hasSlimeBlockLaunch()) {
+                data.setHasSlimeBlockLaunch(false);
+            }
+        } else {
+            if (data.descending()) {
+                data.setHasSlimeBlockLaunch(false);
+
+                // we just started descending, set.
+                if (data.descendingTime() == 1) data.setFlightDescendingLocation(data.from());
+            }
+        }
+    }
+
     @Override
     public void reloadConfig() {
         load();
@@ -463,6 +545,15 @@ public final class Flight extends Check {
 
     @Override
     public void load() {
+        loadGeneralConfiguration();
+        if (!isLegacy) loadBoatFlyConfiguration();
+        CheckTimings.registerTiming(checkType);
+    }
+
+    /**
+     * Load general configuration
+     */
+    private void loadGeneralConfiguration() {
         maxJumpDistance = configuration.getDouble("max-jump-distance");
         maxClimbSpeedUp = configuration.getDouble("max-climbing-speed-up");
         maxClimbSpeedDown = configuration.getDouble("max-climbing-speed-down");
@@ -474,13 +565,20 @@ public final class Flight extends Check {
         verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
         safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
+        slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
+    }
+
+    /**
+     * Load boat fly configuration
+     */
+    private void loadBoatFlyConfiguration() {
+        final ConfigurationSection configuration = this.configuration.getSubType(CheckSubType.FLIGHT_BOATFLY);
         boatFlyOutOfLiquidTime = configuration.getInt("boat-fly-out-of-liquid-time");
         kickPlayerFromBoat = configuration.getBoolean("kick-player-from-boat");
         teleportAfterKickFromBoat = configuration.getBoolean("teleport-player-after-kicked-from-boat");
         minBoatDescendSpeed = configuration.getDouble("min-boat-descend-speed");
         boatDescendingTime = configuration.getInt("min-boat-descending-time");
         boatDescendingScoreMin = configuration.getDouble("boat-descending-score-min");
-
-        CheckTimings.registerTiming(checkType);
     }
+
 }

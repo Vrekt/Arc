@@ -106,7 +106,7 @@ public final class CheckResult {
      */
     public CheckResult setFailed(String information) {
         if (informationBuilder != null && informationBuilder.length() != 0) {
-            Arc.getPlugin().getLogger().warning("A check is not resetting the check result, information: \n" + information);
+            Arc.getPlugin().getLogger().warning("A check is not resetting the check result, violation message: " + information);
         }
 
         setFailed();

@@ -109,8 +109,8 @@ public final class Permissions {
         if (player == null || !player.isOnline() || canBypassAllChecks(player)) return true;
 
         for (CheckType check : checks) {
-            if (canBypassCategory(player, check.category())) return true;
-            if (player.hasPermission(ARC_BYPASS + "." + check.category().name().toLowerCase() + "." + check.getPermissionName().toLowerCase()))
+            if (canBypassCategory(player, check.getCategory())) return true;
+            if (player.hasPermission(ARC_BYPASS + "." + check.getCategory().name().toLowerCase() + "." + check.getPermissionName().toLowerCase()))
                 return true;
         }
         return false;

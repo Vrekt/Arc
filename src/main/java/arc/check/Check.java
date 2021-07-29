@@ -396,13 +396,6 @@ public abstract class Check implements Configurable {
     }
 
     /**
-     * @return the check name.
-     */
-    public String getName() {
-        return checkType.getName();
-    }
-
-    /**
      * @return the pretty name.
      */
     public String getPrettyName() {

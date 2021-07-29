@@ -5,7 +5,7 @@ import arc.check.types.CheckType;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
-import arc.check.combat.AttackReach;
+import arc.check.combat.Reach;
 import arc.data.combat.CombatData;
 import arc.data.packet.PacketData;
 import arc.listener.AbstractPacketListener;
@@ -32,7 +32,7 @@ public final class CombatPacketListener extends AbstractPacketListener {
     /**
      * BlockBreakReach
      */
-    private final AttackReach reach;
+    private final Reach reach;
 
     /**
      * No swing

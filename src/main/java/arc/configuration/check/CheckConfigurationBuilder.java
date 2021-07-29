@@ -29,7 +29,7 @@ public final class CheckConfigurationBuilder {
         this.check = check;
 
         final FileConfiguration configuration = Arc.getPlugin().getConfig();
-        final String name = check.getName();
+        final String name = check.getConfigurationName();
         if (configuration.isConfigurationSection(name)) {
             section = configuration.getConfigurationSection(name);
         } else {

@@ -83,6 +83,7 @@ public final class ConfigValue<T> {
     /**
      * @return the list
      */
+    @SuppressWarnings("unchecked")
     public List<String> asList() {
         return (List<String>) type;
     }

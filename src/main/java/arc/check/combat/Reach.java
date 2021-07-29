@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
  * The default config is optimized to REDUCE false positives.
  * Its not strict what-so-ever.
  */
-public final class AttackReach extends Check {
+public final class Reach extends Check {
 
     /**
      * Max survival and creative distances.
@@ -33,7 +33,7 @@ public final class AttackReach extends Check {
      */
     private boolean subtractPlayerVelocity, subtractEntityVelocity;
 
-    public AttackReach() {
+    public Reach() {
         super(CheckType.ATTACK_REACH);
         isEnabled(true)
                 .cancel(true)

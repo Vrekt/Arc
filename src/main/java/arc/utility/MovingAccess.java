@@ -108,7 +108,9 @@ public final class MovingAccess {
             data.incrementOnGroundTime();
 
             // slime block checking
-            final boolean hasSlimeblock = BlockAccess.isSlimeblock(to.getBlock().getRelative(BlockFace.DOWN));
+            final boolean hasSlimeblock = BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -0.1, 0.3)
+                    || BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -0.5, 0.3)
+                    || BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -1, 0.3);
             data.hasSlimeblock(hasSlimeblock);
 
             final boolean isOnIce = MovingAccess.isOnIce(cloneTo);
@@ -129,9 +131,12 @@ public final class MovingAccess {
             data.onGroundTime(0);
             data.setInAirTime(data.getInAirTime() + 1);
 
-            // extra modifier
-            final boolean hasSlimeblock = BlockAccess.isSlimeblock(to.getBlock().getRelative(0, -2, 0));
-            data.hasSlimeblock(hasSlimeblock);
+            final boolean hadSlimeblock = BlockAccess.hasSlimeblockAt(cloneFrom, cloneFrom.getWorld(), 0.3, -0.1, 0.3)
+                    || BlockAccess.hasSlimeblockAt(cloneFrom, cloneFrom.getWorld(), 0.3, -1, 0.3);
+            final boolean hasSlimeblock = BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -0.1, 0.3)
+                    || BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -1, 0.3)
+                    || BlockAccess.hasSlimeblockAt(cloneTo, cloneTo.getWorld(), 0.3, -2, 0.3);
+            data.hasSlimeblock(hadSlimeblock || hasSlimeblock);
 
             data.onIce(false);
 

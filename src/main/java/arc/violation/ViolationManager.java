@@ -133,7 +133,7 @@ public final class ViolationManager implements Configurable, Closeable {
 
             final String violationMessage = configuration.getViolationMessage()
                     .player(player)
-                    .check(check, result.hasSubType() ? "(" + result.subType().prettyName() + ")" : null)
+                    .check(check, result.hasSubType() ? "(" + result.subType().getPrettyName() + ")" : null)
                     .level(level)
                     .prefix()
                     .value();

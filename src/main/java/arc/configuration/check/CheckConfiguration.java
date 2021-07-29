@@ -5,7 +5,6 @@ import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
 import arc.configuration.ArcConfiguration;
 import arc.configuration.Configurable;
-import bridge.Version;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -27,11 +26,6 @@ public final class CheckConfiguration implements Configurable {
      * The map of sub-type sections.
      */
     private final Map<CheckSubType, ConfigurationSection> subTypeSections = new HashMap<>();
-
-    /**
-     * The map of versions
-     */
-    private final Map<Version, ConfigurationSection> versionSections = new HashMap<>();
 
     /**
      * The section for this check
@@ -57,7 +51,6 @@ public final class CheckConfiguration implements Configurable {
     public CheckConfiguration(CheckType check, ConfigurationSection section) {
         this.check = check;
         this.section = section;
-
 
         readFromFile(null);
     }
@@ -86,17 +79,11 @@ public final class CheckConfiguration implements Configurable {
                 subTypeSections.put(subType, subTypeSection);
             }
         });
-
-        // retrieve versions
-        for (Version value : Version.values()) {
-            final ConfigurationSection versionSection = section.getConfigurationSection(value.getFriendlyName());
-            if (versionSection != null) versionSections.put(value, versionSection);
-        }
     }
 
     @Override
     public void reloadConfiguration(ArcConfiguration configuration) {
-        this.section = Arc.getPlugin().getConfig().getConfigurationSection(check.getName());
+        this.section = Arc.getPlugin().getConfig().getConfigurationSection(check.getConfigurationName());
         readFromFile(null);
     }
 
@@ -112,17 +99,6 @@ public final class CheckConfiguration implements Configurable {
     }
 
     /**
-     * Get a version section
-     * If the section is not found, will return the default {@code section} within this configuration.
-     *
-     * @param version the version
-     * @return the section
-     */
-    public ConfigurationSection getVersion(Version version) {
-        return versionSections.getOrDefault(version, section);
-    }
-
-    /**
      * Create a sub-type section
      *
      * @param subType the sub-type
@@ -130,16 +106,6 @@ public final class CheckConfiguration implements Configurable {
     public void createSubTypeSection(CheckSubType subType) {
         if (section.isConfigurationSection(subType.getName())) return;
         subTypeSections.put(subType, section.createSection(subType.getName()));
-    }
-
-    /**
-     * Create a version section
-     *
-     * @param version the version
-     */
-    public void createVersionSection(Version version) {
-        if (section.isConfigurationSection(version.getFriendlyName())) return;
-        versionSections.put(version, section.createSection(version.getFriendlyName()));
     }
 
     /**
@@ -168,24 +134,6 @@ public final class CheckConfiguration implements Configurable {
             Arc.getPlugin().getLogger().warning("Failed to write to sub-type: " + type.getName());
             return;
         }
-        if (section.contains(valueName)) return;
-        section.set(valueName, value);
-    }
-
-    /**
-     * Add a configuration value for a certain version
-     *
-     * @param version   the version
-     * @param valueName the value name
-     * @param value     the value
-     */
-    public void addConfigurationValueFor(Version version, String valueName, Object value) {
-        final ConfigurationSection section = getVersion(version);
-        if (section.getName().equals(this.section.getName())) {
-            Arc.getPlugin().getLogger().warning("Failed to write a version section to the configuration: " + version + ", value: " + valueName);
-            return;
-        }
-
         if (section.contains(valueName)) return;
         section.set(valueName, value);
     }

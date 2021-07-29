@@ -68,7 +68,7 @@ public enum CheckSubType {
     /**
      * @return the super type
      */
-    public CheckType from() {
+    public CheckType getCheck() {
         return from;
     }
 
@@ -82,7 +82,7 @@ public enum CheckSubType {
     /**
      * @return the fancy name
      */
-    public String prettyName() {
+    public String getPrettyName() {
         return prettyName;
     }
 
