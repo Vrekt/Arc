@@ -290,6 +290,7 @@ public final class Flight extends Check {
      */
     private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to,
                                      double vertical, int ascendingTime, CheckResult result) {
+        if(exempt(player, CheckSubType.FLIGHT_BOATFLY)) return;
         // attempt to find liquid in a large range.
         final boolean findAnyLiquid = data.inLiquid() || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
 
@@ -359,6 +360,8 @@ public final class Flight extends Check {
      */
     private void checkElytraMovement(Player player, MovingData data, Location from, Location to,
                                      double vertical, CheckResult result) {
+        if(exempt(player, CheckSubType.FLIGHT_ELYTRAFLY)) return;
+
         if (data.ascending()) {
             // player is ascending, set the current start location and return.
             if (!data.isTrackingAscending()) {
