@@ -6,6 +6,7 @@ import arc.check.timing.CheckTimings;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.exemption.type.ExemptionType;
+import arc.utility.api.BukkitAccess;
 import arc.utility.math.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -54,7 +55,7 @@ public final class NoFall extends Check {
      * @param data   the data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player) || exempt(player, ExemptionType.DEATH)) return;
+        if (exempt(player) || exempt(player, ExemptionType.DEATH) || BukkitAccess.isFlyingWithElytra(player)) return;
 
         if (data.onGround()) {
             checkGround(player, data);
