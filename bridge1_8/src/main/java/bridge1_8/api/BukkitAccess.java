@@ -8,6 +8,7 @@ import net.minecraft.server.v1_8_R3.AxisAlignedBB;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -122,5 +123,10 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
     @Override
     public boolean isFlyingWithElytra(Player player) {
         return false;
+    }
+
+    @Override
+    public boolean hasItemInHand(Player player, Material material) {
+        return player.getItemInHand().getType() == material;
     }
 }

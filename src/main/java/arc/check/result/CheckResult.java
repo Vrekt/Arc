@@ -190,6 +190,7 @@ public final class CheckResult {
         if (result == Result.FAILED) {
             result = Result.PASSED;
             informationBuilder.setLength(0);
+            subType = null;
         }
     }
 }

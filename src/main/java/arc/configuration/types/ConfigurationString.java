@@ -49,13 +49,24 @@ public final class ConfigurationString {
     /**
      * Replace check value
      *
+     * @param check the check
+     * @return this
+     */
+    public ConfigurationString check(Check check) {
+        value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + " ");
+        return this;
+    }
+
+    /**
+     * Replace check value
+     *
      * @param check   the check
      * @param subType the sub-type
      * @return this
      */
     public ConfigurationString check(Check check, String subType) {
         if (subType != null) {
-            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + ChatColor.GRAY + " " + subType + " ");
+            value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + " " + ChatColor.GRAY + subType);
         } else {
             value = StringUtils.replace(value, Placeholders.CHECK.placeholder(), check.getPrettyName() + " ");
         }
@@ -91,6 +102,18 @@ public final class ConfigurationString {
      */
     public ConfigurationString time(int time) {
         value = StringUtils.replace(value, Placeholders.TIME.placeholder(), time + "");
+        return this;
+    }
+
+    /**
+     * Replace check sub-type
+     * <p>
+     * TODO
+     *
+     * @param subType the type
+     * @return this
+     */
+    public ConfigurationString subType(String subType) {
         return this;
     }
 

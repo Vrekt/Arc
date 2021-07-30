@@ -1,6 +1,7 @@
 package arc.utility.material;
 
 import arc.Arc;
+import bridge.Version;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -13,6 +14,16 @@ public final class MaterialAccess {
      * Access
      */
     private static final bridge.material.MaterialAccess ACCESS = Arc.getBridge().getMaterialAccess();
+
+    /**
+     * Firework rocket.
+     */
+    public static final Material FIREWORK_ROCKET;
+
+    static {
+        FIREWORK_ROCKET = Arc.getMCVersion() == Version.VERSION_1_8 ? ACCESS.getMaterial("FIREWORK")
+                : ACCESS.getMaterial("FIREWORK_ROCKET");
+    }
 
     /**
      * Get a material

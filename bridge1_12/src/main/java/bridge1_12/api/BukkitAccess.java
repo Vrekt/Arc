@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -63,12 +64,15 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
         return player.getPotionEffect(type);
     }
 
-    /**
-     * TODO
-     */
     @Override
     public boolean isFlyingWithElytra(Player player) {
         return player.isGliding();
+    }
+
+    @Override
+    public boolean hasItemInHand(Player player, Material material) {
+        return player.getInventory().getItemInMainHand().getType() == material
+                || player.getInventory().getItemInOffHand().getType() == material;
     }
 
 }

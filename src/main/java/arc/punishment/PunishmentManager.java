@@ -170,7 +170,7 @@ public final class PunishmentManager implements Configurable, Closeable {
         // build the message to send to violation viewers, then send it.
         final String violation = banConfiguration.globalViolationsBanMessage()
                 .player(player)
-                .check(check, null)
+                .check(check)
                 .prefix()
                 .time(banConfiguration.globalBanDelay())
                 .value();
@@ -212,7 +212,7 @@ public final class PunishmentManager implements Configurable, Closeable {
         // build the message to send to violation viewers, then send it.
         final String violation = banConfiguration.globalViolationsBanMessage()
                 .player(player)
-                .check(check, null)
+                .check(check)
                 .prefix()
                 .time(banConfiguration.globalBanDelay())
                 .value();
@@ -240,7 +240,7 @@ public final class PunishmentManager implements Configurable, Closeable {
 
         final String playerBan = type == BanList.Type.IP ? player.getAddress().getHostName() : player.getName();
         final String message = banConfiguration.globalBanMessage()
-                .check(check, null)
+                .check(check)
                 .value();
 
         // ban the player and kick them
@@ -254,7 +254,7 @@ public final class PunishmentManager implements Configurable, Closeable {
             final boolean hasTime = date != null;
             ConfigurationString configMessage = banConfiguration.globalBroadcastBanMessage()
                     .player(player)
-                    .check(check, null)
+                    .check(check)
                     .prefix();
 
             // replace the time placeholder
@@ -290,7 +290,7 @@ public final class PunishmentManager implements Configurable, Closeable {
 
         final String playerBan = type == BanList.Type.IP ? player.getAddress().getHostName() : player.getName();
         final String message = banConfiguration.globalBanMessage()
-                .check(check, null)
+                .check(check)
                 .value();
 
         // Do not forget the space!
@@ -309,7 +309,7 @@ public final class PunishmentManager implements Configurable, Closeable {
             final boolean hasTime = banLengthType != BanLengthType.PERM;
             ConfigurationString configMessage = banConfiguration.globalBroadcastBanMessage()
                     .player(player)
-                    .check(check, null)
+                    .check(check)
                     .prefix();
 
             // replace the time placeholder
@@ -334,7 +334,7 @@ public final class PunishmentManager implements Configurable, Closeable {
     public void kickPlayer(Player player, Check check) {
         pendingPlayerKicks.add(player);
         final String violationsMessage = kickConfiguration.globalViolationsKickMessage()
-                .check(check, null)
+                .check(check)
                 .player(player)
                 .prefix()
                 .time(kickConfiguration.globalKickDelay())
@@ -356,7 +356,7 @@ public final class PunishmentManager implements Configurable, Closeable {
         BukkitAccess.broadcast(violationsMessage, Permissions.ARC_VIOLATIONS);
         Bukkit.getScheduler().runTaskLater(Arc.getPlugin(), () -> {
             final String message = kickConfiguration.globalKickMessage()
-                    .check(check, null)
+                    .check(check)
                     .value();
             pendingPlayerKicks.remove(player);
             BukkitAccess.kickPlayer(player, message);

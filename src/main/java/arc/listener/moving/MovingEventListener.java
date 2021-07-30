@@ -8,12 +8,18 @@ import arc.check.moving.Speed;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.utility.MovingAccess;
+import arc.utility.api.BukkitAccess;
+import arc.utility.material.MaterialAccess;
 import arc.world.WorldManager;
+import bridge.Version;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 /**
@@ -41,11 +47,27 @@ public final class MovingEventListener implements Listener {
      */
     private final Speed speed;
 
+    /**
+     * Legacy flag.
+     */
+    private final boolean legacy;
+
+    /**
+     * Firework rocket
+     */
+    private final Material rocket;
+
     public MovingEventListener() {
         flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
         jesus = Arc.getInstance().getCheckManager().getCheck(CheckType.JESUS);
         noFall = Arc.getInstance().getCheckManager().getCheck(CheckType.NOFALL);
         speed = Arc.getInstance().getCheckManager().getCheck(CheckType.SPEED);
+
+        legacy = Arc.getMCVersion() == Version.VERSION_1_8;
+
+        rocket = Arc.getMCVersion() == Version.VERSION_1_8
+                || Arc.getMCVersion() == Version.VERSION_1_12 ? MaterialAccess.getMaterial("FIREWORK")
+                : MaterialAccess.getMaterial("FIREWORK_ROCKET");
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
@@ -73,6 +95,35 @@ public final class MovingEventListener implements Listener {
                 || from.getBlockZ() != to.getBlockZ();
         if (hasMovedByBlock) {
             runBlockChecks(player, data);
+        }
+    }
+
+    /**
+     * Listens for elytra related actions.
+     * <p>
+     * Do not set {@code ignoreCancelled} to {@code true}
+     *
+     * @param event the event
+     */
+    @EventHandler(ignoreCancelled = false, priority = EventPriority.HIGHEST)
+    private void onInteract(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR
+                && !legacy) {
+            final Player player = event.getPlayer();
+
+            // player is using rockets, and has elytra.
+            if (BukkitAccess.hasItemInHand(player, rocket)
+                    && player.getInventory().getChestplate() != null
+                    && player.getInventory().getChestplate().getType() == Material.ELYTRA) {
+                final MovingData data = MovingData.get(player);
+
+                data.setLastRocketUse(System.currentTimeMillis());
+
+                // update checking buffer.
+                if (!data.descending()) {
+                    data.setRocketDistanceBuffer(data.getRocketDistanceBuffer() + 64);
+                }
+            }
         }
     }
 

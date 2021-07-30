@@ -67,6 +67,21 @@ public final class Flight extends Check {
      */
     private boolean kickPlayerFromBoat, teleportAfterKickFromBoat;
 
+    /**
+     * Default distance a rocket will send you vertically.
+     * The min distance needed from the start of your ascent to start checking.
+     * The default distance you can fly without boosting from a rocket.
+     * The max descend speed allowed with an elytra
+     * The modifier to use to calculate the max distance you can fly ascendStart + noRocketDistance + (descendSpeed * modifier)
+     */
+    private double distanceRocketSendsYou, minDistanceFromAscend, noRocketDistance, maxDescendSpeed, descendSpeedModifier;
+
+    /**
+     * Min = will check and make sure player doesn't fly too high AFTER using a rocket.
+     * Max = will check and make sure player doesn't fly too high with no rocket use.
+     */
+    private long minLastRocketUseTime, maxLastRocketUseTime;
+
     private final boolean isLegacy;
 
     public Flight() {
@@ -83,6 +98,7 @@ public final class Flight extends Check {
         isLegacy = Arc.getMCVersion() == Version.VERSION_1_8;
         writeGeneralConfiguration();
         writeBoatFlyConfiguration();
+        writeElytraFlyConfiguration();
         if (isEnabled()) load();
     }
 
@@ -118,6 +134,20 @@ public final class Flight extends Check {
     }
 
     /**
+     * Write elytra fly configuration
+     */
+    private void writeElytraFlyConfiguration() {
+        createSubTypeSections(CheckSubType.FLIGHT_ELYTRAFLY);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "distance-rocket-sends-you", 64);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "min-last-rocket-use-time", 3500);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "max-last-rocket-use-time", 5000);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "min-distance-from-ascend", 3);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "no-rocket-distance", 10);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "max-descend-speed", 4);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "descend-speed-modifier", 15);
+    }
+
+    /**
      * Check the player
      *
      * @param player the player
@@ -126,11 +156,7 @@ public final class Flight extends Check {
     public void check(Player player, MovingData data) {
         if (exempt(player)) return;
 
-        // TODO: Elytra support later, for now ignore gliding players.
-        if (BukkitAccess.isFlyingWithElytra(player)) {
-            return;
-        }
-
+        final boolean elytra = BukkitAccess.isFlyingWithElytra(player);
         final CheckResult result = new CheckResult();
         final Location from = data.from();
         final Location to = data.to();
@@ -157,7 +183,7 @@ public final class Flight extends Check {
                 && !data.hasClimbable();
 
         // check the vertical move of this player.
-        if (validVerticalMove) {
+        if (validVerticalMove && !elytra) {
             // check vertical clip regardless of ascending or descending state.
             // return here since we don't want the rest of the check interfering with setback.
             final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, vertical);
@@ -166,7 +192,7 @@ public final class Flight extends Check {
             }
         }
 
-        if (data.hasClimbable()) {
+        if (data.hasClimbable() && !elytra) {
             // the ascending cooldown, will need to be reversed if descending.
             final double cooldown = climbingCooldown - (vertical * 2);
             if (data.climbTime() >= cooldown) checkClimbingMovement(player, data, from, vertical, cooldown, result);
@@ -243,6 +269,9 @@ public final class Flight extends Check {
     private void runNonLegacyChecks(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
         if (player.isInsideVehicle() && player.getVehicle() instanceof Boat)
             checkEntityMovement(player, data, ground, from, to, vertical, ascendingTime, result);
+
+        if (BukkitAccess.isFlyingWithElytra(player))
+            checkElytraMovement(player, data, from, to, vertical, result);
     }
 
     /**
@@ -259,7 +288,8 @@ public final class Flight extends Check {
      * @param ascendingTime ascendingTime
      * @param result        result
      */
-    private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
+    private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to,
+                                     double vertical, int ascendingTime, CheckResult result) {
         // attempt to find liquid in a large range.
         final boolean findAnyLiquid = data.inLiquid() || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
 
@@ -271,7 +301,7 @@ public final class Flight extends Check {
             // +2 ascending time to be extra safe
             if (data.ascending() && ascendingTime >= 2) {
                 // not possible, flag.
-                result.setFailed("Ascending while in a boat")
+                result.setFailed(CheckSubType.FLIGHT_BOATFLY, "Ascending while in a boat")
                         .withParameter("outOfLiquidTime", outOfLiquidTime)
                         .withParameter("max", boatFlyOutOfLiquidTime)
                         .withParameter("ascendingTime", ascendingTime)
@@ -290,7 +320,7 @@ public final class Flight extends Check {
                 if (data.descending() && data.descendingTime() >= boatDescendingTime && !boatOnGround) {
                     if (vertical < minBoatDescendSpeed) {
                         // too slow regardless, flag
-                        result.setFailed("descending too slow in a boat")
+                        result.setFailed(CheckSubType.FLIGHT_BOATFLY, "descending too slow in a boat")
                                 .withParameter("vertical", vertical)
                                 .withParameter("min", minBoatDescendSpeed);
 
@@ -302,7 +332,7 @@ public final class Flight extends Check {
 
                         if (score >= boatDescendingScoreMin) {
                             // player falling too slow.
-                            result.setFailed("descending too slow in a boat")
+                            result.setFailed(CheckSubType.FLIGHT_BOATFLY, "descending too slow in a boat")
                                     .withParameter("vertical", vertical)
                                     .withParameter("expected", expected)
                                     .withParameter("score", score)
@@ -318,6 +348,95 @@ public final class Flight extends Check {
     }
 
     /**
+     * Check elytra flying movements.
+     *
+     * @param player   the player
+     * @param data     their data
+     * @param from     the from
+     * @param to       the to
+     * @param vertical the vertical
+     * @param result   the result
+     */
+    private void checkElytraMovement(Player player, MovingData data, Location from, Location to,
+                                     double vertical, CheckResult result) {
+        if (data.ascending()) {
+            // player is ascending, set the current start location and return.
+            if (!data.isTrackingAscending()) {
+                data.setTrackingAscending(true);
+                data.setFlightAscendingLocation(to);
+
+                if (data.getLastRocketUse() == 0.0) {
+                    // no rocket use, no buffer.
+                    data.setRocketDistanceBuffer(0.0);
+                } else {
+                    data.setRocketDistanceBuffer(distanceRocketSendsYou);
+                }
+
+                return;
+            }
+            final long lastRocket = data.getLastRocketUse();
+
+            // retrieve the distance we have flown upwards since first ascend.
+            final double verticalDistanceFromAscend = MathUtil.vertical(data.getFlightAscendingLocation(), to);
+            // retrieve time since last boost from a rocket.
+            final long delta = System.currentTimeMillis() - lastRocket;
+
+            final double maxDistance = data.getRocketDistanceBuffer();
+            final boolean hasLastUse = lastRocket != 0.0;
+
+            // check if the player is ascending too high based on rocket usage
+            if (verticalDistanceFromAscend > minDistanceFromAscend && (delta <= minLastRocketUseTime || !hasLastUse)) {
+                // player recently used a rocket.
+                if (verticalDistanceFromAscend > maxDistance) {
+                    result.setFailed(CheckSubType.FLIGHT_ELYTRAFLY, "Flying too high with an elytra")
+                            .withParameter("maxDistance", maxDistance)
+                            .withParameter("distance", verticalDistanceFromAscend)
+                            .withParameter("delta", delta)
+                            .withParameter("minDelta", minLastRocketUseTime);
+                    // just cancel to from, should make it annoying enough.
+                    handleCheckViolationAndReset(player, result, from);
+                }
+            } else if (verticalDistanceFromAscend > minDistanceFromAscend && delta >= maxLastRocketUseTime) {
+                data.setRocketDistanceBuffer(noRocketDistance);
+                // hasn't used a rocket in awhile.
+                // player.sendMessage("Max: " + data.getMaxDescendSpeed());
+                // get the descend speed and times it by a set amount to get an allowed buffer.
+                // this can be abused to fly higher, but cap at some point.
+                final double max = Math.min(data.getMaxDescendSpeed(), maxDescendSpeed);
+                final double modifier = max * descendSpeedModifier;
+                final double allowed = data.getRocketDistanceBuffer() + modifier;
+
+                // get a max ceiling the player can go.
+                final double ceiling = data.getFlightAscendingLocation().getY() + modifier;
+                if (to.getY() > ceiling) {
+                    result.setFailed(CheckSubType.FLIGHT_ELYTRAFLY, "Flying too high with no rocket boost")
+                            .withParameter("ceil", ceiling)
+                            .withParameter("y", to.getY())
+                            .withParameter("speed", max)
+                            .withParameter("modifier", modifier)
+                            .withParameter("allowed", allowed);
+                    handleCheckViolationAndReset(player, result, from);
+                }
+
+                // flag if too far away in general.
+                if (verticalDistanceFromAscend > allowed) {
+                    result.setFailed(CheckSubType.FLIGHT_ELYTRAFLY, "Flying too high with no rocket boost")
+                            .withParameter("distFromAscend", verticalDistanceFromAscend)
+                            .withParameter("allowed", allowed)
+                            .withParameter("speed", max)
+                            .withParameter("modifier", modifier)
+                            .withParameter("allowed", allowed);
+                    handleCheckViolationAndReset(player, result, from);
+                }
+            }
+        } else {
+            // player is descending, track speed.
+            // Could probably be abused, since doesn't reset until ground.
+            if (vertical > data.getMaxDescendSpeed()) data.setMaxDescendSpeed(vertical);
+        }
+    }
+
+    /**
      * Check the players vertical movement.
      *
      * @param player        the player
@@ -329,7 +448,8 @@ public final class Flight extends Check {
      * @param ascendingTime ascendingTime
      * @param result        result
      */
-    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to, double vertical, int ascendingTime, CheckResult result) {
+    private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to,
+                                   double vertical, int ascendingTime, CheckResult result) {
         if (data.ascending()) {
 
             // check ground distance.
@@ -429,7 +549,8 @@ public final class Flight extends Check {
      * @param vertical the vertical
      * @return {@code true} if the player moved through a solid block.
      */
-    private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location from, Location to, double vertical) {
+    private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location
+            from, Location to, double vertical) {
         if (vertical >= verticalClipMinimum) {
             // safe
             final double min1 = Math.min(safe.getY(), to.getY());
@@ -487,7 +608,8 @@ public final class Flight extends Check {
      * @param cooldown the cooldown time
      * @param result   the result
      */
-    private void checkClimbingMovement(Player player, MovingData data, Location from, double vertical, double cooldown, CheckResult result) {
+    private void checkClimbingMovement(Player player, MovingData data, Location from, double vertical,
+                                       double cooldown, CheckResult result) {
         final double modifiedCooldown = data.ascending() ? cooldown : (climbingCooldown) + (vertical * 2);
         final double max = data.ascending() ? maxClimbSpeedUp : maxClimbSpeedDown;
         final int time = data.ascending() ? data.ascendingTime() : data.descendingTime();
@@ -528,8 +650,11 @@ public final class Flight extends Check {
                     && data.hasSlimeBlockLaunch()) {
                 data.setHasSlimeBlockLaunch(false);
             }
+            data.setTrackingAscending(false);
+            data.setMaxDescendSpeed(0.0);
         } else {
             if (data.descending()) {
+                data.setTrackingAscending(false);
                 data.setHasSlimeBlockLaunch(false);
 
                 // we just started descending, set.
@@ -547,6 +672,7 @@ public final class Flight extends Check {
     public void load() {
         loadGeneralConfiguration();
         if (!isLegacy) loadBoatFlyConfiguration();
+        if (!isLegacy) loadElytraFlyConfiguration();
         CheckTimings.registerTiming(checkType);
     }
 
@@ -579,6 +705,20 @@ public final class Flight extends Check {
         minBoatDescendSpeed = configuration.getDouble("min-boat-descend-speed");
         boatDescendingTime = configuration.getInt("min-boat-descending-time");
         boatDescendingScoreMin = configuration.getDouble("boat-descending-score-min");
+    }
+
+    /**
+     * Load elytra fly config
+     */
+    private void loadElytraFlyConfiguration() {
+        final ConfigurationSection configuration = this.configuration.getSubType(CheckSubType.FLIGHT_ELYTRAFLY);
+        distanceRocketSendsYou = configuration.getDouble("distance-rocket-sends-you");
+        minLastRocketUseTime = configuration.getLong("min-last-rocket-use-time");
+        maxLastRocketUseTime = configuration.getLong("max-last-rocket-use-time");
+        minDistanceFromAscend = configuration.getDouble("min-distance-from-ascend");
+        noRocketDistance = configuration.getDouble("no-rocket-distance");
+        maxDescendSpeed = configuration.getDouble("max-descend-speed");
+        descendSpeedModifier = configuration.getDouble("descend-speed-modifier");
     }
 
 }

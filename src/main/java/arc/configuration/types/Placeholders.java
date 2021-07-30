@@ -41,7 +41,13 @@ public enum Placeholders {
     /**
      * Ban reason
      */
-    REASON("%reason%");
+    REASON("%reason%"),
+
+    /**
+     * Check subtype
+     * TODO
+     */
+    SUBTYPE("%subtype%");
 
     /**
      * The placeholder

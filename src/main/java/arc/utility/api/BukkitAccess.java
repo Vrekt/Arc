@@ -3,6 +3,7 @@ package arc.utility.api;
 import arc.Arc;
 import bridge.utility.BoundingBox;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -110,11 +111,26 @@ public final class BukkitAccess {
         return ACCESS.getPotionEffect(player, type);
     }
 
+
     /**
-     * TODO
+     * Check if the player is gliding
+     *
+     * @param player the player
+     * @return {@code true} if so
      */
     public static boolean isFlyingWithElytra(Player player) {
         return ACCESS.isFlyingWithElytra(player);
+    }
+
+    /**
+     * Check if the player has an item in their hand or off hand
+     *
+     * @param player   the player
+     * @param material the material
+     * @return {@code true} if so
+     */
+    public static boolean hasItemInHand(Player player, Material material) {
+        return ACCESS.hasItemInHand(player, material);
     }
 
 }

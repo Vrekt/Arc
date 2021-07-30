@@ -35,7 +35,12 @@ public enum CheckSubType {
     /**
      * Flight BoatFly
      */
-    FLIGHT_BOATFLY(CheckType.FLIGHT, "boatfly", "BoatFly");
+    FLIGHT_BOATFLY(CheckType.FLIGHT, "boatfly", "BoatFly"),
+
+    /**
+     * Flight ElytraFly
+     */
+    FLIGHT_ELYTRAFLY(CheckType.FLIGHT, "elytrafly", "ElytraFly");
 
     /**
      * Values

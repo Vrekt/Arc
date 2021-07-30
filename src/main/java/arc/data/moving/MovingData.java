@@ -183,6 +183,27 @@ public final class MovingData implements Data {
      */
     private boolean hasSlimeBlockLaunch;
 
+    /**
+     * Last rocket use.
+     */
+    private long lastRocketUse;
+
+    /**
+     * If tracking elytra ascending
+     */
+    private boolean trackingAscending;
+
+    /**
+     * Start ascending location
+     */
+    private Location flightAscendingLocation;
+
+    /**
+     * Increases everytime a rocket is used
+     * Max descend speed when gliding
+     */
+    private double rocketDistanceBuffer, maxDescendSpeed;
+
     public Location from() {
         return from;
     }
@@ -649,5 +670,45 @@ public final class MovingData implements Data {
 
     public void setFlightDescendingLocation(Location flightDescendingLocation) {
         this.flightDescendingLocation = flightDescendingLocation;
+    }
+
+    public long getLastRocketUse() {
+        return lastRocketUse;
+    }
+
+    public void setLastRocketUse(long lastRocketUse) {
+        this.lastRocketUse = lastRocketUse;
+    }
+
+    public boolean isTrackingAscending() {
+        return trackingAscending;
+    }
+
+    public void setTrackingAscending(boolean trackingAscending) {
+        this.trackingAscending = trackingAscending;
+    }
+
+    public Location getFlightAscendingLocation() {
+        return flightAscendingLocation;
+    }
+
+    public void setFlightAscendingLocation(Location flightAscendingLocation) {
+        this.flightAscendingLocation = flightAscendingLocation;
+    }
+
+    public double getRocketDistanceBuffer() {
+        return rocketDistanceBuffer;
+    }
+
+    public void setRocketDistanceBuffer(double rocketDistanceBuffer) {
+        this.rocketDistanceBuffer = rocketDistanceBuffer;
+    }
+
+    public double getMaxDescendSpeed() {
+        return maxDescendSpeed;
+    }
+
+    public void setMaxDescendSpeed(double maxDescendSpeed) {
+        this.maxDescendSpeed = maxDescendSpeed;
     }
 }
