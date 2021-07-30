@@ -204,6 +204,11 @@ public final class MovingData implements Data {
      */
     private double rocketDistanceBuffer, maxDescendSpeed;
 
+    /**
+     * No vertical movement amount when flying.
+     */
+    private int noVerticalMovementAmount;
+
     public Location from() {
         return from;
     }
@@ -710,5 +715,13 @@ public final class MovingData implements Data {
 
     public void setMaxDescendSpeed(double maxDescendSpeed) {
         this.maxDescendSpeed = maxDescendSpeed;
+    }
+
+    public int getNoVerticalMovementAmount() {
+        return noVerticalMovementAmount;
+    }
+
+    public void setNoVerticalMovementAmount(int noVerticalMovementAmount) {
+        this.noVerticalMovementAmount = MathUtil.clampInt(noVerticalMovementAmount, 0, 100);
     }
 }

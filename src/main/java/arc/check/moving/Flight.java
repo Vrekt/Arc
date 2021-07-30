@@ -77,6 +77,11 @@ public final class Flight extends Check {
     private double distanceRocketSendsYou, minDistanceFromAscend, noRocketDistance, maxDescendSpeed, descendSpeedModifier;
 
     /**
+     * Max amount of times a player can not move vertically while flying
+     */
+    private int maxFlyingNoVerticalMovement;
+
+    /**
      * Min = will check and make sure player doesn't fly too high AFTER using a rocket.
      * Max = will check and make sure player doesn't fly too high with no rocket use.
      */
@@ -145,6 +150,7 @@ public final class Flight extends Check {
         addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "no-rocket-distance", 10);
         addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "max-descend-speed", 4);
         addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "descend-speed-modifier", 15);
+        addConfigurationValue(CheckSubType.FLIGHT_ELYTRAFLY, "max-flying-no-vertical-movement", 5);
     }
 
     /**
@@ -290,7 +296,7 @@ public final class Flight extends Check {
      */
     private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to,
                                      double vertical, int ascendingTime, CheckResult result) {
-        if(exempt(player, CheckSubType.FLIGHT_BOATFLY)) return;
+        if (exempt(player, CheckSubType.FLIGHT_BOATFLY)) return;
         // attempt to find liquid in a large range.
         final boolean findAnyLiquid = data.inLiquid() || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
 
@@ -360,9 +366,26 @@ public final class Flight extends Check {
      */
     private void checkElytraMovement(Player player, MovingData data, Location from, Location to,
                                      double vertical, CheckResult result) {
-        if(exempt(player, CheckSubType.FLIGHT_ELYTRAFLY)) return;
+        if (exempt(player, CheckSubType.FLIGHT_ELYTRAFLY)) return;
 
+        // check for flying and not descending or ascending.
         if (data.ascending()) {
+            final double verticalDelta = Math.abs(vertical - data.lastVertical());
+            if (verticalDelta == 0.0) {
+                // player not moving vertically.
+                data.setNoVerticalMovementAmount(data.getNoVerticalMovementAmount() + 1);
+                if (data.getNoVerticalMovementAmount() >= maxFlyingNoVerticalMovement) {
+                    result.setFailed(CheckSubType.FLIGHT_ELYTRAFLY, "Not moving vertically while flying")
+                            .withParameter("vertical", vertical)
+                            .withParameter("last", data.lastVertical())
+                            .withParameter("amt", data.getNoVerticalMovementAmount())
+                            .withParameter("max", 5);
+                    handleCheckViolationAndReset(player, result, from);
+                }
+            } else {
+                data.setNoVerticalMovementAmount(data.getNoVerticalMovementAmount() - 1);
+            }
+
             // player is ascending, set the current start location and return.
             if (!data.isTrackingAscending()) {
                 data.setTrackingAscending(true);
@@ -436,6 +459,22 @@ public final class Flight extends Check {
             // player is descending, track speed.
             // Could probably be abused, since doesn't reset until ground.
             if (vertical > data.getMaxDescendSpeed()) data.setMaxDescendSpeed(vertical);
+
+            final double verticalDelta = Math.abs(vertical - data.lastVertical());
+            if (verticalDelta == 0.0) {
+                // player not moving vertically.
+                data.setNoVerticalMovementAmount(data.getNoVerticalMovementAmount() + 1);
+                if (data.getNoVerticalMovementAmount() >= 5) {
+                    result.setFailed(CheckSubType.FLIGHT_ELYTRAFLY, "Not moving vertically while flying")
+                            .withParameter("vertical", vertical)
+                            .withParameter("last", data.lastVertical())
+                            .withParameter("amt", data.getNoVerticalMovementAmount())
+                            .withParameter("max", 5);
+                    handleCheckViolationAndReset(player, result, from);
+                }
+            } else {
+                data.setNoVerticalMovementAmount(data.getNoVerticalMovementAmount() - 1);
+            }
         }
     }
 
@@ -655,6 +694,7 @@ public final class Flight extends Check {
             }
             data.setTrackingAscending(false);
             data.setMaxDescendSpeed(0.0);
+            data.setNoVerticalMovementAmount(0);
         } else {
             if (data.descending()) {
                 data.setTrackingAscending(false);
@@ -722,6 +762,7 @@ public final class Flight extends Check {
         noRocketDistance = configuration.getDouble("no-rocket-distance");
         maxDescendSpeed = configuration.getDouble("max-descend-speed");
         descendSpeedModifier = configuration.getDouble("descend-speed-modifier");
+        maxFlyingNoVerticalMovement = configuration.getInt("max-flying-no-vertical-movement");
     }
 
 }
