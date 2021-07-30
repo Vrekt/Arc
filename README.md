@@ -59,6 +59,8 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
     * Clipping through blocks
     * FastLadder
     * BoatFly
+    * SlimeJump
+    * Hover/AirStuck
   * NoFall
   * MorePackets
   * Jesus
