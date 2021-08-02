@@ -1,15 +1,17 @@
 package arc.listener.combat;
 
 import arc.Arc;
-import arc.check.types.CheckType;
 import arc.check.combat.Criticals;
 import arc.check.combat.KillAura;
 import arc.check.combat.NoSwing;
 import arc.check.combat.Reach;
+import arc.check.types.CheckType;
 import arc.data.combat.CombatData;
 import arc.data.packet.PacketData;
+import arc.data.player.PlayerData;
 import arc.listener.AbstractPacketListener;
 import arc.world.WorldManager;
+import com.comphenix.packetwrapper.WrapperPlayClientBlockDig;
 import com.comphenix.packetwrapper.WrapperPlayClientUseEntity;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
@@ -48,6 +50,17 @@ public final class CombatPacketListener extends AbstractPacketListener {
     public void register(ProtocolManager protocol) {
         listener(protocol, PacketType.Play.Client.USE_ENTITY, this::onUseEntity);
         listener(protocol, PacketType.Play.Client.ARM_ANIMATION, this::onArmSwing);
+
+        // TODO: Isn't really a combat packet is it.
+        listener(protocol, PacketType.Play.Client.BLOCK_DIG, packetEvent -> {
+            // we need to listen for stop consuming stuff.
+            // TODO: Watch for spam of this maybe.
+            final WrapperPlayClientBlockDig packet = new WrapperPlayClientBlockDig(packetEvent.getPacket());
+            if (packet.getStatus() == EnumWrappers.PlayerDigType.RELEASE_USE_ITEM) {
+                final PlayerData data = PlayerData.get(packetEvent.getPlayer());
+                data.setConsuming(false);
+            }
+        });
     }
 
     public CombatPacketListener() {

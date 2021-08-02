@@ -3,12 +3,18 @@ package arc.exemption;
 import arc.check.types.CheckType;
 import arc.exemption.type.ExemptionType;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Player exemption data
  */
 public final class ExemptionHistory {
+
+    /**
+     * Empty
+     */
+    public static final ExemptionHistory EMPTY = new ExemptionHistory();
 
     /**
      * Exemption data
@@ -18,7 +24,7 @@ public final class ExemptionHistory {
     /**
      * Set of exemption types
      */
-    private final List<ExemptionType> exemptionTypes = new ArrayList<>();
+    private final Map<ExemptionType, Long> exemptionTypes = new HashMap<>();
 
     /**
      * Add an exemption
@@ -45,7 +51,17 @@ public final class ExemptionHistory {
      * @param type the type
      */
     public void addExemption(ExemptionType type) {
-        exemptionTypes.add(type);
+        exemptionTypes.put(type, -1L);
+    }
+
+    /**
+     * Add an exemption type
+     *
+     * @param type     the type
+     * @param duration the duration
+     */
+    public void addExemption(ExemptionType type, long duration) {
+        exemptionTypes.put(type, duration);
     }
 
     /**
@@ -69,9 +85,9 @@ public final class ExemptionHistory {
         // perm exemption
         if (time == -1) return true;
 
-        final boolean result = (System.currentTimeMillis() - time <= 0);
+        final boolean result = (time - System.currentTimeMillis() <= 0);
         if (result) exemptions.remove(check);
-        return result;
+        return !result;
     }
 
     /**
@@ -81,7 +97,14 @@ public final class ExemptionHistory {
      * @return {@code true} if so
      */
     public boolean isExempt(ExemptionType type) {
-        return exemptionTypes.contains(type);
+        final long time = exemptionTypes.getOrDefault(type, 0L);
+        if (time == 0) return false;
+        if (time == -1) return true;
+
+        final boolean result = (time - System.currentTimeMillis() <= 0);
+
+        if (result) exemptionTypes.remove(type);
+        return !result;
     }
 
     /**

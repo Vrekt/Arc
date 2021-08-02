@@ -5,6 +5,7 @@ import arc.check.Check;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.combat.CombatData;
+import arc.data.player.PlayerData;
 import bridge.Version;
 import org.bukkit.entity.Player;
 
@@ -43,6 +44,10 @@ public abstract class AbstractBlockNoSwingCheck extends Check {
     private boolean checkLegacyNoSwing(Player player, CombatData data) {
         final long delta = System.currentTimeMillis() - data.lastSwingTime();
         if (delta > swingTime) {
+            // ensure we are not consuming.
+            final PlayerData playerData = PlayerData.get(player);
+            if (playerData.isConsuming()) return false;
+
             final CheckResult result = new CheckResult();
             result.setFailed("No swing animation within time")
                     .withParameter("delta", delta)
@@ -67,6 +72,10 @@ public abstract class AbstractBlockNoSwingCheck extends Check {
         data.setLastNoSwingOther(now);
         // we have attacked within the last second.
         if (delta <= 1000 && swingDelta >= swingTime) {
+            // ensure we are not consuming.
+            final PlayerData playerData = PlayerData.get(player);
+            if (playerData.isConsuming()) return false;
+
             final CheckResult result = new CheckResult();
             result.setFailed("No swing animation within time")
                     .withParameter("delta", delta)

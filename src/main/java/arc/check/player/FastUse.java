@@ -60,8 +60,11 @@ public final class FastUse extends PacketCheck {
             if (exempt(player, CheckSubType.FAST_USE_FAST_BOW)) return;
             PlayerData.get(player).lastBowUse(System.currentTimeMillis());
         } else if (item.isEdible() || item == Material.POTION) {
+            final PlayerData data = PlayerData.get(player);
+            data.setConsuming(true);
+
             if (exempt(player, CheckSubType.FAST_USE_FAST_CONSUME)) return;
-            PlayerData.get(player).consumeStartTime(System.currentTimeMillis());
+            data.consumeStartTime(System.currentTimeMillis());
         }
     }
 

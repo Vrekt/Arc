@@ -48,18 +48,6 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     public void onPlayerJoin(Player player) {
         exemptions.put(player.getUniqueId(), new ExemptionHistory());
-        doJoinExemptions(player);
-    }
-
-    /**
-     * Exempt players when joining.
-     * MORE_PACKETS because sometimes when joining their is client lag that will batch and spam packets.
-     *
-     * @param player player
-     */
-    private void doJoinExemptions(Player player) {
-        addExemption(player, CheckType.MORE_PACKETS, 1000);
-        addExemption(player, CheckType.NOFALL, 500);
     }
 
     /**
@@ -82,28 +70,27 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     public boolean isPlayerExempt(Player player, CheckType check) {
         final boolean exemptFromCheck = isPlayerExemptFromCheck(player, check);
-        final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
-        boolean exemptionsMapped = false;
+        if (exemptFromCheck) return true;
 
-        final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
-        if (exemptions != null) {
-            exemptionsMapped = exemptions.isExempt(check);
-        }
-        return isExemptFireEvent(player, check, null, (exemptFromCheck || exemptFlying || exemptionsMapped));
+        final boolean exemptFlying = isFlying(player) && isExemptWhenFlying(check);
+        if (exemptFlying) return true;
+
+        final ExemptionHistory exemptions = this.exemptions.getOrDefault(player.getUniqueId(), ExemptionHistory.EMPTY);
+        return isExemptFireEvent(player, check, null, exemptions.isExempt(check));
     }
 
     /**
      * Check if a player is exempt
+     * <p>
+     * TODO: Maybe include subType.getCheck() as apart of this
      *
      * @param player  the player
      * @param subType the sub-type
      * @return {@code true} if so
      */
     public boolean isPlayerExempt(Player player, CheckSubType subType) {
-        final boolean permission = player.hasPermission(Permissions.ARC_BYPASS + "."
-                + subType.getCheck().getCategory().name().toLowerCase() + "."
-                + subType.getCheck().getPermissionName() + "." + subType.getName());
-        return isExemptFireEvent(player, null, subType, permission);
+        final boolean permission = player.hasPermission(subType.getBypassPermission());
+        return isExemptFireEvent(player, subType.getCheck(), subType, permission);
     }
 
     /**
@@ -119,7 +106,8 @@ public final class ExemptionManager implements Configurable, Closeable {
 
         final PlayerExemptionCheckEvent event = new PlayerExemptionCheckEvent(player, check, subType, isExempt);
         Arc.triggerEvent(event);
-        return event.isExempt();
+
+        return event.setExempt();
     }
 
     /**
@@ -130,7 +118,7 @@ public final class ExemptionManager implements Configurable, Closeable {
      * @return {@code true} if so
      */
     public boolean isPlayerExemptFromCheck(Player player, CheckType check) {
-        return Permissions.canBypassChecks(player, check);
+        return Permissions.canBypassCheck(player, check);
     }
 
     /**
@@ -160,7 +148,7 @@ public final class ExemptionManager implements Configurable, Closeable {
      * Add an exemption permanently
      *
      * @param player the player
-     * @param check  the check
+     * @param check  the check(s)
      */
     public void addExemptionPermanently(Player player, CheckType... check) {
         final ExemptionHistory exemptions = this.exemptions.get(player.getUniqueId());
@@ -177,6 +165,17 @@ public final class ExemptionManager implements Configurable, Closeable {
      */
     public void addExemption(Player player, ExemptionType type) {
         exemptions.get(player.getUniqueId()).addExemption(type);
+    }
+
+    /**
+     * Add an exemption type
+     *
+     * @param player   the player
+     * @param type     the type
+     * @param duration the duration
+     */
+    public void addExemption(Player player, ExemptionType type, long duration) {
+        exemptions.get(player.getUniqueId()).addExemption(type, System.currentTimeMillis() + duration);
     }
 
     /**

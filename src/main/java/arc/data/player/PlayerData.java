@@ -56,6 +56,8 @@ public final class PlayerData implements Data {
      */
     private long consumeStartTime;
 
+    private boolean isConsuming;
+
     public long lastHealthRegain() {
         return lastHealthRegain;
     }
@@ -86,5 +88,13 @@ public final class PlayerData implements Data {
 
     public void consumeStartTime(long consumeStartTime) {
         this.consumeStartTime = consumeStartTime;
+    }
+
+    public boolean isConsuming() {
+        return isConsuming;
+    }
+
+    public void setConsuming(boolean consuming) {
+        isConsuming = consuming;
     }
 }

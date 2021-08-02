@@ -55,8 +55,9 @@ public enum CheckSubType {
     /**
      * The name
      * The fancy name
+     * The permission to bypass
      */
-    private final String name, prettyName;
+    private final String name, prettyName, bypassPermission;
 
     /**
      * Initialize the sub-type
@@ -68,6 +69,8 @@ public enum CheckSubType {
         this.from = from;
         this.name = name;
         this.prettyName = prettyName;
+
+        this.bypassPermission = from.getBypassPermission() + "." + name;
     }
 
     /**
@@ -89,6 +92,13 @@ public enum CheckSubType {
      */
     public String getPrettyName() {
         return prettyName;
+    }
+
+    /**
+     * @return the bypass permission
+     */
+    public String getBypassPermission() {
+        return bypassPermission;
     }
 
     /**

@@ -104,7 +104,11 @@ public final class PlayerListener implements Listener {
     @EventHandler
     private void onConsumeItem(PlayerItemConsumeEvent event) {
         final Player player = event.getPlayer();
+        if (!WorldManager.isEnabledInWorld(player)) return;
+
         final PlayerData data = PlayerData.get(player);
+        data.setConsuming(false);
+
         final boolean result = fastUse.checkFastConsume(player, data);
         event.setCancelled(result);
     }

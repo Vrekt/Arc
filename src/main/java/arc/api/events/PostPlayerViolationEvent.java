@@ -56,28 +56,29 @@ public final class PostPlayerViolationEvent extends PlayerEvent {
     /**
      * @return the violation result.
      */
-    public ViolationResult result() {
+    public ViolationResult getResult() {
         return violationResult;
     }
+
 
     /**
      * @return the check that was failed.
      */
-    public CheckType checkFailed() {
+    public CheckType getCheck() {
         return checkFailed;
     }
 
     /**
      * @return the violation level
      */
-    public int violationLevel() {
+    public int getViolationLevel() {
         return violationLevel;
     }
 
     /**
      * @return the information
      */
-    public String information() {
+    public String getInformation() {
         return information;
     }
 

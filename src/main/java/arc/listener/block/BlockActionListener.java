@@ -4,6 +4,7 @@ import arc.Arc;
 import arc.check.block.Nuker;
 import arc.check.types.CheckType;
 import arc.utility.block.BlockAccess;
+import arc.world.WorldManager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -67,6 +68,8 @@ public final class BlockActionListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onBreak(BlockBreakEvent event) {
         final Player player = event.getPlayer();
+        if (!WorldManager.isEnabledInWorld(player)) return;
+
         if (!nuker.isPacketCheck()) event.setCancelled(nuker.check(player));
         if (blockBreakReach.check(player, player.getLocation(), event.getBlock().getLocation()))
             event.setCancelled(true);
@@ -76,6 +79,8 @@ public final class BlockActionListener implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
     private void onPlace(BlockPlaceEvent event) {
         final Player player = event.getPlayer();
+        if (!WorldManager.isEnabledInWorld(player)) return;
+
         if (blockPlaceReach.check(player, player.getLocation(), event.getBlock().getLocation()))
             event.setCancelled(true);
         if (blockPlaceNoSwing.check(player)) event.setCancelled(true);
@@ -86,6 +91,8 @@ public final class BlockActionListener implements Listener {
         if (event.getClickedBlock() != null
                 && BlockAccess.isInteractable(event.getClickedBlock())) {
             final Player player = event.getPlayer();
+            if (!WorldManager.isEnabledInWorld(player)) return;
+
             if (blockInteractReach.check(player, player.getLocation(), event.getClickedBlock().getLocation()))
                 event.setCancelled(true);
             if (blockInteractNoSwing.check(player)) event.setCancelled(true);

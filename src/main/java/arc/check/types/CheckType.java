@@ -1,5 +1,7 @@
 package arc.check.types;
 
+import arc.permissions.Permissions;
+
 /**
  * Tells what type the check is
  */
@@ -110,29 +112,30 @@ public enum CheckType {
     private final String name, prettyName, permissionName;
 
     /**
+     * Permission bypass
+     */
+    private final String bypassPermission;
+
+    /**
      * The category
      */
     private final CheckCategory category;
-
-    CheckType(String name, String prettyName, CheckCategory category) {
-        this.name = name;
-        this.prettyName = prettyName;
-        this.permissionName = name;
-        this.category = category;
-    }
 
     CheckType(String name, String prettyName, String permissionName, CheckCategory category) {
         this.name = name;
         this.prettyName = prettyName;
         this.permissionName = permissionName;
         this.category = category;
+
+        this.bypassPermission = Permissions.ARC_BYPASS + "." + category.name().toLowerCase() + "." + permissionName.toLowerCase();
+    }
+
+    CheckType(String name, String prettyName, CheckCategory category) {
+        this(name, prettyName, name, category);
     }
 
     CheckType(String name, CheckCategory category) {
-        this.name = name;
-        this.prettyName = name;
-        this.permissionName = name;
-        this.category = category;
+        this(name, name, name, category);
     }
 
     /**
@@ -154,6 +157,13 @@ public enum CheckType {
      */
     public String getConfigurationName() {
         return name.toLowerCase();
+    }
+
+    /**
+     * @return the bypass permission
+     */
+    public String getBypassPermission() {
+        return bypassPermission;
     }
 
     /**

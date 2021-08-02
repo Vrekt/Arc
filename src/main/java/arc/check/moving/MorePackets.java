@@ -2,9 +2,10 @@ package arc.check.moving;
 
 import arc.Arc;
 import arc.check.Check;
-import arc.check.types.CheckType;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
+import arc.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -159,6 +160,7 @@ public final class MorePackets extends Check {
 
         schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!WorldManager.isEnabledInWorld(player)) continue;
                 check(player, MovingData.get(player));
             }
         }, 0, 20);

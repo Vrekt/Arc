@@ -120,7 +120,7 @@ public final class NoFall extends Check {
      * @param data   their data
      */
     private void checkGround(Player player, MovingData data) {
-        if (player.isDead() || exempt(player, ExemptionType.DEATH)) return;
+        if (exempt(player, ExemptionType.DEATH)) return;
 
         // check if we just checked.
         if (data.validFallingLocation() != null) {

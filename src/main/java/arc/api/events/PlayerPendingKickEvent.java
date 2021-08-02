@@ -71,7 +71,6 @@ public final class PlayerPendingKickEvent extends PlayerEvent implements Cancell
         this.cancelled = cancelled;
     }
 
-
     @Override
     public HandlerList getHandlers() {
         return HANDLERS;

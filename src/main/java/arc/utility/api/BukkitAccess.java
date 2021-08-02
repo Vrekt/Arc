@@ -3,7 +3,9 @@ package arc.utility.api;
 import arc.Arc;
 import bridge.utility.BoundingBox;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -131,6 +133,54 @@ public final class BukkitAccess {
      */
     public static boolean hasItemInHand(Player player, Material material) {
         return ACCESS.hasItemInHand(player, material);
+    }
+
+    public static long getChunkKey(Chunk chunk) {
+        return getChunkKey(chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * @param x X Coordinate
+     * @param z Z Coordinate
+     * @return Chunk coordinates packed into a long
+     */
+    public static long getChunkKey(int x, int z) {
+        return (long) x & 0xffffffffL | ((long) z & 0xffffffffL) << 32;
+    }
+
+    /**
+     * Returns this block's coordinates packed into a long value.
+     * Computed via: {@code Block.getBlockKey(this.getX(), this.getY(), this.getZ())}
+     *
+     * @return This block's x, y, and z coordinates packed into a long value
+     * @see Block#getBlockKey(int, int, int)
+     */
+    public static long getBlockKey(Block block) {
+        return getBlockKey(block.getX(), block.getY(), block.getZ());
+    }
+
+    /**
+     * Returns the specified block coordinates packed into a long value
+     * <p>
+     * The return value can be computed as follows:
+     * <br>
+     * {@code long value = ((long)x & 0x7FFFFFF) | (((long)z & 0x7FFFFFF) << 27) | ((long)y << 54);}
+     * </p>
+     *
+     * <p>
+     * And may be unpacked as follows:
+     * <br>
+     * {@code int x = (int) ((packed << 37) >> 37);}
+     * <br>
+     * {@code int y = (int) (packed >>> 54);}
+     * <br>
+     * {@code int z = (int) ((packed << 10) >> 37);}
+     * </p>
+     *
+     * @return This block's x, y, and z coordinates packed into a long value
+     */
+    public static long getBlockKey(int x, int y, int z) {
+        return ((long) x & 0x7FFFFFF) | (((long) z & 0x7FFFFFF) << 27) | ((long) y << 54);
     }
 
 }

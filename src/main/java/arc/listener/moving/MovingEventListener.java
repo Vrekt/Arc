@@ -14,11 +14,13 @@ import arc.world.WorldManager;
 import bridge.Version;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
@@ -125,6 +127,22 @@ public final class MovingEventListener implements Listener {
                 }
             }
         }
+    }
+
+    /**
+     * Tests if the player is pushed by a piston
+     *
+     * @param event the event
+     */
+    @EventHandler(ignoreCancelled = true)
+    private void onPistonPush(BlockPistonExtendEvent event) {
+        if (!WorldManager.isEnabledWorld(event.getBlock().getWorld())) return;
+        if (event.getBlocks().size() == 0) return;
+
+        // retrieve the LAST block pushed by the piston.
+        // this is for location checking in flight.
+        final Block last = event.getBlocks().get(event.getBlocks().size() - 1);
+        flight.recordPistonEvent(last);
     }
 
     /**

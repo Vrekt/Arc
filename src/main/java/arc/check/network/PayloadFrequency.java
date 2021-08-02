@@ -1,10 +1,11 @@
 package arc.check.network;
 
 import arc.Arc;
-import arc.check.types.CheckType;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
+import arc.check.types.CheckType;
 import arc.data.packet.PacketData;
+import arc.world.WorldManager;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
@@ -166,6 +167,7 @@ public final class PayloadFrequency extends PacketCheck {
         registerPacketListener(PacketType.Play.Client.CUSTOM_PAYLOAD, this::onPayload);
         schedule(() -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
+                if (!WorldManager.isEnabledInWorld(player)) continue;
                 if (!exempt(player)) check(player, PacketData.get(player));
             }
         }, checkInterval, checkInterval);

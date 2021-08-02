@@ -7,7 +7,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 /**
- * Invoked when a request is sent to check if a player is exempt;
+ * Invoked when a request is sent to check if a player is exempt.
  */
 public final class PlayerExemptionCheckEvent extends PlayerEvent {
 
@@ -22,7 +22,7 @@ public final class PlayerExemptionCheckEvent extends PlayerEvent {
     private final CheckType check;
 
     /**
-     * The sub type is applicable
+     * The sub type if applicable
      */
     private final CheckSubType subType;
 
@@ -41,21 +41,21 @@ public final class PlayerExemptionCheckEvent extends PlayerEvent {
     /**
      * @return the check or {@code null}
      */
-    public CheckType check() {
+    public CheckType getCheck() {
         return check;
     }
 
     /**
      * @return the sub-type or {@code null}
      */
-    public CheckSubType subType() {
+    public CheckSubType getSubType() {
         return subType;
     }
 
     /**
      * @return if the player is exempt
      */
-    public boolean isExempt() {
+    public boolean setExempt() {
         return isExempt;
     }
 
@@ -64,7 +64,7 @@ public final class PlayerExemptionCheckEvent extends PlayerEvent {
      *
      * @param exempt exempt
      */
-    public void isExempt(boolean exempt) {
+    public void setExempt(boolean exempt) {
         isExempt = exempt;
     }
 

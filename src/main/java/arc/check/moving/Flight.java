@@ -7,6 +7,7 @@ import arc.check.timing.CheckTimings;
 import arc.check.types.CheckSubType;
 import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
+import arc.exemption.type.ExemptionType;
 import arc.utility.MovingAccess;
 import arc.utility.api.BukkitAccess;
 import arc.utility.block.BlockAccess;
@@ -14,18 +15,30 @@ import arc.utility.math.MathUtil;
 import bridge.Version;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * Checks various vertical movement/flying stuff.
- * TODO: calculate ground distance
- * TODO: Flag when falling onto ladder.
  */
 public final class Flight extends Check {
+
+    /**
+     * Keeps track of piston push events.
+     * Key is a chunk key.
+     * Value is a block key.
+     * <p>
+     * TODO: Probably good enough for now, but entries to be exempt could be purged early.
+     */
+    private final ConcurrentMap<Long, Long> chunkAndBlockKeys = new ConcurrentHashMap<>();
 
     /**
      * The max jump distance.
@@ -39,12 +52,11 @@ public final class Flight extends Check {
 
     /**
      * The minimum distance required to move to check vclip.
-     * The minimum distance required to update the players safe location.
      * <p>
      * Minimum speed boat can fall
      * If player score is greater than this value (the player speed doesn't match expected), flag.
      */
-    private double verticalClipMinimum, safeDistanceUpdateThreshold, minBoatDescendSpeed, boatDescendingScoreMin;
+    private double verticalClipMinimum, minBoatDescendSpeed, boatDescendingScoreMin;
 
     /**
      * The max difference allowed between a=(vertical speed - expected) then, (vertical speed - a)
@@ -84,8 +96,10 @@ public final class Flight extends Check {
     /**
      * Min = will check and make sure player doesn't fly too high AFTER using a rocket.
      * Max = will check and make sure player doesn't fly too high with no rocket use.
+     * <p>
+     * How long to exempt for after being pushed by a piston, in milliseconds.
      */
-    private long minLastRocketUseTime, maxLastRocketUseTime;
+    private long minLastRocketUseTime, maxLastRocketUseTime, pistonExemptionTimeMs;
 
     private final boolean isLegacy;
 
@@ -123,6 +137,7 @@ public final class Flight extends Check {
         addConfigurationValue("safe-location-update-distance-threshold", 1.99);
         addConfigurationValue("max-in-air-hover-time", 6);
         addConfigurationValue("slimeblock-max-score-difference", 0.42);
+        addConfigurationValue("piston-exemption-time-ms", 500);
     }
 
     /**
@@ -190,11 +205,12 @@ public final class Flight extends Check {
 
         // check the vertical move of this player.
         if (validVerticalMove && !elytra) {
+            final boolean wasMovedByPiston = wasMovedByPiston(player, from);
             // check vertical clip regardless of ascending or descending state.
             // return here since we don't want the rest of the check interfering with setback.
-            final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, vertical);
+            final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, wasMovedByPiston, vertical);
             if (!hasVerticalModifier && !failed) {
-                checkVerticalMove(player, data, ground, from, to, vertical, data.ascendingTime(), result);
+                checkVerticalMove(player, data, ground, from, to, vertical, data.ascendingTime(), wasMovedByPiston, result);
             }
         }
 
@@ -481,17 +497,18 @@ public final class Flight extends Check {
     /**
      * Check the players vertical movement.
      *
-     * @param player        the player
-     * @param data          their data
-     * @param ground        ground location
-     * @param from          the from
-     * @param to            movedTo
-     * @param vertical      vertical
-     * @param ascendingTime ascendingTime
-     * @param result        result
+     * @param player           the player
+     * @param data             their data
+     * @param ground           ground location
+     * @param from             the from
+     * @param to               movedTo
+     * @param vertical         vertical
+     * @param ascendingTime    ascendingTime
+     * @param wasMovedByPiston if the player was moved by a piston
+     * @param result           result
      */
     private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to,
-                                   double vertical, int ascendingTime, CheckResult result) {
+                                   double vertical, int ascendingTime, boolean wasMovedByPiston, CheckResult result) {
         if (data.ascending()) {
 
             // check ground distance.
@@ -556,9 +573,9 @@ public final class Flight extends Check {
                 }
             }
 
-            // go back to where we were.
-            // maybe ground later.
-            if (vertical > maxJumpHeight && !data.hasSlimeBlockLaunch()) {
+            if (vertical > maxJumpHeight
+                    && !data.hasSlimeBlockLaunch()
+                    && !wasMovedByPiston) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);
@@ -583,17 +600,18 @@ public final class Flight extends Check {
     /**
      * Check if the player moved vertically through a solid block.
      *
-     * @param player   the player
-     * @param result   the result
-     * @param safe     the safe location
-     * @param from     the from
-     * @param to       the to
-     * @param vertical the vertical
+     * @param player           the player
+     * @param result           the result
+     * @param safe             the safe location
+     * @param from             the from
+     * @param to               the to
+     * @param wasMovedByPiston if moved by piston
+     * @param vertical         the vertical
      * @return {@code true} if the player moved through a solid block.
      */
     private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location
-            from, Location to, double vertical) {
-        if (vertical >= verticalClipMinimum) {
+            from, Location to, boolean wasMovedByPiston, double vertical) {
+        if (vertical >= verticalClipMinimum && !wasMovedByPiston) {
             // safe
             final double min1 = Math.min(safe.getY(), to.getY());
             final double max1 = Math.max(safe.getY(), to.getY()) + 1;
@@ -706,6 +724,46 @@ public final class Flight extends Check {
         }
     }
 
+    /**
+     * Check if the player was moved by a piston, or they are previously exempt.
+     *
+     * @param player the player
+     * @param from   from
+     * @return {@code true} if exempt or moved by piston.
+     */
+    private boolean wasMovedByPiston(Player player, Location from) {
+        final Block block = from.getBlock().getRelative(BlockFace.DOWN);
+        final long chunkKey = BukkitAccess.getChunkKey(block.getChunk());
+
+        boolean wasMovedByPiston = false;
+        // see if we had a recent piston event matching this players' location.
+        if (chunkAndBlockKeys.containsKey(chunkKey)) {
+            wasMovedByPiston = chunkAndBlockKeys.get(chunkKey)
+                    == BukkitAccess.getBlockKey(block);
+
+            chunkAndBlockKeys.remove(chunkKey);
+        }
+
+        // add this to the exemptions if we were pushed.
+        if (wasMovedByPiston) {
+            // exempt for 10 ticks.
+            Arc.getInstance().getExemptionManager().addExemption(player, ExemptionType.PISTON, pistonExemptionTimeMs);
+        }
+
+        return exempt(player, ExemptionType.PISTON) || wasMovedByPiston;
+    }
+
+    /**
+     * Record a piston event
+     *
+     * @param block the block
+     */
+    public void recordPistonEvent(Block block) {
+        // purge if too many events.
+        if (this.chunkAndBlockKeys.size() >= 100) chunkAndBlockKeys.clear();
+        this.chunkAndBlockKeys.put(BukkitAccess.getChunkKey(block.getChunk()), BukkitAccess.getBlockKey(block));
+    }
+
     @Override
     public void reloadConfig() {
         load();
@@ -732,9 +790,9 @@ public final class Flight extends Check {
         groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
         verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
-        safeDistanceUpdateThreshold = configuration.getDouble("safe-location-update-distance-threshold");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
         slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
+        pistonExemptionTimeMs = configuration.getLong("piston-exemption-time-ms");
     }
 
     /**
