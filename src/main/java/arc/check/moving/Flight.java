@@ -524,7 +524,11 @@ public final class Flight extends Check {
                 // make sure we are within the limits of the ground.
                 // we don't want a flag when the player is wildly jumping around.
                 final double hDist = MathUtil.horizontal(ground, to);
-                if (ascendingTime >= 5 && hDist < groundDistanceHorizontalCap && !data.hasSlimeBlockLaunch()) {
+                if (ascendingTime >= 5
+                        && hDist < groundDistanceHorizontalCap
+                        && !data.hasSlimeBlockLaunch()
+                        && !BukkitAccess.hasLevitation(player)
+                        && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
                     result.setFailed("Vertical distance from ground greater than allowed within limits.")
                             .withParameter("distance", distance)
                             .withParameter("threshold", groundDistanceThreshold)
@@ -573,9 +577,12 @@ public final class Flight extends Check {
                 }
             }
 
+            // cooldown for levitation and after levitation since we have high vertical possible.
             if (vertical > maxJumpHeight
                     && !data.hasSlimeBlockLaunch()
-                    && !wasMovedByPiston) {
+                    && !wasMovedByPiston
+                    && !BukkitAccess.hasLevitation(player)
+                    && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);
@@ -587,7 +594,11 @@ public final class Flight extends Check {
             final int modifier = player.hasPotionEffect(PotionEffectType.JUMP)
                     ? BukkitAccess.getPotionEffect(player, PotionEffectType.JUMP).getAmplifier()
                     + jumpBoostAscendAmplifier : 0;
-            if (ascendingTime > (maxAscendTime + modifier) && !data.hadClimbable() && !data.hasSlimeBlockLaunch()) {
+            if (ascendingTime > (maxAscendTime + modifier)
+                    && !data.hadClimbable()
+                    && !data.hasSlimeBlockLaunch()
+                    && !BukkitAccess.hasLevitation(player)
+                    && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
                 result.setFailed("Ascending for too long")
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
@@ -720,6 +731,12 @@ public final class Flight extends Check {
 
                 // we just started descending, set.
                 if (data.descendingTime() == 1) data.setFlightDescendingLocation(data.from());
+            }
+
+            // reset ascending time if we have potion effects
+            if (BukkitAccess.hasLevitation(player)) {
+                data.ascendingTime(0);
+                data.setLastLevitationEffect(System.currentTimeMillis());
             }
         }
     }

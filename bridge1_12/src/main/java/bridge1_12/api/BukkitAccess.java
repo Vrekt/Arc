@@ -75,4 +75,14 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
                 || player.getInventory().getItemInOffHand().getType() == material;
     }
 
+    @Override
+    public boolean hasSlowFalling(Player player) {
+        return false;
+    }
+
+    @Override
+    public boolean hasLevitation(Player player) {
+        return player.hasPotionEffect(PotionEffectType.LEVITATION);
+    }
+
 }

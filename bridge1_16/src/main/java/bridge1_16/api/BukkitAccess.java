@@ -47,7 +47,7 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
 
     @Override
     public void sendMessage(Player player, TextComponent message) {
-        player.sendMessage(Component.text(message.getText()));
+        player.sendMessage(message);
     }
 
     @Override
@@ -75,6 +75,16 @@ public final class BukkitAccess implements bridge.api.BukkitAccess {
     public boolean hasItemInHand(Player player, Material material) {
         return player.getInventory().getItemInMainHand().getType() == material
                 || player.getInventory().getItemInOffHand().getType() == material;
+    }
+
+    @Override
+    public boolean hasSlowFalling(Player player) {
+        return player.hasPotionEffect(PotionEffectType.SLOW_FALLING);
+    }
+
+    @Override
+    public boolean hasLevitation(Player player) {
+        return player.hasPotionEffect(PotionEffectType.LEVITATION);
     }
 
 }

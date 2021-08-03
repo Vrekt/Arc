@@ -1,6 +1,6 @@
 main: arc.Arc
 name: Arc
-version: 2.4.3
+version: 2.4.4
 description: An anticheat for 1.8.8, 1.12.2 and 1.16.5
 author: Vrekt
 depend:
@@ -47,6 +47,8 @@ permissions:
             children:
               arc.bypass.moving.flight.boatfly:
                 description: Allows the player to bypass the Flight BoatFly check.
+              arc.bypass.moving.flight.elytrafly:
+                description: Allows the player to bypass the Flight ElytraFly check.
       arc.bypass.player:
         default: false
         description: Allows the player to bypass all Player checks.

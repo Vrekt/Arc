@@ -135,6 +135,26 @@ public final class BukkitAccess {
         return ACCESS.hasItemInHand(player, material);
     }
 
+    /**
+     * Check if a player has slow-falling
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    public static boolean hasSlowFalling(Player player) {
+        return ACCESS.hasSlowFalling(player);
+    }
+
+    /**
+     * Check if a player has levitation
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    public static boolean hasLevitation(Player player) {
+        return ACCESS.hasLevitation(player);
+    }
+
     public static long getChunkKey(Chunk chunk) {
         return getChunkKey(chunk.getX(), chunk.getZ());
     }

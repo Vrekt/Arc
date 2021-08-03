@@ -55,7 +55,10 @@ public final class NoFall extends Check {
      * @param data   the data
      */
     public void check(Player player, MovingData data) {
-        if (exempt(player) || exempt(player, ExemptionType.DEATH) || BukkitAccess.isFlyingWithElytra(player)) return;
+        if (exempt(player)
+                || exempt(player, ExemptionType.DEATH)
+                || BukkitAccess.isFlyingWithElytra(player)
+                || BukkitAccess.hasSlowFalling(player)) return;
 
         if (data.onGround()) {
             checkGround(player, data);

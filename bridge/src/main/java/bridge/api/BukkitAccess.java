@@ -107,4 +107,20 @@ public interface BukkitAccess {
      */
     boolean hasItemInHand(Player player, Material material);
 
+    /**
+     * Check if a player has slow-falling
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    boolean hasSlowFalling(Player player);
+
+    /**
+     * Check if a player has levitation
+     *
+     * @param player the player
+     * @return {@code true} if so
+     */
+    boolean hasLevitation(Player player);
+
 }

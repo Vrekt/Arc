@@ -209,6 +209,11 @@ public final class MovingData implements Data {
      */
     private int noVerticalMovementAmount;
 
+    /**
+     * Last time player had levitation
+     */
+    private long lastLevitationEffect;
+
     public Location from() {
         return from;
     }
@@ -723,5 +728,13 @@ public final class MovingData implements Data {
 
     public void setNoVerticalMovementAmount(int noVerticalMovementAmount) {
         this.noVerticalMovementAmount = MathUtil.clampInt(noVerticalMovementAmount, 0, 100);
+    }
+
+    public long getLastLevitationEffect() {
+        return lastLevitationEffect;
+    }
+
+    public void setLastLevitationEffect(long lastLevitationEffect) {
+        this.lastLevitationEffect = lastLevitationEffect;
     }
 }

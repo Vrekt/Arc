@@ -1,11 +1,13 @@
 package arc.check.network;
 
 import arc.Arc;
+import arc.bridge.packets.WrapperPlayClientCustomPayload16;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.packet.PacketData;
 import arc.world.WorldManager;
+import bridge.Version;
 import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
@@ -114,13 +116,22 @@ public final class PayloadFrequency extends PacketCheck {
             return;
         }
 
-        final WrapperPlayClientCustomPayload packet = new WrapperPlayClientCustomPayload(event.getPacket());
-        final String channel = packet.getChannel();
+        String channel;
+        byte[] bytes;
+        if (Arc.getMCVersion() == Version.VERSION_1_16) {
+            final WrapperPlayClientCustomPayload16 packet = new WrapperPlayClientCustomPayload16(event.getPacket());
+            channel = packet.getChannel().getFullKey();
+            bytes = packet.getContents();
+        } else {
+            final WrapperPlayClientCustomPayload packet = new WrapperPlayClientCustomPayload(event.getPacket());
+            channel = packet.getChannel();
+            bytes = packet.getContents();
+        }
+
         final CheckResult result = new CheckResult();
 
         // if we have a valid channel to check
         if (channels.contains(channel)) {
-            final byte[] bytes = packet.getContents();
             final int max = (isBookChannel(channel) ? maxPacketSizeBooks : maxPacketSizeOthers);
             // check if the length is bigger than the allowed size
             if (bytes.length >= max) {
