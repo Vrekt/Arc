@@ -72,7 +72,7 @@ public final class MovingData implements Data {
      * If we are in liquid
      * If we were in liquid
      */
-    private boolean ascending, descending, hasClimbable, hadClimbable, climbing, onIce, inLiquid, wasInLiquid;
+    private boolean ascending, descending, hasClimbable, hadClimbable, climbing, onIce, inLiquid;
 
     private final AtomicBoolean sneaking = new AtomicBoolean(), sprinting = new AtomicBoolean();
 
@@ -213,6 +213,20 @@ public final class MovingData implements Data {
      * Last time player had levitation
      */
     private long lastLevitationEffect;
+
+    /**
+     * If player was previously on boat.
+     */
+    private boolean wasOnBoat;
+
+    /**
+     * Player isn't moving down.
+     * <p>
+     * No reset times.
+     * <p>
+     * Amount of times flagged so far, used to ignore, kinda as a work-around.
+     */
+    private int noGlideTime, noResetAscendTime, noResetDescendTime, glideDescendFlags;
 
     public Location from() {
         return from;
@@ -663,7 +677,7 @@ public final class MovingData implements Data {
     }
 
     public void setInAirTime(int inAirTime) {
-        this.inAirTime = MathUtil.clampInt(inAirTime, 0, 100);
+        this.inAirTime = MathUtil.clampInt(inAirTime, 0, 5000);
     }
 
     public boolean hasSlimeBlockLaunch() {
@@ -736,5 +750,45 @@ public final class MovingData implements Data {
 
     public void setLastLevitationEffect(long lastLevitationEffect) {
         this.lastLevitationEffect = lastLevitationEffect;
+    }
+
+    public boolean wasOnBoat() {
+        return wasOnBoat;
+    }
+
+    public void setWasOnBoat(boolean wasOnBoat) {
+        this.wasOnBoat = wasOnBoat;
+    }
+
+    public int getNoGlideTime() {
+        return noGlideTime;
+    }
+
+    public void setNoGlideTime(int noGlideTime) {
+        this.noGlideTime = MathUtil.clampInt(noGlideTime, 0, 100);
+    }
+
+    public int getNoResetAscendTime() {
+        return noResetAscendTime;
+    }
+
+    public void setNoResetAscendTime(int noResetAscendTime) {
+        this.noResetAscendTime = MathUtil.clampInt(noResetAscendTime, 0, 1000);
+    }
+
+    public int getNoResetDescendTime() {
+        return noResetDescendTime;
+    }
+
+    public void setNoResetDescendTime(int noResetDescendTime) {
+        this.noResetDescendTime = MathUtil.clampInt(noResetDescendTime, 0, 1000);
+    }
+
+    public int getGlideDescendFlags() {
+        return glideDescendFlags;
+    }
+
+    public void setGlideDescendFlags(int glideDescendFlags) {
+        this.glideDescendFlags = MathUtil.clampInt(glideDescendFlags, 0, 100);
     }
 }

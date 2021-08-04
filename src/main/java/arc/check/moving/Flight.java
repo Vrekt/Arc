@@ -14,14 +14,12 @@ import arc.utility.block.BlockAccess;
 import arc.utility.math.MathUtil;
 import bridge.Version;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.util.NumberConversions;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -90,17 +88,44 @@ public final class Flight extends Check {
 
     /**
      * Max amount of times a player can not move vertically while flying
+     * The time required out of liquid to check ascend
      */
-    private int maxFlyingNoVerticalMovement;
+    private int maxFlyingNoVerticalMovement, ascendOutOfLiquidCooldown;
 
     /**
      * Min = will check and make sure player doesn't fly too high AFTER using a rocket.
      * Max = will check and make sure player doesn't fly too high with no rocket use.
      * <p>
      * How long to exempt for after being pushed by a piston, in milliseconds.
+     * The time to wait after the player had levitation to check.
      */
-    private long minLastRocketUseTime, maxLastRocketUseTime, pistonExemptionTimeMs;
+    private long minLastRocketUseTime, maxLastRocketUseTime, pistonExemptionTimeMs, levitationExemptionTimeMs;
 
+    /**
+     * The max amount of times the player can have no difference in velocity when falling.
+     */
+    private int noGlideDifferenceMax;
+
+    /**
+     * The minimum time needed to be descending to check glide.
+     * The minimum distance away from ground needed to check glide, 0.85 = player jump
+     * The max difference allowed between calculated fall velocity and actual fall velocity.
+     */
+    private double glideDescendTimeMin, glideDescendDistanceMin, glideMaxDifference;
+
+    /**
+     * No reset ascend checks if the player is ascending too high.
+     * Players previously could bypass regular ascend check by ascending slowly and descending every now and again.
+     * This check does not reset the players ascend time if they descend.
+     * <p>
+     * The distance needed away from ground to start checking a no reset ascend.
+     * The max amount of ascending moves allowed.
+     */
+    private double noResetAscendGroundDistanceThreshold, maxNoResetAscendMoves;
+
+    /**
+     * If this check is legacy. (1.8.8)
+     */
     private final boolean isLegacy;
 
     public Flight() {
@@ -138,6 +163,14 @@ public final class Flight extends Check {
         addConfigurationValue("max-in-air-hover-time", 6);
         addConfigurationValue("slimeblock-max-score-difference", 0.42);
         addConfigurationValue("piston-exemption-time-ms", 500);
+        addConfigurationValue("levitation-exemption-cooldown", 1500);
+        addConfigurationValue("ascend-out-of-liquid-cooldown", 3);
+        addConfigurationValue("no-glide-difference-max", 2);
+        addConfigurationValue("glide-descend-time-min", 5);
+        addConfigurationValue("glide-descend-distance-min", 1.6);
+        addConfigurationValue("glide-max-difference", 0.010);
+        addConfigurationValue("no-reset-ascend-ground-distance-threshold", 1);
+        addConfigurationValue("max-no-reset-ascend-moves", 8);
     }
 
     /**
@@ -182,7 +215,6 @@ public final class Flight extends Check {
         final Location from = data.from();
         final Location to = data.to();
         final Location ground = data.ground();
-        final Location safe = data.getSafeLocation();
 
         final double vertical = data.vertical();
         startTiming(player);
@@ -203,15 +235,23 @@ public final class Flight extends Check {
                 && !data.inLiquid()
                 && !data.hasClimbable();
 
+        final double distanceToGround = MathUtil.vertical(ground, to);
+
         // check the vertical move of this player.
         if (validVerticalMove && !elytra) {
             final boolean wasMovedByPiston = wasMovedByPiston(player, from);
-            // check vertical clip regardless of ascending or descending state.
-            // return here since we don't want the rest of the check interfering with setback.
-            final boolean failed = checkIfMovedThroughSolidBlock(player, result, safe, from, to, wasMovedByPiston, vertical);
-            if (!hasVerticalModifier && !failed) {
-                checkVerticalMove(player, data, ground, from, to, vertical, data.ascendingTime(), wasMovedByPiston, result);
+            if (!hasVerticalModifier) {
+                checkVerticalMove(player, data, ground, from, to, vertical, distanceToGround, data.ascendingTime(), wasMovedByPiston, result);
             }
+        }
+
+        // check gliding, descending movement.
+        if (!player.isInsideVehicle()
+                && !data.inLiquid()
+                && !data.hasClimbable()
+                && !elytra
+                && !BukkitAccess.hasSlowFalling(player)) {
+            checkGlide(player, data, ground, to, vertical, distanceToGround, result);
         }
 
         if (data.hasClimbable() && !elytra) {
@@ -246,7 +286,7 @@ public final class Flight extends Check {
     public void checkNoMovement(Player player, MovingData data) {
         if (exempt(player)) return;
 
-        // don't wanna update the current player moving data set
+        // don't want to update the current player moving data set
         // in-case it causes issues else-where, so for now use a temporary one
         // to retrieve stuff we need right now
         final MovingData temp = MovingData.retrieveTemporary();
@@ -313,11 +353,12 @@ public final class Flight extends Check {
     private void checkEntityMovement(Player player, MovingData data, Location ground, Location from, Location to,
                                      double vertical, int ascendingTime, CheckResult result) {
         if (exempt(player, CheckSubType.FLIGHT_BOATFLY)) return;
-        // attempt to find liquid in a large range.
-        final boolean findAnyLiquid = data.inLiquid() || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
 
-        final int outOfLiquidTime = findAnyLiquid ? 0 : data.getOutOfLiquidTime() + 1;
-        data.setOutOfLiquidTime(outOfLiquidTime);
+        // attempt to find liquid in a large range.
+        final boolean findAnyLiquid = data.inLiquid()
+                || BlockAccess.hasLiquidAt(to, player.getWorld(), 1, -1, 1);
+        final int outOfLiquidTime = findAnyLiquid ? 0 : data.getOutOfLiquidTime();
+
         // no liquid and we haven't been in any in awhile, check.
         if (!findAnyLiquid
                 && outOfLiquidTime >= boatFlyOutOfLiquidTime) {
@@ -350,6 +391,7 @@ public final class Flight extends Check {
                         if (kickPlayerFromBoat) player.leaveVehicle();
                         handleCheckViolationAndReset(player, result, teleportAfterKickFromBoat ? ground : null);
                     } else {
+                        // TODO: Uhh ?? + Leave for now I guess.
                         final double expected = MathUtil.vertical(from, to) - 0.1;
                         final double score = Math.abs(vertical - expected);
 
@@ -503,20 +545,37 @@ public final class Flight extends Check {
      * @param from             the from
      * @param to               movedTo
      * @param vertical         vertical
+     * @param distance         the distance to ground
      * @param ascendingTime    ascendingTime
      * @param wasMovedByPiston if the player was moved by a piston
      * @param result           result
      */
     private void checkVerticalMove(Player player, MovingData data, Location ground, Location from, Location to,
-                                   double vertical, int ascendingTime, boolean wasMovedByPiston, CheckResult result) {
+                                   double vertical, double distance, int ascendingTime, boolean wasMovedByPiston, CheckResult result) {
         if (data.ascending()) {
-
             // check ground distance.
-            final double distance = MathUtil.vertical(ground, to);
 
             final boolean hasSlimeblock = data.hasSlimeblock();
-            if (hasSlimeblock && vertical > 0.42 && distance > 3f) {
+            if (hasSlimeblock && vertical > 0.42 && distance > 1f) {
                 data.setHasSlimeBlockLaunch(true);
+            }
+
+            // tighter distance check, more moves allowed though, don't use ascend that resets.
+            if (distance >= noResetAscendGroundDistanceThreshold) {
+                // check ascending moves, no reset.
+                final int moves = data.getNoResetAscendTime();
+
+                if (moves >= maxNoResetAscendMoves
+                        && !BukkitAccess.hasLevitation(player)
+                        && !data.hasSlimeBlockLaunch()
+                        && (System.currentTimeMillis() - data.getLastLevitationEffect() >= levitationExemptionTimeMs)) {
+                    // we have a few moves here to work with.
+                    result.setFailed("Ascending too long")
+                            .withParameter("distance", distance)
+                            .withParameter("moves", moves)
+                            .withParameter("max", maxNoResetAscendMoves);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
             }
 
             if (distance >= groundDistanceThreshold) {
@@ -526,9 +585,10 @@ public final class Flight extends Check {
                 final double hDist = MathUtil.horizontal(ground, to);
                 if (ascendingTime >= 5
                         && hDist < groundDistanceHorizontalCap
+                        && !hasSlimeblock
                         && !data.hasSlimeBlockLaunch()
                         && !BukkitAccess.hasLevitation(player)
-                        && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
+                        && (System.currentTimeMillis() - data.getLastLevitationEffect() >= levitationExemptionTimeMs)) {
                     result.setFailed("Vertical distance from ground greater than allowed within limits.")
                             .withParameter("distance", distance)
                             .withParameter("threshold", groundDistanceThreshold)
@@ -539,7 +599,7 @@ public final class Flight extends Check {
             }
 
             // ensure we didn't walk up a block that modifies your vertical
-            final double maxJumpHeight = getJumpHeight(player);
+            double maxJumpHeight = getJumpHeight(player);
 
             if (hasSlimeblock) {
                 // player was launched, set state
@@ -578,16 +638,27 @@ public final class Flight extends Check {
             }
 
             // cooldown for levitation and after levitation since we have high vertical possible.
+
+            final boolean boat = MovingAccess.isOnBoat(player);
+            // boat modifier, slightly higher step height.
+            if (boat) maxJumpHeight += 0.0175;
+
             if (vertical > maxJumpHeight
+                    && !hasSlimeblock
                     && !data.hasSlimeBlockLaunch()
                     && !wasMovedByPiston
                     && !BukkitAccess.hasLevitation(player)
-                    && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
+                    && System.currentTimeMillis() - data.getLastLevitationEffect() >= levitationExemptionTimeMs
+                    && !boat
+                    && !data.wasOnBoat()) {
                 result.setFailed("Vertical move greater than max jump height.")
                         .withParameter("vertical", vertical)
                         .withParameter("max", maxJumpHeight);
                 handleCheckViolationAndReset(player, result, from);
             }
+
+            // update after
+            data.setWasOnBoat(boat);
 
             // add to our modifier if we have a jump effect.
             // this will need to be amplified by the amplifier.
@@ -598,7 +669,8 @@ public final class Flight extends Check {
                     && !data.hadClimbable()
                     && !data.hasSlimeBlockLaunch()
                     && !BukkitAccess.hasLevitation(player)
-                    && (System.currentTimeMillis() - data.getLastLevitationEffect() >= 1500)) {
+                    && (System.currentTimeMillis() - data.getLastLevitationEffect() >= levitationExemptionTimeMs)
+                    && data.getOutOfLiquidTime() >= ascendOutOfLiquidCooldown) {
                 result.setFailed("Ascending for too long")
                         .withParameter("vertical", vertical)
                         .withParameter("time", data.ascendingTime())
@@ -609,64 +681,71 @@ public final class Flight extends Check {
     }
 
     /**
-     * Check if the player moved vertically through a solid block.
+     * Generally check player gliding and flight movements.
      *
-     * @param player           the player
-     * @param result           the result
-     * @param safe             the safe location
-     * @param from             the from
-     * @param to               the to
-     * @param wasMovedByPiston if moved by piston
-     * @param vertical         the vertical
-     * @return {@code true} if the player moved through a solid block.
+     * @param player   the player
+     * @param data     their data
+     * @param ground   ground location
+     * @param to       to
+     * @param vertical vertical
+     * @param distance the distance to ground
+     * @param result   result
      */
-    private boolean checkIfMovedThroughSolidBlock(Player player, CheckResult result, Location safe, Location
-            from, Location to, boolean wasMovedByPiston, double vertical) {
-        if (vertical >= verticalClipMinimum && !wasMovedByPiston) {
-            // safe
-            final double min1 = Math.min(safe.getY(), to.getY());
-            final double max1 = Math.max(safe.getY(), to.getY()) + 1;
+    private void checkGlide(Player player, MovingData data, Location ground, Location to, double vertical, double distance, CheckResult result) {
 
-            // from
-            final double min2 = Math.min(from.getY(), to.getY());
-            final double max2 = Math.max(from.getY(), to.getY()) + 1;
+        // first, basic glide check
+        // ensure player is actually moving down when off the ground here.
+        if (!data.onGround() && !data.ascending()) {
+            // calculate how we moved since last time.
+            final double delta = Math.abs(vertical - data.lastVertical());
 
-            if (hasSolidBlockBetween(min1, max1, player.getWorld(), safe)) {
-                result.setFailed("Attempted to move through a block")
+            // player hasn't moved, increase 'time'
+            if (vertical == 0.0 || delta == 0.0) {
+                data.setNoGlideTime(data.getNoGlideTime() + 1);
+            } else {
+                // decrease / reward
+                data.setNoGlideTime(data.getNoGlideTime() - 1);
+            }
+
+            if (data.getNoGlideTime() > noGlideDifferenceMax) {
+                result.setFailed("No vertical difference while off ground")
                         .withParameter("vertical", vertical)
-                        .withParameter("min", verticalClipMinimum)
-                        .withParameter("safe", true);
-                return handleCheckViolationAndReset(player, result, safe);
-            } else if (hasSolidBlockBetween(min2, max2, player.getWorld(), from)) {
-                result.setFailed("Attempted to move through a block")
-                        .withParameter("vertical", vertical)
-                        .withParameter("min", verticalClipMinimum)
-                        .withParameter("from", true);
-                return handleCheckViolationAndReset(player, result, from);
+                        .withParameter("last", data.lastVertical())
+                        .withParameter("delta", delta)
+                        .withParameter("time", data.getNoGlideTime())
+                        .withParameter("max", noGlideDifferenceMax);
+                handleCheckViolationAndReset(player, result, ground);
+            }
+
+            // next, calculate how we should be falling.
+            // ensure we have been falling though, and have at-least decent distance.
+            // Check horizontal distance as-well since its possible to glide pretty far
+            // before hitting the vertical distance required.
+            if (data.getNoResetDescendTime() >= glideDescendTimeMin
+                    && ((distance >= glideDescendDistanceMin)
+                    || MathUtil.horizontal(ground, data.to()) >= glideDescendDistanceMin)) {
+
+                final int time = data.getInAirTime();
+
+                // meant to stop increasing the overall expected after a certain distance
+                // sort of like a reset.
+                final double mod = time <= 50 ? 0.000006 :
+                        MathUtil.vertical(data.getFlightDescendingLocation(), to) >= 50 ? 0.00000456
+                                : 0.000006;
+
+                final double expected = mod * Math.pow(data.getInAirTime(), 2) - 0.0011 * data.getInAirTime() + 0.077;
+                final double difference = expected - delta;
+
+                if (difference > glideMaxDifference) {
+                    result.setFailed("Gliding delta not expected")
+                            .withParameter("delta", delta)
+                            .withParameter("e", expected)
+                            .withParameter("diff", difference)
+                            .withParameter("max", glideMaxDifference);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
             }
         }
-
-        return false;
-    }
-
-    /**
-     * Check if there is a solid block between the coordinates.
-     *
-     * @param min    the min
-     * @param max    the max
-     * @param world  the world
-     * @param origin the origin
-     * @return the result
-     */
-    private boolean hasSolidBlockBetween(double min, double max, World world, Location origin) {
-        for (double y = min; y <= max + 1; y++) {
-            if (BlockAccess.isConsideredGround(world.getBlockAt(
-                    origin.getBlockX(),
-                    NumberConversions.floor(y),
-                    origin.getBlockZ()))) return true;
-        }
-
-        return false;
     }
 
     /**
@@ -724,6 +803,11 @@ public final class Flight extends Check {
             data.setTrackingAscending(false);
             data.setMaxDescendSpeed(0.0);
             data.setNoVerticalMovementAmount(0);
+
+            // slowly decrease the time here.
+            // if start seeing false positives, reset 0 instead.
+            data.setNoGlideTime(data.getNoGlideTime() - 1);
+            data.setGlideDescendFlags(0);
         } else {
             if (data.descending()) {
                 data.setTrackingAscending(false);
@@ -736,6 +820,7 @@ public final class Flight extends Check {
             // reset ascending time if we have potion effects
             if (BukkitAccess.hasLevitation(player)) {
                 data.ascendingTime(0);
+                data.setNoResetAscendTime(0);
                 data.setLastLevitationEffect(System.currentTimeMillis());
             }
         }
@@ -810,6 +895,14 @@ public final class Flight extends Check {
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
         slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
         pistonExemptionTimeMs = configuration.getLong("piston-exemption-time-ms");
+        levitationExemptionTimeMs = configuration.getInt("levitation-exemption-cooldown");
+        ascendOutOfLiquidCooldown = configuration.getInt("ascend-out-of-liquid-cooldown");
+        noGlideDifferenceMax = configuration.getInt("no-glide-difference-max");
+        glideDescendTimeMin = configuration.getInt("glide-descend-time-min");
+        glideDescendDistanceMin = configuration.getDouble("glide-descend-distance-min");
+        glideMaxDifference = configuration.getDouble("glide-max-difference");
+        noResetAscendGroundDistanceThreshold = configuration.getDouble("no-reset-ascend-ground-distance-threshold");
+        maxNoResetAscendMoves = configuration.getInt("max-no-reset-ascend-moves");
     }
 
     /**

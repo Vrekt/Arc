@@ -6,6 +6,7 @@ import arc.check.types.CheckType;
 import arc.data.moving.MovingData;
 import arc.world.WorldManager;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 
 /**
@@ -28,10 +29,11 @@ public final class MovingTaskListener implements Runnable {
         final long now = System.currentTimeMillis();
         for (Player player : Bukkit.getOnlinePlayers()) {
             // make sure we are in a safe world.
-            if (WorldManager.isEnabledInWorld(player)) {
+            if (WorldManager.isEnabledInWorld(player) && (player.getGameMode() == GameMode.SURVIVAL
+                    || player.getGameMode() == GameMode.ADVENTURE)) {
                 final MovingData data = MovingData.get(player);
                 if (now - data.lastMovingUpdate() >= 500) {
-                    // player hasn't moved in awhile, check-in.
+                    // player hasn't moved in a while, check-in.
                     checkIn(player, data);
                 }
             }

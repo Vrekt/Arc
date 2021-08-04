@@ -12,6 +12,7 @@ import arc.utility.api.BukkitAccess;
 import arc.utility.material.MaterialAccess;
 import arc.world.WorldManager;
 import bridge.Version;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -87,7 +88,11 @@ public final class MovingEventListener implements Listener {
         // check if we have moved.
         boolean hasMoved = from.getX() != to.getX() || from.getY() != to.getY() || from.getZ() != to.getZ();
         if (hasMoved) {
-            MovingAccess.updatePlayerMovingData(data, from, to);
+            // ignore players who are in creative or spectator for now.
+            if (player.getGameMode() == GameMode.SURVIVAL
+                    || player.getGameMode() == GameMode.ADVENTURE) {
+                MovingAccess.updatePlayerMovingData(data, from, to);
+            }
             // run checks
             runChecks(player, data);
         }

@@ -40,7 +40,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.4.5";
+    public static final String VERSION_STRING = "2.5";
 
     /**
      * If sync events should be used.

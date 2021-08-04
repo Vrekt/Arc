@@ -66,9 +66,9 @@ public final class MovingAccess {
      * @return {@code true} if so
      */
     public static boolean isOnBoat(Player player) {
-        return player.getNearbyEntities(0.1, 0.1, 0.1)
+        return player.getNearbyEntities(0.3, 0.1, 0.3)
                 .stream()
-                .anyMatch(entity -> entity instanceof Boat && entity.getLocation().getY() < player.getLocation().getY());
+                .anyMatch(entity -> entity instanceof Boat && entity.getLocation().getY() <= player.getLocation().getY());
     }
 
     /**
@@ -127,6 +127,10 @@ public final class MovingAccess {
             }
 
             data.setInAirTime(0);
+
+            // actually reset if on ground ofc :-)
+            data.setNoResetDescendTime(0);
+            data.setNoResetAscendTime(0);
         } else {
             data.onGroundTime(0);
             data.setInAirTime(data.getInAirTime() + 1);
@@ -171,12 +175,14 @@ public final class MovingAccess {
         data.descending(descending);
         if (ascending) {
             data.incrementAscendingTime();
+            data.setNoResetAscendTime(data.getNoResetAscendTime() + 1);
         } else {
             data.ascendingTime(0);
         }
 
         if (descending) {
             data.incrementDescendingTime();
+            data.setNoResetDescendTime(data.getNoResetDescendTime() + 1);
         } else {
             data.descendingTime(0);
         }
@@ -198,6 +204,10 @@ public final class MovingAccess {
         // calculate liquids
         final boolean inLiquid = MovingAccess.isInOrOnLiquid(cloneTo);
         data.inLiquid(inLiquid);
+
+        final int outOfLiquidTime = inLiquid ? 0 : data.getOutOfLiquidTime() + 1;
+        data.setOutOfLiquidTime(outOfLiquidTime);
+
         data.lastMovingUpdate(now);
     }
 

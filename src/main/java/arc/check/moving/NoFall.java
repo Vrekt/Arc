@@ -104,7 +104,16 @@ public final class NoFall extends Check {
                     data.failedNoFall(checkViolation(player, result));
                 } else {
                     // patch basic types of NoFall.
-                    if (clientGround || fallDistance == 0.0 && !data.hasSlimeblock()) {
+                    if ((clientGround || fallDistance == 0.0)
+                            && !data.hasSlimeblock()
+                            && !data.hasSlimeBlockLaunch()) {
+
+                        // test if player will die from this damage.
+                        // TODO: Dirty workaround
+                        if (clientGround && fallDistance > 25) {
+                            return;
+                        }
+
                         result.setFailed("Client on ground or fall distance is 0.0")
                                 .withParameter("fallDistance", fallDistance)
                                 .withParameter("clientGround", clientGround);
