@@ -170,7 +170,7 @@ public final class Flight extends Check {
         addConfigurationValue("glide-descend-distance-min", 1.6);
         addConfigurationValue("glide-max-difference", 0.010);
         addConfigurationValue("no-reset-ascend-ground-distance-threshold", 1);
-        addConfigurationValue("max-no-reset-ascend-moves", 8);
+        addConfigurationValue("max-no-reset-ascend-moves", 10);
     }
 
     /**
@@ -693,6 +693,27 @@ public final class Flight extends Check {
      */
     private void checkGlide(Player player, MovingData data, Location ground, Location to, double vertical, double distance, CheckResult result) {
 
+        // check no ground stuff
+        // TODO: Can be bypassed, needs to be improved, see comment below.
+        if (!data.onGround() && (data.getNoResetDescendTime() >= 5 || data.getNoResetAscendTime() >= 5)) {
+            final double horizontal = MathUtil.horizontal(ground, to);
+            if (horizontal > 3f && data.getInAirTime() >= 15) {
+                // player is far from ground, so we should expect to be a certain distance by this point.
+                // This can still be abused here, so in the future calculate what we should expect.
+                // TODO: Bypassable by falling a greater amount over time.
+                if (distance < 1f) {
+                    result.setFailed("Not gliding over-time (experimental)")
+                            .withParameter("horizontal", horizontal)
+                            .withParameter("min", 3f)
+                            .withParameter("air", data.getInAirTime())
+                            .withParameter("min", 15)
+                            .withParameter("distance", distance)
+                            .withParameter("min", 1f);
+                    handleCheckViolationAndReset(player, result, ground);
+                }
+            }
+        }
+
         // first, basic glide check
         // ensure player is actually moving down when off the ground here.
         if (!data.onGround() && !data.ascending()) {
@@ -723,7 +744,7 @@ public final class Flight extends Check {
             // before hitting the vertical distance required.
             if (data.getNoResetDescendTime() >= glideDescendTimeMin
                     && ((distance >= glideDescendDistanceMin)
-                    || MathUtil.horizontal(ground, data.to()) >= glideDescendDistanceMin)) {
+                    || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)) {
 
                 final int time = data.getInAirTime();
 
@@ -736,7 +757,7 @@ public final class Flight extends Check {
                 final double expected = mod * Math.pow(data.getInAirTime(), 2) - 0.0011 * data.getInAirTime() + 0.077;
                 final double difference = expected - delta;
 
-                if (difference > glideMaxDifference) {
+                if (difference > glideMaxDifference || difference < 0.0001) {
                     result.setFailed("Gliding delta not expected")
                             .withParameter("delta", delta)
                             .withParameter("e", expected)
