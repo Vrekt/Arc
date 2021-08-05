@@ -3,37 +3,13 @@
 # Arc
 Arc is an anticheat built to support older PvP versions and newer game versions. The goal of Arc is to be extremely configurable, performant, compatible, and effective. As of right now Arc is still very experimental and there are alot of things still missing.
 
+#### Some highlights of Arc:
+
+* Extensive configuration and permissions
 * Supports 1.8, 1.12 and 1.16
 * LiteBans support
-* Customizable checks
 * Performant
 * API
-* Extensive configuration and permissions
-
-##
-
-<img align="right" src="violationdebug.png">
-
-* Customizable violation messages
-* Customizable violation parameters
-* Customizable violation actions
-* Customizable notify levels for each check
-* Hovering debug system
-* Violation data kept on logout
-* Notified on player kicks/bans
-* Ability to toggle on/off
-
-
-##
-
-<img align="right" src="https://i.imgur.com/P4otxe9.png">
-
-* WIP Inventory management system
-* Toggle violations
-* Reload configuration
-* View timings
-
-... and more!
 
 # Installing
 * Arc *requires* Java 8.
