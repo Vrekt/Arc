@@ -3,8 +3,6 @@
 # Arc
 Arc is an anticheat built to support older PvP versions and newer game versions. The goal of Arc is to be extremely configurable, performant, compatible, and effective. As of right now Arc is still very experimental and there are alot of things still missing.
 
-#### Some highlights of Arc:
-
 * Extensive configuration and permissions
 * Supports 1.8, 1.12 and 1.16
 * LiteBans support
@@ -13,28 +11,17 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 Arc **requires** Java 8 and ProtocolLib to function. Arc is compatible with either Spigot or PaperSpigot.
 
+
+
 # Checks
 
 * `Combat` checks
   * KillAura
-    * Direction
-    * Attack Speed
-    * WIP.
   * Criticals
   * Reach
   * NoSwing
 * `Moving` checks
   * Flight
-    * Contains multiple related checks but is still WIP.
-    * Ascending too high (Spider)
-    * Ascending too fast (Spider)
-    * HighJump
-    * Clipping through blocks
-    * FastLadder
-    * BoatFly
-    * SlimeJump
-    * Hover/AirStuck
-    * ElytraFly
   * NoFall
   * MorePackets
   * Jesus
@@ -56,9 +43,8 @@ Arc **requires** Java 8 and ProtocolLib to function. Arc is compatible with eith
     * Placing
     * Interaction
   * Nuker
-  * Still WIP
 
-*...All checks are still work in progress and subject to change*
+*...All checks are still work in progress and subject to change...*
 
 # Development
 
