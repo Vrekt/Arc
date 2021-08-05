@@ -22,6 +22,7 @@ import bridge.Bridge;
 import bridge.Version;
 import bridge1_12.Bridge1_12;
 import bridge1_16.Bridge1_16;
+import bridge1_17.Bridge1_17;
 import bridge1_8.Bridge1_8;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -101,15 +102,14 @@ public final class Arc extends JavaPlugin {
     public void onEnable() {
         arc = this;
 
-        getLogger().info(ChatColor.RED + "This version of Arc is experimental!");
-        getLogger().info(ChatColor.RED + "Expect random log messages, errors, crashes, and console spam.");
-        getLogger().info(ChatColor.RED + "Please report any issues to GitHub.");
-
-        getLogger().info("Checking server version...");
         if (!loadCompatibleVersions()) {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        getLogger().info(ChatColor.RED + "This version of Arc is experimental!");
+        getLogger().info(ChatColor.RED + "Expect random log messages, errors, crashes, and console spam.");
+        getLogger().info(ChatColor.RED + "Please report any issues to GitHub.");
 
         getLogger().info("Reading configuration...");
         saveDefaultConfig();
@@ -221,6 +221,7 @@ public final class Arc extends JavaPlugin {
      * Load compatible versions
      */
     private boolean loadCompatibleVersions() {
+        getLogger().info("Checking server version...");
         version = Version.isCompatible(Bukkit.getVersion());
 
         if (version == null) {
@@ -238,6 +239,9 @@ public final class Arc extends JavaPlugin {
                 case VERSION_1_16:
                     loadFor1_16();
                     break;
+                case VERSION_1_17:
+                    loadFor1_17();
+                    break;
             }
 
             useSyncEvents = version.isNewerThan(Version.VERSION_1_8);
@@ -247,7 +251,7 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
-     * Load arc for 1.8.8
+     * Load version: 1.8
      */
     private void loadFor1_8() {
         version = Version.VERSION_1_8;
@@ -255,7 +259,7 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
-     * Load arc for 1.12
+     * Load version: 1.12
      */
     private void loadFor1_12() {
         version = Version.VERSION_1_12;
@@ -263,11 +267,19 @@ public final class Arc extends JavaPlugin {
     }
 
     /**
-     * Load arc for 1.16
+     * Load version: 1.16
      */
     private void loadFor1_16() {
         version = Version.VERSION_1_16;
         bridge = new Bridge1_16();
+    }
+
+    /**
+     * Load version: 1.17
+     */
+    private void loadFor1_17() {
+        version = Version.VERSION_1_17;
+        bridge = new Bridge1_17();
     }
 
     /**

@@ -123,4 +123,14 @@ public final class BlockAccess implements bridge.block.BlockAccess {
         }
         return false;
     }
+
+    @Override
+    public boolean isCarpet(Block block) {
+        return block.getType() == Material.CARPET;
+    }
+
+    @Override
+    public boolean isGround(Block block) {
+        return block.getType() == Material.END_ROD;
+    }
 }

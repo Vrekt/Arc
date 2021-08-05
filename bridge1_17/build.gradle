@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+configurations {
+    priority
+    sourceSets.main.compileClasspath = configurations.priority + sourceSets.main.compileClasspath
+}
+
+group 'me.vrekt'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+}
+
+dependencies {
+    priority 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
+    compile(project(':bridge')) {
+        transitive = false
+    }
+}

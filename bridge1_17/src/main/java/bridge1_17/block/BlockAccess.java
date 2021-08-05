@@ -1,20 +1,20 @@
-package bridge1_16.block;
+package bridge1_17.block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.type.*;
 
 /**
- * Block access for 1.16
+ * Block access for 1.17
  */
 public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean hasVerticalModifier(Block block) {
-        return block.getState() instanceof Fence
-                || block.getState() instanceof Slab
-                || block.getState() instanceof Stairs
-                || block.getState() instanceof Gate
+        return block.getBlockData() instanceof Fence
+                || block.getBlockData() instanceof Slab
+                || block.getBlockData() instanceof Stairs
+                || block.getBlockData() instanceof Gate
                 || isWall(block)
                 || block.getType() == Material.SNOW
                 || block.getType() == Material.SKELETON_SKULL
@@ -22,12 +22,13 @@ public final class BlockAccess implements bridge.block.BlockAccess {
                 || block.getType() == Material.CREEPER_HEAD
                 || block.getType() == Material.DRAGON_HEAD
                 || block.getType() == Material.PLAYER_HEAD
-                || block.getType() == Material.ZOMBIE_HEAD;
+                || block.getType() == Material.ZOMBIE_HEAD
+                || block.getType() == Material.SCULK_SENSOR;
     }
 
     @Override
     public boolean isClimbable(Block block) {
-        return block.getState().getBlock() instanceof Ladder
+        return block.getBlockData() instanceof Ladder
                 || block.getType() == Material.VINE
                 || block.getType() == Material.TWISTING_VINES
                 || block.getType() == Material.WEEPING_VINES;
@@ -40,7 +41,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isTrapdoor(Block block) {
-        return block.getState() instanceof TrapDoor;
+        return block.getBlockData() instanceof TrapDoor;
     }
 
     @Override
@@ -50,7 +51,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isWall(Block block) {
-        return block.getState() instanceof Wall;
+        return block.getBlockData() instanceof Wall;
     }
 
     @Override
@@ -82,6 +83,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
             case GREEN_CARPET:
             case RED_CARPET:
             case BLACK_CARPET:
+            case MOSS_CARPET:
                 return true;
         }
         return false;
@@ -89,7 +91,14 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isGround(Block block) {
-        return block.getType() == Material.END_ROD;
-    }
+        switch (block.getType()) {
+            case BIG_DRIPLEAF:
+            case BIG_DRIPLEAF_STEM:
+            case END_ROD:
+            case LIGHTNING_ROD:
+                return true;
+        }
 
+        return false;
+    }
 }

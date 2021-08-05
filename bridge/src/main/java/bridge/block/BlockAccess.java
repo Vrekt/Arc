@@ -72,14 +72,34 @@ public interface BlockAccess {
     boolean isInteractable(Block block);
 
     /**
+     * Check if the block is carpet
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isCarpet(Block block);
+
+    /**
+     * Check if this block should be considered ground
+     *
+     * @param block the block
+     * @return {@code true} if so
+     */
+    boolean isGround(Block block);
+
+    /**
      * Check if the provided {@code block} is considered to be ground, meaning you can stand on it.
      *
      * @param block the block
      * @return {@code true} if so
      */
     default boolean isConsideredGround(Block block) {
-        if (isWall(block)) return false;
-        return block.getType().isSolid() || hasVerticalModifier(block) || isTrapdoor(block);
+        return block.getType().isSolid()
+                || hasVerticalModifier(block)
+                || isTrapdoor(block)
+                || isWall(block)
+                || isGround(block)
+                || isCarpet(block);
     }
 
 }

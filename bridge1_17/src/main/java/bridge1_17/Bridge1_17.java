@@ -1,15 +1,15 @@
-package bridge1_16;
+package bridge1_17;
 
 import bridge.Bridge;
 import bridge.Version;
-import bridge1_16.api.BukkitAccess;
-import bridge1_16.block.BlockAccess;
-import bridge1_16.materials.MaterialAccess;
+import bridge1_17.api.BukkitAccess;
+import bridge1_17.block.BlockAccess;
+import bridge1_17.materials.MaterialAccess;
 
 /**
- * Current bridge for 1.16
+ * Current bridge for 1.17
  */
-public final class Bridge1_16 implements Bridge {
+public final class Bridge1_17 implements Bridge {
 
     private static final bridge.material.MaterialAccess MATERIAL_ACCESS = new MaterialAccess();
     private static final bridge.block.BlockAccess BLOCK_ACCESS = new BlockAccess();
@@ -17,7 +17,7 @@ public final class Bridge1_16 implements Bridge {
 
     @Override
     public Version getVersion() {
-        return Version.VERSION_1_16;
+        return Version.VERSION_1_17;
     }
 
     @Override

@@ -1,14 +1,12 @@
 package arc.check.network;
 
 import arc.Arc;
-import arc.bridge.packets.WrapperPlayClientCustomPayload16;
+import arc.bridge.packets.BridgePlayClientCustomPayload;
 import arc.check.PacketCheck;
 import arc.check.result.CheckResult;
 import arc.check.types.CheckType;
 import arc.data.packet.PacketData;
 import arc.world.WorldManager;
-import bridge.Version;
-import com.comphenix.packetwrapper.WrapperPlayClientCustomPayload;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.PacketEvent;
 import com.google.common.collect.Lists;
@@ -116,18 +114,9 @@ public final class PayloadFrequency extends PacketCheck {
             return;
         }
 
-        String channel;
-        byte[] bytes;
-        if (Arc.getMCVersion() == Version.VERSION_1_16) {
-            final WrapperPlayClientCustomPayload16 packet = new WrapperPlayClientCustomPayload16(event.getPacket());
-            channel = packet.getChannel().getFullKey();
-            bytes = packet.getContents();
-        } else {
-            final WrapperPlayClientCustomPayload packet = new WrapperPlayClientCustomPayload(event.getPacket());
-            channel = packet.getChannel();
-            bytes = packet.getContents();
-        }
-
+        final BridgePlayClientCustomPayload packet = new BridgePlayClientCustomPayload(event.getPacket());
+        final String channel = packet.getChannel();
+        final byte[] bytes = packet.getContents();
         final CheckResult result = new CheckResult();
 
         // if we have a valid channel to check
