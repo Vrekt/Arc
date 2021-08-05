@@ -13,6 +13,8 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 Arc is currently built with Java 8 and requires ProtocolLib to be present on the server. In the near future, builds using Java 16 will be available for 1.17+ game versions.
 
+Head over to the [releases page](https://github.com/Vrekt/Arc/releases) and download the latest version. Then, place the jar file into your plugin directory.
+
 ##### ProtocolLib
 You can find ProtocolLib [here](https://www.spigotmc.org/resources/protocollib.1997/).
 
