@@ -1,67 +1,37 @@
 <img align="right" src="test.png">
 
 # Arc
-Arc is an anticheat built to support older PvP versions and newer game versions. The goal of Arc is to be extremely configurable, performant, compatible, and effective. As of right now Arc is still very experimental and there are alot of things still missing.
+Arc is an anticheat built to support older PvP versions and newer game versions. The goal of Arc is to be extremely configurable, performant, compatible, and effective.
 
+* Extensive configuration and permissions
 * Supports 1.8, 1.12 and 1.16
 * LiteBans support
-* Customizable checks
 * Performant
 * API
-* Extensive configuration and permissions
 
-##
+### Installing
 
-<img align="right" src="violationdebug.png">
+Arc is currently built with Java 8 and requires ProtocolLib to be present on the server. In the near future, builds using Java 16 will be available for 1.17+ game versions.
 
-* Customizable violation messages
-* Customizable violation parameters
-* Customizable violation actions
-* Customizable notify levels for each check
-* Hovering debug system
-* Violation data kept on logout
-* Notified on player kicks/bans
-* Ability to toggle on/off
+Head over to the [releases page](https://github.com/Vrekt/Arc/releases) and download the latest version. Then, place the jar file into your plugin directory.
 
+##### ProtocolLib
+You can find ProtocolLib [here](https://www.spigotmc.org/resources/protocollib.1997/).
 
-##
+##### Compatibility
+Arc is compatible with either `Spigot` or `PaperSpigot`. Other software or forks are untested, so use at your own risk.
 
-<img align="right" src="https://i.imgur.com/P4otxe9.png">
+### Checks
 
-* WIP Inventory management system
-* Toggle violations
-* Reload configuration
-* View timings
-
-... and more!
-
-# Installing
-* Arc *requires* Java 8.
-* Arc *requires* ProtocolLib
-* Compatible with Spigot and PaperSpigot!
-
-# Checks
+Arc is still experimental regardless, improvements and features are worked on every day. As such, expect some things to be totally missing or broken.
 
 * `Combat` checks
   * KillAura
-    * Direction
-    * Attack Speed
-    * WIP.
   * Criticals
   * Reach
   * NoSwing
 * `Moving` checks
   * Flight
-    * Contains multiple related checks but is still WIP.
-    * Ascending too high (Spider)
-    * Ascending too fast (Spider)
-    * HighJump
-    * Clipping through blocks
-    * FastLadder
-    * BoatFly
-    * SlimeJump
-    * Hover/AirStuck
-    * ElytraFly
   * NoFall
   * MorePackets
   * Jesus
@@ -83,13 +53,10 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
     * Placing
     * Interaction
   * Nuker
-  * Still WIP
 
-*...All checks are still work in progress and subject to change*
+### Development
 
-# Development
-
-View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress items and TODO.
+Visit the [projects board](https://github.com/Vrekt/Arc/projects) to see in-progress items and TODO.
 
 * You can submit pull requests at any time to implement a feature or change.
   * Please ensure the code is quality and readable
@@ -102,7 +69,7 @@ View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress it
   * A CraftBukkit 1.16.5 jar - which can be obtained from BuildTools using `--compile craftbukkit`
   * Each CraftBukkit jar must be placed in their respective `bridgex_x` directory.
 
-# Documentation
+### Documentation
 
 All the documentation is still work-in-progress and very incomplete.
 
@@ -114,9 +81,3 @@ Although, most things within the code are very clear and documented.
   * [Configuration](https://github.com/Vrekt/Arc/wiki/Configuration)
   * [Check Configuration](https://github.com/Vrekt/Arc/wiki/Check-configuration)
   * [Configuration Preview](https://github.com/Vrekt/Arc/wiki/Configuration-Preview)
- 
-
-# Preview
-Check out the default configuration file [here](https://github.com/Vrekt/Arc/wiki/Configuration-Preview).
-
-NOTE: Comments are not included once the configuration is written to the plugin directory.
