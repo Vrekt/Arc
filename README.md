@@ -11,10 +11,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 * Performant
 * API
 
-# Installing
-* Arc *requires* Java 8.
-* Arc *requires* ProtocolLib
-* Compatible with Spigot and PaperSpigot!
+Arc **requires** Java 8 and ProtocolLib to function. Arc is compatible with either Spigot or PaperSpigot.
 
 # Checks
 
@@ -65,7 +62,7 @@ Arc is an anticheat built to support older PvP versions and newer game versions.
 
 # Development
 
-View the [trello board](https://trello.com/b/Ytgv320C/arc) to see in-progress items and TODO.
+Visit the [projects board](https://github.com/Vrekt/Arc/projects) to see in-progress items and TODO.
 
 * You can submit pull requests at any time to implement a feature or change.
   * Please ensure the code is quality and readable
