@@ -1,15 +1,10 @@
 package arc.command.commands;
 
 import arc.Arc;
-import arc.inventory.InventoryCreator;
 import arc.permissions.Permissions;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.Collections;
 
 /**
  * Toggle player violations
@@ -34,20 +29,6 @@ public final class ToggleViolationsSubCommand extends ArcSubCommand {
         final Player player = (Player) sender;
         final boolean state = toggleState(player);
         sendMessage(player, ChatColor.DARK_AQUA + "Violations are now " + (state ? ChatColor.GREEN + "on." : ChatColor.RED + "off."));
-    }
-
-    @Override
-    public void executeInventory(ItemStack item, InventoryCreator inventory, Player player) {
-        final ItemStack modified = item.clone();
-        final boolean violations = Arc.getInstance().getViolationManager().toggleViolationsViewer(player);
-
-        final ItemMeta meta = modified.getItemMeta();
-        if (meta != null) {
-            // TODO @Deprecated
-            meta.setLore(Collections.singletonList(ChatColor.DARK_AQUA + "Violations are currently " + (violations ? ChatColor.GREEN + "on." : ChatColor.RED + "off.")));
-        }
-        modified.setItemMeta(meta);
-        inventory.replace(item, modified);
     }
 
     /**

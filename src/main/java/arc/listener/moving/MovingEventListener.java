@@ -58,7 +58,7 @@ public final class MovingEventListener implements Listener {
     /**
      * Firework rocket
      */
-    private final Material rocket;
+    private Material rocket;
 
     public MovingEventListener() {
         flight = Arc.getInstance().getCheckManager().getCheck(CheckType.FLIGHT);
@@ -68,9 +68,10 @@ public final class MovingEventListener implements Listener {
 
         legacy = Arc.getMCVersion() == Version.VERSION_1_8;
 
-        rocket = Arc.getMCVersion() == Version.VERSION_1_8
-                || Arc.getMCVersion() == Version.VERSION_1_12 ? MaterialAccess.getMaterial("FIREWORK")
-                : MaterialAccess.getMaterial("FIREWORK_ROCKET");
+        if (!legacy) {
+            rocket = Arc.getMCVersion() == Version.VERSION_1_12 ? MaterialAccess.getMaterial("FIREWORK")
+                    : MaterialAccess.getMaterial("FIREWORK_ROCKET");
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

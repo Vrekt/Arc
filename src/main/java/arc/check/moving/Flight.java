@@ -742,9 +742,11 @@ public final class Flight extends Check {
             // ensure we have been falling though, and have at-least decent distance.
             // Check horizontal distance as-well since its possible to glide pretty far
             // before hitting the vertical distance required.
+            // TODO: Broken in 1.17
             if (data.getNoResetDescendTime() >= glideDescendTimeMin
                     && ((distance >= glideDescendDistanceMin)
-                    || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)) {
+                    || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)
+                    && Arc.getMCVersion() != Version.VERSION_1_17) {
 
                 final int time = data.getInAirTime();
 
@@ -828,7 +830,6 @@ public final class Flight extends Check {
             // slowly decrease the time here.
             // if start seeing false positives, reset 0 instead.
             data.setNoGlideTime(data.getNoGlideTime() - 1);
-            data.setGlideDescendFlags(0);
         } else {
             if (data.descending()) {
                 data.setTrackingAscending(false);

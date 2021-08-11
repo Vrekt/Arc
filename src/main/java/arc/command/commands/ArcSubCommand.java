@@ -1,11 +1,9 @@
 package arc.command.commands;
 
-import arc.inventory.InventoryCreator;
 import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * A basic sub command.
@@ -105,17 +103,6 @@ public abstract class ArcSubCommand {
      * @param arguments the arguments
      */
     public abstract void execute(CommandSender sender, String[] arguments);
-
-    /**
-     * Execute this command from an inventory interface.
-     *
-     * @param item      the item
-     * @param inventory the inventory
-     * @param player    the player
-     */
-    public void executeInventory(ItemStack item, InventoryCreator inventory, Player player) {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * Check if the sender is a player

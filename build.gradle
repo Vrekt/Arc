@@ -16,22 +16,21 @@ repositories {
 
 dependencies {
     // Paper.
-    compileOnly 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
-
+    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     // Compile each project, while ignoring their respective spigot version.
-    compile(project(':bridge')) {
+    implementation(project(':bridge')) {
         transitive = false
     }
-    compile(project(':bridge1_8')) {
+    implementation(project(':bridge1_8')) {
         transitive = false
     }
-    compile(project(':bridge1_12')) {
+    implementation(project(':bridge1_12')) {
         transitive = false
     }
-    compile(project(':bridge1_16')) {
+    implementation(project(':bridge1_16')) {
         transitive = false
     }
-    compile(project(':bridge1_17')) {
+    implementation(project(':bridge1_17')) {
         transitive = false
     }
 

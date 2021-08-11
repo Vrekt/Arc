@@ -10,8 +10,8 @@ repositories {
 }
 
 dependencies {
-    compile files('paper.jar')
-    compile(project(':bridge')) {
+    implementation files('paper.jar')
+    implementation(project(':bridge')) {
         transitive = false
     }
 }

@@ -2,12 +2,10 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.check.timing.CheckTimings;
-import arc.inventory.InventoryCreator;
 import arc.permissions.Permissions;
+import arc.utility.chat.ColoredChat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Allows viewing of timings
@@ -35,23 +33,18 @@ public final class TimingsSubCommand extends ArcSubCommand {
                 .forEach(check -> {
                     final double avg = Math.floor((CheckTimings.getAverageTiming(check)) * 1000) / 1000;
                     final double toMs = Math.floor((avg / 1e+6) * 1000) / 1000;
-                    sendMessage(sender, ChatColor.GRAY
-                            + check.getPrettyName()
-                            + ChatColor.DARK_AQUA + " took on average "
-                            + ChatColor.DARK_GRAY + "("
-                            + ChatColor.GRAY + avg
-                            + ChatColor.DARK_GRAY + ")"
-                            + ChatColor.DARK_AQUA + " ns or "
-                            + ChatColor.DARK_GRAY + "("
-                            + ChatColor.GRAY + toMs
-                            + ChatColor.DARK_GRAY + ")"
-                            + ChatColor.DARK_AQUA + " ms.");
+
+                    ColoredChat.forRecipient(sender)
+                            .setMainColor(ChatColor.DARK_AQUA)
+                            .setParameterColor(ChatColor.GRAY)
+                            .parameter(check.getPrettyName())
+                            .message(" took on average ")
+                            .parameter(avg + "")
+                            .message(" ns or ")
+                            .parameter(toMs + "")
+                            .message(" ms.")
+                            .send();
                 });
         ;
-    }
-
-    @Override
-    public void executeInventory(ItemStack item, InventoryCreator inventory, Player player) {
-        execute(player, null);
     }
 }

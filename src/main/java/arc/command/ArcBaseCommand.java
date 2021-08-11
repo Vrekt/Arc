@@ -2,13 +2,10 @@ package arc.command;
 
 import arc.Arc;
 import arc.command.commands.ArcSubCommand;
-import arc.inventory.InventoryCreator;
 import arc.permissions.Permissions;
 import arc.utility.chat.ChatUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,16 +42,7 @@ public abstract class ArcBaseCommand {
      * @param line       the line
      */
     protected void addHelpLine(String permission, String line) {
-        helpLines.put(permission, Arc.getInstance().getArcConfiguration().getPrefix() + line);
-    }
-
-    /**
-     * Add a help line that doesn't require a permission.
-     *
-     * @param line the line
-     */
-    protected void addHelpLine(String line) {
-        helpLines.put(Permissions.ARC_COMMANDS_BASE, Arc.getInstance().getArcConfiguration().getPrefix() + line);
+        helpLines.put(permission, Arc.getInstance().getArcConfiguration().getPrefix() + " " + line);
     }
 
     /**
@@ -85,23 +73,6 @@ public abstract class ArcBaseCommand {
     }
 
     /**
-     * Execute a sub-command inventory action
-     *
-     * @param player    the player
-     * @param command   the command
-     * @param item      the item
-     * @param inventory the inventory
-     */
-    protected void executeSubCommandInventory(Player player, String command, ItemStack item, InventoryCreator inventory) {
-        final ArcSubCommand subCommand = subCommands.get(command);
-        if (player.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(player)) {
-            subCommand.executeInventory(item, inventory, player);
-        } else {
-            ChatUtil.sendMessage(player, ChatColor.RED + "You do not have permission to do this.");
-        }
-    }
-
-    /**
      * Check base permissions
      *
      * @param sender the sender
@@ -114,16 +85,6 @@ public abstract class ArcBaseCommand {
             return false;
         }
         return true;
-    }
-
-    /**
-     * Check if the provided argument is help
-     *
-     * @param argument the argument
-     * @return {@code true} if so
-     */
-    protected boolean help(String argument) {
-        return argument.equalsIgnoreCase("help");
     }
 
     /**

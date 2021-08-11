@@ -291,5 +291,4 @@ public final class BlockAccess {
     public static boolean isSlimeblock(Block block) {
         return ACCESS.isSlimeblock(block);
     }
-
 }

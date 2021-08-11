@@ -41,7 +41,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.5-pre1";
+    public static final String VERSION_STRING = "2.5.1-81021a-bukkit";
 
     /**
      * If sync events should be used.
@@ -110,6 +110,7 @@ public final class Arc extends JavaPlugin {
         getLogger().info(ChatColor.RED + "This version of Arc is experimental!");
         getLogger().info(ChatColor.RED + "Expect random log messages, errors, crashes, and console spam.");
         getLogger().info(ChatColor.RED + "Please report any issues to GitHub.");
+        getLogger().info(ChatColor.GREEN + "Current version of Arc is: " + VERSION_STRING);
 
         getLogger().info("Reading configuration...");
         saveDefaultConfig();

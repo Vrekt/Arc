@@ -2,6 +2,7 @@ package arc.command.commands;
 
 import arc.Arc;
 import arc.permissions.Permissions;
+import arc.utility.chat.ColoredChat;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -33,6 +34,11 @@ public final class CancelBanSubCommand extends ArcSubCommand {
         }
 
         Arc.getInstance().getPunishmentManager().cancelBan(playerName);
-        sendMessage(sender, ChatColor.DARK_AQUA + "The pending ban for " + ChatColor.GRAY + playerName + ChatColor.DARK_AQUA + " has been cancelled.");
+        ColoredChat.forRecipient(sender)
+                .setMainColor(ChatColor.DARK_AQUA)
+                .setParameterColor(ChatColor.GRAY)
+                .message("The pending ban for ")
+                .parameter(playerName)
+                .message(" has been cancelled.");
     }
 }

@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     priority 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
-    compile(project(':bridge')) {
+    implementation(project(':bridge')) {
         transitive = false
     }
 }

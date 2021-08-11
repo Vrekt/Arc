@@ -20,8 +20,8 @@ repositories {
 
 dependencies {
     priority 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
-    compile files('craftbukkit.jar')
-    compile(project(':bridge')) {
+    implementation files('craftbukkit.jar')
+    implementation(project(':bridge')) {
         transitive = false
     }
 }

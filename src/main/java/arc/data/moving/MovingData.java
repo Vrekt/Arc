@@ -224,9 +224,8 @@ public final class MovingData implements Data {
      * <p>
      * No reset times.
      * <p>
-     * Amount of times flagged so far, used to ignore, kinda as a work-around.
      */
-    private int noGlideTime, noResetAscendTime, noResetDescendTime, glideDescendFlags;
+    private int noGlideTime, noResetAscendTime, noResetDescendTime;
 
     public Location from() {
         return from;
@@ -784,11 +783,4 @@ public final class MovingData implements Data {
         this.noResetDescendTime = MathUtil.clampInt(noResetDescendTime, 0, 1000);
     }
 
-    public int getGlideDescendFlags() {
-        return glideDescendFlags;
-    }
-
-    public void setGlideDescendFlags(int glideDescendFlags) {
-        this.glideDescendFlags = MathUtil.clampInt(glideDescendFlags, 0, 100);
-    }
 }
