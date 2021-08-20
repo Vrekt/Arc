@@ -49,7 +49,6 @@ public final class Jesus extends Check {
 
         addConfigurationValue("time-in-liquid-required", 3);
         addConfigurationValue("max-setback-distance", 2);
-        addConfigurationValue("time-ascending-required", 1);
         addConfigurationValue("time-in-liquid-required-distance-checking", 3);
         addConfigurationValue("max-no-distance-change-allowed", 3);
         addConfigurationValue("ascending-min-distance-required", 0.12);
@@ -68,7 +67,7 @@ public final class Jesus extends Check {
         if (exempt(player)) return;
 
         // ignore elytra movements for now.
-        // TODO: Maybe change in future, depending
+        // TODO: Maybe change in future, depending + also watch swimming
         if (BukkitAccess.isFlyingWithElytra(player)) {
             return;
         }

@@ -49,12 +49,10 @@ public final class Flight extends Check {
     private double maxJumpDistance, maxClimbSpeedUp, maxClimbSpeedDown, climbingCooldown, groundDistanceThreshold, groundDistanceHorizontalCap;
 
     /**
-     * The minimum distance required to move to check vclip.
-     * <p>
      * Minimum speed boat can fall
      * If player score is greater than this value (the player speed doesn't match expected), flag.
      */
-    private double verticalClipMinimum, minBoatDescendSpeed, boatDescendingScoreMin;
+    private double minBoatDescendSpeed, boatDescendingScoreMin;
 
     /**
      * The max difference allowed between a=(vertical speed - expected) then, (vertical speed - a)
@@ -103,8 +101,9 @@ public final class Flight extends Check {
 
     /**
      * The max amount of times the player can have no difference in velocity when falling.
+     * Ensure we haven't had liquid anytime recently before checking glide delta
      */
-    private int noGlideDifferenceMax;
+    private int noGlideDifferenceMax, glideDeltaOutOfLiquidTime;
 
     /**
      * The minimum time needed to be descending to check glide.
@@ -164,11 +163,12 @@ public final class Flight extends Check {
         addConfigurationValue("slimeblock-max-score-difference", 0.42);
         addConfigurationValue("piston-exemption-time-ms", 500);
         addConfigurationValue("levitation-exemption-cooldown", 1500);
-        addConfigurationValue("ascend-out-of-liquid-cooldown", 3);
+        addConfigurationValue("ascend-out-of-liquid-cooldown", 10);
         addConfigurationValue("no-glide-difference-max", 2);
         addConfigurationValue("glide-descend-time-min", 5);
         addConfigurationValue("glide-descend-distance-min", 1.6);
         addConfigurationValue("glide-max-difference", 0.010);
+        addConfigurationValue("glide-delta-out-of-liquid-time", 10);
         addConfigurationValue("no-reset-ascend-ground-distance-threshold", 1);
         addConfigurationValue("max-no-reset-ascend-moves", 10);
     }
@@ -742,7 +742,7 @@ public final class Flight extends Check {
             // ensure we have been falling though, and have at-least decent distance.
             // Check horizontal distance as-well since its possible to glide pretty far
             // before hitting the vertical distance required.
-            // TODO: Broken in 1.17
+            // TODO: Account for diff < 0.0001
             if (data.getNoResetDescendTime() >= glideDescendTimeMin
                     && ((distance >= glideDescendDistanceMin)
                     || MathUtil.horizontal(ground, to) >= glideDescendDistanceMin)
@@ -759,12 +759,15 @@ public final class Flight extends Check {
                 final double expected = mod * Math.pow(data.getInAirTime(), 2) - 0.0011 * data.getInAirTime() + 0.077;
                 final double difference = expected - delta;
 
-                if (difference > glideMaxDifference || difference < 0.0001) {
+                if (data.getOutOfLiquidTime() >= glideDeltaOutOfLiquidTime
+                        && (difference > glideMaxDifference)) {
                     result.setFailed("Gliding delta not expected")
                             .withParameter("delta", delta)
                             .withParameter("e", expected)
                             .withParameter("diff", difference)
-                            .withParameter("max", glideMaxDifference);
+                            .withParameter("max", glideMaxDifference)
+                            .withParameter("noLiquidTime", data.getOutOfLiquidTime())
+                            .withParameter("min", glideDeltaOutOfLiquidTime);
                     handleCheckViolationAndReset(player, result, ground);
                 }
             }
@@ -913,7 +916,6 @@ public final class Flight extends Check {
         jumpBoostAscendAmplifier = configuration.getInt("jump-boost-ascend-amplifier");
         groundDistanceThreshold = configuration.getDouble("ground-distance-threshold");
         groundDistanceHorizontalCap = configuration.getDouble("ground-distance-horizontal-cap");
-        verticalClipMinimum = configuration.getDouble("vertical-clip-vertical-minimum");
         maxInAirHoverTime = configuration.getInt("max-in-air-hover-time");
         slimeblockMaxScoreDiff = configuration.getDouble("slimeblock-max-score-difference");
         pistonExemptionTimeMs = configuration.getLong("piston-exemption-time-ms");
@@ -925,6 +927,7 @@ public final class Flight extends Check {
         glideMaxDifference = configuration.getDouble("glide-max-difference");
         noResetAscendGroundDistanceThreshold = configuration.getDouble("no-reset-ascend-ground-distance-threshold");
         maxNoResetAscendMoves = configuration.getInt("max-no-reset-ascend-moves");
+        glideDeltaOutOfLiquidTime = configuration.getInt("glide-delta-out-of-liquid-time");
     }
 
     /**

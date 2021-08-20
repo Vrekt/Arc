@@ -27,7 +27,6 @@ public final class TimingsSubCommand extends ArcSubCommand {
             return;
         }
 
-        final StringBuilder builder = new StringBuilder();
         CheckTimings.getAllTimings()
                 .keySet()
                 .forEach(check -> {
@@ -45,6 +44,5 @@ public final class TimingsSubCommand extends ArcSubCommand {
                             .message(" ms.")
                             .send();
                 });
-        ;
     }
 }

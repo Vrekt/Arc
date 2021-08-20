@@ -22,7 +22,6 @@ import bridge.Bridge;
 import bridge.Version;
 import bridge1_12.Bridge1_12;
 import bridge1_16.Bridge1_16;
-import bridge1_17.Bridge1_17;
 import bridge1_8.Bridge1_8;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -41,7 +40,7 @@ public final class Arc extends JavaPlugin {
     /**
      * The version of Arc.
      */
-    public static final String VERSION_STRING = "2.5.1-81021a-bukkit";
+    public static final String VERSION_STRING = "2.5.2-82021a-bukkit";
 
     /**
      * If sync events should be used.
@@ -120,7 +119,7 @@ public final class Arc extends JavaPlugin {
         loadExternalPlugins();
 
         checkManager.initializeAllChecks();
-        violationManager.initialize(arcConfiguration, punishmentManager);
+        violationManager.loadConfiguration(arcConfiguration);
         punishmentManager.loadConfiguration(arcConfiguration);
         exemptionManager.loadConfiguration(arcConfiguration);
 
@@ -280,7 +279,7 @@ public final class Arc extends JavaPlugin {
      */
     private void loadFor1_17() {
         version = Version.VERSION_1_17;
-        bridge = new Bridge1_17();
+     //   bridge = new Bridge1_17();
     }
 
     /**

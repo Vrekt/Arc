@@ -11,10 +11,10 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean hasVerticalModifier(Block block) {
-        return block.getState() instanceof Fence
-                || block.getState() instanceof Slab
-                || block.getState() instanceof Stairs
-                || block.getState() instanceof Gate
+        return block.getBlockData() instanceof Fence
+                || block.getBlockData() instanceof Slab
+                || block.getBlockData() instanceof Stairs
+                || block.getBlockData() instanceof Gate
                 || isWall(block)
                 || block.getType() == Material.SNOW
                 || block.getType() == Material.SKELETON_SKULL
@@ -27,7 +27,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isClimbable(Block block) {
-        return block.getState().getBlock() instanceof Ladder
+        return block.getType() == Material.LADDER
                 || block.getType() == Material.VINE
                 || block.getType() == Material.TWISTING_VINES
                 || block.getType() == Material.WEEPING_VINES;
@@ -40,7 +40,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isTrapdoor(Block block) {
-        return block.getState() instanceof TrapDoor;
+        return block.getBlockData() instanceof TrapDoor;
     }
 
     @Override
@@ -50,7 +50,7 @@ public final class BlockAccess implements bridge.block.BlockAccess {
 
     @Override
     public boolean isWall(Block block) {
-        return block.getState() instanceof Wall;
+        return block.getBlockData() instanceof Wall;
     }
 
     @Override

@@ -42,7 +42,12 @@ public enum CheckCategory {
     /**
      * Checks block interactions
      */
-    BLOCKINTERACT;
+    BLOCKINTERACT,
+
+    /**
+     * Checks inventory related actions
+     */
+    INVENTORY;
 
     /**
      * Bypass permission

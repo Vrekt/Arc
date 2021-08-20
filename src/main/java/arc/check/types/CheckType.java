@@ -102,14 +102,18 @@ public enum CheckType {
     /**
      * Nuker
      */
-    NUKER("Nuker", CheckCategory.BLOCK);
+    NUKER("Nuker", CheckCategory.BLOCK),
+
+    /**
+     * Inventory move
+     */
+    INVENTORY_MOVE("InventoryMove", CheckCategory.INVENTORY);
 
     /**
      * The name
      * Pretty name
-     * Permission name
      */
-    private final String name, prettyName, permissionName;
+    private final String name, prettyName;
 
     /**
      * Permission bypass
@@ -124,7 +128,6 @@ public enum CheckType {
     CheckType(String name, String prettyName, String permissionName, CheckCategory category) {
         this.name = name;
         this.prettyName = prettyName;
-        this.permissionName = permissionName;
         this.category = category;
 
         this.bypassPermission = Permissions.ARC_BYPASS + "." + category.name().toLowerCase() + "." + permissionName.toLowerCase();
@@ -143,13 +146,6 @@ public enum CheckType {
      */
     public String getPrettyName() {
         return prettyName;
-    }
-
-    /**
-     * @return the permission name
-     */
-    public String getPermissionName() {
-        return permissionName;
     }
 
     /**
@@ -181,7 +177,7 @@ public enum CheckType {
      */
     public static CheckType getCheckTypeByName(String name) {
         for (CheckType value : values()) {
-            if (value.getPrettyName().equalsIgnoreCase(name)) {
+            if (value.name.equalsIgnoreCase(name)) {
                 return value;
             }
         }

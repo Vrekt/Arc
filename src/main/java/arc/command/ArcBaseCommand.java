@@ -3,8 +3,6 @@ package arc.command;
 import arc.Arc;
 import arc.command.commands.ArcSubCommand;
 import arc.permissions.Permissions;
-import arc.utility.chat.ChatUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.HashMap;
@@ -67,7 +65,7 @@ public abstract class ArcBaseCommand {
         if (sender.hasPermission(Permissions.ARC_COMMANDS_ALL) || subCommand.hasPermission(sender)) {
             subCommand.execute(sender, arguments);
         } else {
-            ChatUtil.sendMessage(sender, ChatColor.RED + "You do not have permission to do this.");
+            sender.sendMessage(Arc.getInstance().getArcConfiguration().getNoPermissionMessage());
         }
         return true;
     }
